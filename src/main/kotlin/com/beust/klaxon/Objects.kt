@@ -1,5 +1,7 @@
 package com.beust.klaxon
 
+import java.util.Arrays
+
 open public class JsonObject {
     val map = hashMapOf<String, JsonObject>()
 
@@ -44,6 +46,14 @@ public class JsonString(val value: String) : JsonObject() {
     override fun toString() : String {
         return "{String: \"$value\"}"
     }
+
+    fun equals(other : Any?) : Boolean {
+        return (other as JsonString).value.equals(value)
+    }
+
+    fun hashCode() : Int {
+        return value.hashCode()
+    }
 }
 
 public class JsonLong(val value: Long) : JsonObject() {
@@ -53,6 +63,14 @@ public class JsonLong(val value: Long) : JsonObject() {
 
     override fun toString() : String {
         return "{Long: $value}"
+    }
+
+    fun equals(other : Any?) : Boolean {
+        return (other as JsonLong).value.equals(value)
+    }
+
+    fun hashCode() : Int {
+        return value.hashCode()
     }
 }
 
@@ -64,6 +82,14 @@ public class JsonDouble(val value: Double): JsonObject() {
     override fun toString() : String {
         return "{Double: $value}"
     }
+
+    fun equals(other : Any?) : Boolean {
+        return (other as JsonDouble).value.equals(value)
+    }
+
+    fun hashCode() : Int {
+        return value.hashCode()
+    }
 }
 
 public class JsonBoolean(val value: Boolean) : JsonObject() {
@@ -74,21 +100,38 @@ public class JsonBoolean(val value: Boolean) : JsonObject() {
     override fun toString() : String {
         return "{Boolean: $value}"
     }
+
+    fun equals(other : Any?) : Boolean {
+        return (other as JsonBoolean).value == value
+    }
+
+    fun hashCode() : Int {
+        return value.hashCode()
+    }
 }
 
 public class JsonArray() : JsonObject() {
-    val array = arrayListOf<JsonObject>()
+    val value = arrayListOf<JsonObject>()
 
-    fun add(o : JsonObject) {
-        array.add(o)
+    fun add(o : JsonObject) : JsonArray {
+        value.add(o)
+        return this
     }
 
     override fun asList() : List<JsonObject> {
-        return array
+        return value
     }
 
     override fun toString() : String {
-        val result = "{Array: " + array.toString() + "}"
+        val result = "{Array: " + value.toString() + "}"
         return result
+    }
+
+    fun equals(other : Any?) : Boolean {
+        return (other as JsonArray).value.equals(value)
+    }
+
+    fun hashCode() : Int {
+        return value.hashCode()
     }
 }

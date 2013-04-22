@@ -10,11 +10,25 @@ class KlaxonTest {
     fun bc() {
     }
 
+    private fun read(name: String) : JsonObject  {
+        val cls = javaClass<KlaxonTest>()
+        return Parser().parse(cls.getResourceAsStream(name)!!)
+    }
+
+    Test
+    fun simple() {
+        val j = read("/b.json")!!
+        val expected = JsonArray()
+                .add(JsonLong(1))
+                .add(JsonString("abc"))
+                .add(JsonDouble(2.34))
+                .add(JsonBoolean(false))
+        assertEquals(expected, j)
+    }
+
     Test
     fun basic() {
-        val cls = javaClass<KlaxonTest>()
-        val inputStream = cls.getResourceAsStream("/a.json")
-        val j = Parser().parse(inputStream!!)
+        val j = read("/a.json")!!
         assertEquals("b", j.get("a")!!.asString())
         val array = j.get("c")!!.asList()
         assertEquals(4, array.size())

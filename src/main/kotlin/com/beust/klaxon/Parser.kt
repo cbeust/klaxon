@@ -130,7 +130,7 @@ public class Parser {
                         status = statusStack.get(0) // peek
                     }
                     else{
-                        status = Status.IN_FINISHED_VALUE;
+                        status = Status.IN_FINISHED_VALUE
                     }
 
                 } else if (tokenType == Type.LEFT_BRACE) {
@@ -161,7 +161,7 @@ public class Parser {
 }
 
 fun main(args : Array<String>) {
-    val fileName = "/tmp/a.json"
+    val fileName = "/tmp/b.json"
     val inputStream = FileInputStream(File(fileName))!!
     if (false) {
         val lexer = Lexer(inputStream)
@@ -171,6 +171,6 @@ fun main(args : Array<String>) {
             token = lexer.nextToken()
         }
     } else {
-        Parser().parse(inputStream)
+        println(Parser().parse(inputStream))
     }
 }
