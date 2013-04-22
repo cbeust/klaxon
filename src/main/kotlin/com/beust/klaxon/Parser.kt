@@ -1,7 +1,10 @@
 package com.beust.klaxon
 
-import java.util.regex.Pattern
 import java.util.LinkedList
+import java.io.InputStream
+import java.io.FileInputStream
+import java.io.File
+import kotlin.test.assertEquals
 
 public enum class Status {
     INIT;
@@ -20,10 +23,17 @@ public enum class Status {
  */
 public class Parser {
     var status = Status.INIT
+    var verbose = false
 
-    public fun run(fileName: String) : JsonObject {
+    fun log(s : String) {
+        if (verbose) {
+            println(s)
+        }
+    }
+
+    public fun parse(inputStream : InputStream) : JsonObject {
         var result = JsonObject()
-        val lexer = Lexer(fileName)
+        val lexer = Lexer(inputStream)
 
         val statusStack = LinkedList<Status>()
         val valueStack = LinkedList<JsonObject>()
@@ -33,7 +43,7 @@ public class Parser {
             val token = lexer.nextToken()
             val tokenType = token.tokenType
 
-            println("Current token: ${token}")
+            log("Current token: ${token}")
             if (status == Status.INIT) {
                 if (tokenType == Type.VALUE) {
                     status = Status.IN_FINISHED_VALUE
@@ -114,7 +124,7 @@ public class Parser {
                     val value = valueStack.getFirst() as JsonArray
                     value.add(token.value!!)
                 } else if (tokenType == Type.RIGHT_BRACKET) {
-                    if (valueStack.size() > 1){
+                    if (valueStack.size() > 1) {
                         statusStack.removeFirst()
                         valueStack.removeFirst()
                         status = statusStack.get(0) // peek
@@ -134,7 +144,7 @@ public class Parser {
                     val value = valueStack.getFirst() as JsonArray
                     val newArray = JsonArray()
                     value.add(newArray)
-                    status =Status.IN_ARRAY
+                    status = Status.IN_ARRAY
                     statusStack.addFirst(status)
                     valueStack.addFirst(newArray)
                 } else {
@@ -146,22 +156,21 @@ public class Parser {
 
         } while (token.tokenType != Type.END)
 
-
-        println("Returning: ${result}")
         return result
     }
 }
 
 fun main(args : Array<String>) {
-    val fileName = "/tmp/e.json"
+    val fileName = "/tmp/a.json"
+    val inputStream = FileInputStream(File(fileName))!!
     if (false) {
-        val lexer = Lexer(fileName)
+        val lexer = Lexer(inputStream)
         var token = lexer.nextToken()
         while (token.tokenType != Type.END) {
             println("Read : ${token}")
             token = lexer.nextToken()
         }
     } else {
-        Parser().run(fileName)
+        Parser().parse(inputStream)
     }
 }

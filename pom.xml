@@ -12,6 +12,7 @@
     <properties>
         <kotlin.version>0.5.429</kotlin.version>
         <junit.version>4.10</junit.version>
+        <testng.version>6.8.1</testng.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -22,13 +23,21 @@
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
 
+<!--
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+-->
     </dependencies>
 
     <build>
@@ -72,7 +81,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>hello.HelloPackage</mainClass>
+                    <mainClass>com.beust.klaxon.KlaxonPackage</mainClass>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,7 +1,7 @@
 package com.beust.klaxon
 
-import java.io.File
 import java.util.regex.Pattern
+import java.io.InputStream
 
 public enum class Type {
     VALUE;
@@ -22,8 +22,8 @@ class Token(val tokenType: Type, val value: JsonObject?) {
     }
 }
 
-public class Lexer(val fileName: String) {
-    val bytes = File(fileName).readBytes()
+public class Lexer(val inputStream : InputStream) {
+    val bytes = inputStream.readBytes()
     val END = Token(Type.END, null)
     var index = 0
 
