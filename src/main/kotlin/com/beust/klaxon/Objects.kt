@@ -84,7 +84,7 @@ public class JsonLong(val value: Long) : JsonObject() {
 }
 
 public class JsonDouble(val value: Double): JsonObject() {
-    override open fun asDouble() : Double {
+    override fun asDouble() : Double {
         return value
     }
 
@@ -102,7 +102,7 @@ public class JsonDouble(val value: Double): JsonObject() {
 }
 
 public class JsonBoolean(val value: Boolean) : JsonObject() {
-    override open fun asBoolean() : Boolean {
+    override fun asBoolean() : Boolean {
         return value
     }
 

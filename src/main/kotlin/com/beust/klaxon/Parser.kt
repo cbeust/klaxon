@@ -37,7 +37,6 @@ public class Parser {
 
         val statusStack = LinkedList<Status>()
         val valueStack = LinkedList<JsonObject>()
-        var done = false
 
         do {
             val token = lexer.nextToken()
@@ -64,7 +63,6 @@ public class Parser {
             } else if (status == Status.IN_FINISHED_VALUE) {
                 if (token.tokenType == Type.END) {
                     result = valueStack.removeFirst()
-                    done = true
                 } else {
                     throw RuntimeException("Unexpected token")
                 }
@@ -72,9 +70,9 @@ public class Parser {
             } else if (status == Status.IN_OBJECT) {
                 if (tokenType == Type.COMMA) {
                 } else if (tokenType == Type.VALUE) {
-                    val key = token.value;
-                    valueStack.addFirst(key!!);
-                    status = Status.PASSED_PAIR_KEY;
+                    val key = token.value
+                    valueStack.addFirst(key!!)
+                    status = Status.PASSED_PAIR_KEY
                     statusStack.addFirst(status);
                 } else if (tokenType == Type.RIGHT_BRACE) {
                     if(valueStack.size() > 1){
@@ -162,7 +160,7 @@ public class Parser {
 
 fun main(args : Array<String>) {
     val fileName = "/tmp/b.json"
-    val inputStream = FileInputStream(File(fileName))!!
+    val inputStream = FileInputStream(File(fileName))
     if (false) {
         val lexer = Lexer(inputStream)
         var token = lexer.nextToken()
@@ -171,6 +169,6 @@ fun main(args : Array<String>) {
             token = lexer.nextToken()
         }
     } else {
-        println(Parser().parse(inputStream))
+        println(Parser2().parse(inputStream))
     }
 }
