@@ -88,18 +88,18 @@ public class Parser {
                 }
 
             } else if (status == Status.PASSED_PAIR_KEY) {
-                val key: String?
+                val key: JsonString?
                 val parent: JsonObject
                 if (tokenType == Type.COLON) {
                 } else if (tokenType == Type.VALUE) {
                     statusStack.removeFirst()
-                    key = valueStack.removeFirst().asString()
+                    key = valueStack.removeFirst() as JsonString
                     parent = valueStack.getFirst()
                     parent.put(key!!, token.value!!)
                     status = statusStack.get(0)
                 } else if (tokenType == Type.LEFT_BRACKET) {
                     statusStack.removeFirst()
-                    key = valueStack.removeFirst().asString()
+                    key = valueStack.removeFirst() as JsonString
                     parent = valueStack.getFirst()
                     val newArray = JsonArray()
                     parent.put(key!!, newArray)
@@ -108,7 +108,7 @@ public class Parser {
                     valueStack.addFirst(newArray);
                 } else if (tokenType == Type.LEFT_BRACE) {
                     statusStack.removeFirst()
-                    key = valueStack.removeFirst().asString()
+                    key = valueStack.removeFirst() as JsonString
                     parent = valueStack.getFirst()
                     val newObject = JsonObject()
                     parent.put(key!!, newObject)

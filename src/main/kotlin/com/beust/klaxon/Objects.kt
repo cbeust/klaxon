@@ -3,10 +3,11 @@ package com.beust.klaxon
 import java.util.Arrays
 
 open public class JsonObject {
-    val map = hashMapOf<String, JsonObject>()
+    val map = hashMapOf<JsonString, JsonObject>()
 
-    fun put(key: String, value: JsonObject) {
+    fun put(key: JsonString, value: JsonObject) : JsonObject {
         map.put(key, value)
+        return this
     }
 
     open fun toString() : String {
@@ -36,6 +37,14 @@ open public class JsonObject {
     fun get(key : String) : JsonObject? {
         return map.get(key)
     }
+
+    open fun equals(other : Any?) : Boolean {
+        return (other as JsonObject).map.equals(map)
+    }
+
+    open fun hashCode() : Int {
+        return map.hashCode()
+    }
 }
 
 public class JsonString(val value: String) : JsonObject() {
@@ -47,11 +56,11 @@ public class JsonString(val value: String) : JsonObject() {
         return "{String: \"$value\"}"
     }
 
-    fun equals(other : Any?) : Boolean {
+    override fun equals(other : Any?) : Boolean {
         return (other as JsonString).value.equals(value)
     }
 
-    fun hashCode() : Int {
+    override fun hashCode() : Int {
         return value.hashCode()
     }
 }
@@ -65,11 +74,11 @@ public class JsonLong(val value: Long) : JsonObject() {
         return "{Long: $value}"
     }
 
-    fun equals(other : Any?) : Boolean {
+    override fun equals(other : Any?) : Boolean {
         return (other as JsonLong).value.equals(value)
     }
 
-    fun hashCode() : Int {
+    override fun hashCode() : Int {
         return value.hashCode()
     }
 }
@@ -83,11 +92,11 @@ public class JsonDouble(val value: Double): JsonObject() {
         return "{Double: $value}"
     }
 
-    fun equals(other : Any?) : Boolean {
+    override fun equals(other : Any?) : Boolean {
         return (other as JsonDouble).value.equals(value)
     }
 
-    fun hashCode() : Int {
+    override fun hashCode() : Int {
         return value.hashCode()
     }
 }
@@ -101,11 +110,11 @@ public class JsonBoolean(val value: Boolean) : JsonObject() {
         return "{Boolean: $value}"
     }
 
-    fun equals(other : Any?) : Boolean {
+    override fun equals(other : Any?) : Boolean {
         return (other as JsonBoolean).value == value
     }
 
-    fun hashCode() : Int {
+    override fun hashCode() : Int {
         return value.hashCode()
     }
 }
@@ -127,11 +136,11 @@ public class JsonArray() : JsonObject() {
         return result
     }
 
-    fun equals(other : Any?) : Boolean {
+    override fun equals(other : Any?) : Boolean {
         return (other as JsonArray).value.equals(value)
     }
 
-    fun hashCode() : Int {
+    override fun hashCode() : Int {
         return value.hashCode()
     }
 }
