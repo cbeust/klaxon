@@ -61,7 +61,7 @@ public class Parser {
                 if (token.tokenType == Type.EOF) {
                     result = valueStack.removeFirst()
                 } else {
-                    throw RuntimeException("Unexpected token")
+                    throw RuntimeException("Unexpected token: ${token}")
                 }
 
             } else if (status == Status.IN_OBJECT) {

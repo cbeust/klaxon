@@ -116,13 +116,17 @@ public class Lexer(val inputStream : InputStream) {
                 jsonValue = JsonBoolean(true)
             } else if ("false".equals(v.toLowerCase())) {
                 jsonValue = JsonBoolean(false)
+            } else {
+                throw RuntimeException("Unexpected characted at position ${index}"
+                    + ": '${c} (${c.toInt()})'")
             }
+
             tokenType = Type.VALUE
         } else {
             tokenType = Type.EOF
         }
 
         val value = currentValue.toString()
-        return Token(tokenType, if (value.length() > 0) jsonValue else null)
+        return Token(tokenType, jsonValue)
     }
 }

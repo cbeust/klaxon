@@ -47,8 +47,12 @@ class StateMachine {
     fun next(world: World, token: Token) : World {
         val pair = Pair(world.status, token.tokenType)
         val processor = map.get(pair)
-        val result = if (processor != null) processor(world, token)
-        else throw RuntimeException("No state found: ${world.status} ${token}")
+        val result = if (processor != null) {
+            processor(world, token)
+        } else {
+            val message = "No state found: ${world.status} ${token}"
+            throw RuntimeException(message)
+        }
 
 //        println("${status} ${token.tokenType} -> ${world.status}")
         return result
@@ -56,6 +60,13 @@ class StateMachine {
 }
 
 public class Parser2 {
+    val verbose = false
+
+    fun log(s: String) {
+        if (verbose) {
+            println("[Parser2] ${s}")
+        }
+    }
     public fun parse(inputStream : InputStream) : JsonObject {
 
         val sm = StateMachine()
@@ -88,7 +99,7 @@ public class Parser2 {
             if (world.valueStack.size() > 1) {
                 world.popStatus()
                 world.popValue()
-                world.pushStatus(world.statusStack.get(0))
+                world.status = world.statusStack.get(0)
             } else {
                 world.status = Status.IN_FINISHED_VALUE
             }
@@ -162,6 +173,7 @@ public class Parser2 {
         var world = World(Status.INIT)
         do {
             var token = lexer.nextToken()
+            log("Token: ${token}")
             world = sm.next(world, token)
         } while (token.tokenType != Type.EOF)
 
