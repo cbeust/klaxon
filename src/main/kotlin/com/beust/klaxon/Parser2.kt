@@ -45,7 +45,6 @@ class StateMachine {
     }
 
     fun next(world: World, token: Token) : World {
-        val status = world.status
         val pair = Pair(world.status, token.tokenType)
         val processor = map.get(pair)
         val result = if (processor != null) processor(world, token)
@@ -104,7 +103,7 @@ public class Parser2 {
             world.popStatus()
             val key = world.popValue() as JsonString
             world.parent = world.valueStack.getFirst()
-            world.parent.put(key!!, token.value!!)
+            world.parent.put(key, token.value!!)
             world.status = world.statusStack.get(0)
             world
         })
@@ -113,7 +112,7 @@ public class Parser2 {
             val key = world.popValue()as JsonString
             world.parent = world.valueStack.getFirst()
             val newArray = JsonArray()
-            world.parent.put(key!!, newArray)
+            world.parent.put(key, newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
         sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { (world: World, token: Token) ->
@@ -121,7 +120,7 @@ public class Parser2 {
             val key = world.popValue() as JsonString
             world.parent = world.valueStack.getFirst()
             val newObject = JsonObject()
-            world.parent.put(key!!, newObject)
+            world.parent.put(key, newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
         })
         // else error

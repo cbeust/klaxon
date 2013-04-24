@@ -17,25 +17,28 @@ class KlaxonTest {
 
     Test
     fun simple() {
-        val j = read("/b.json")!!
+        val j = read("/b.json")
         val expected = JsonArray()
-                .add(JsonLong(1))
-                .add(JsonString("abc"))
-                .add(JsonDouble(2.34))
-                .add(JsonBoolean(false))
+                .add(1)
+                .add("abc")
+                .add(2.34)
+                .add(false)
         assertEquals(expected, j)
     }
 
     Test
     fun basic() {
-        val j = read("/a.json")!!
+        val j = read("/a.json")
         val expected = JsonObject()
-            .put(JsonString("a"), JsonString("b"))
-            .put(JsonString("c"), JsonArray()
-                .add(JsonLong(1))
-                .add(JsonDouble(2.34))
-                .add(JsonString("abc"))
-                .add(JsonBoolean(false)))
+            .put("a", "b")
+            .put("c", JsonArray()
+                .add(1)
+                .add(2.34)
+                .add("abc")
+                .add(false))
+            .put("e", JsonObject()
+                .put("f", 30)
+                .put("g", 31))
 
         assertEquals(expected, j)
     }

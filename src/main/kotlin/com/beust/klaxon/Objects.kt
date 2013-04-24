@@ -5,6 +5,26 @@ import java.util.Arrays
 open public class JsonObject {
     val map = hashMapOf<JsonString, JsonObject>()
 
+    fun put(key: String, value: JsonObject) : JsonObject {
+        return put(JsonString(key), value)
+    }
+
+    fun put(key: String, value: String) : JsonObject {
+        return put(JsonString(key), JsonString(value))
+    }
+
+    fun put(key: String, value: Long) : JsonObject {
+        return put(JsonString(key), JsonLong(value))
+    }
+
+    fun put(key: String, value: Double) : JsonObject {
+        return put(JsonString(key), JsonDouble(value))
+    }
+
+    fun put(key: String, value: Boolean) : JsonObject {
+        return put(JsonString(key), JsonBoolean(value))
+    }
+
     fun put(key: JsonString, value: JsonObject) : JsonObject {
         map.put(key, value)
         return this
@@ -90,6 +110,22 @@ data public class JsonBoolean(val value: Boolean) : JsonObject() {
 
 public class JsonArray() : JsonObject() {
     val value = arrayListOf<JsonObject>()
+
+    fun add(value: Long) : JsonArray {
+        return add(JsonLong(value))
+    }
+
+    fun add(value: String) : JsonArray {
+        return add(JsonString(value))
+    }
+
+    fun add(value: Double) : JsonArray {
+        return add(JsonDouble(value))
+    }
+
+    fun add(value: Boolean) : JsonArray {
+        return add(JsonBoolean(value))
+    }
 
     fun add(o : JsonObject) : JsonArray {
         value.add(o)

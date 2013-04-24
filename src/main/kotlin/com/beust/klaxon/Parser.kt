@@ -2,9 +2,6 @@ package com.beust.klaxon
 
 import java.util.LinkedList
 import java.io.InputStream
-import java.io.FileInputStream
-import java.io.File
-import kotlin.test.assertEquals
 
 public enum class Status {
     INIT;
@@ -158,17 +155,3 @@ public class Parser {
     }
 }
 
-fun main(args : Array<String>) {
-    val fileName = "/tmp/b.json"
-    val inputStream = FileInputStream(File(fileName))
-    if (false) {
-        val lexer = Lexer(inputStream)
-        var token = lexer.nextToken()
-        while (token.tokenType != Type.EOF) {
-            println("Read : ${token}")
-            token = lexer.nextToken()
-        }
-    } else {
-        println(Parser2().parse(inputStream))
-    }
-}
