@@ -35,7 +35,17 @@ class World(var status : Status) {
     }
 }
 
-class Pair(status: Status, tokenType: Type)
+class Pair(val status: Status, val tokenType: Type) {
+    fun equals(other : Any?) : Boolean {
+        val o = other as Pair
+        return o.status == status && o.tokenType == tokenType
+    }
+
+    fun hashCode() : Int {
+        return status.hashCode() + tokenType.hashCode()
+    }
+
+}
 
 trait Processor {
     fun process(): World
@@ -54,9 +64,14 @@ class StateMachine {
     }
 
     fun next(world: World, token: Token) : World {
-        val processor = map.get(Pair(world.status, token.tokenType))
-        return if (processor != null) processor(world, token)
-        else throw RuntimeException("No state found: ${token}")
+        val status = world.status
+        val pair = Pair(world.status, token.tokenType)
+        val processor = map.get(pair)
+        val result = if (processor != null) processor(world, token)
+        else throw RuntimeException("No state found: ${world.status} ${token}")
+
+//        println("${status} ${token.tokenType} -> ${world.status}")
+        return result
     }
 }
 
@@ -76,7 +91,7 @@ public class Parser2 {
         })
         // else error
 
-        sm.put(Status.IN_FINISHED_VALUE, Type.END, { (world: World, token: Token) ->
+        sm.put(Status.IN_FINISHED_VALUE, Type.EOF, { (world: World, token: Token) ->
             world.result = world.popValue()
             world
         })
@@ -120,7 +135,7 @@ public class Parser2 {
             world.parent.put(key!!, newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
-        sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACKET, { (world: World, token: Token) ->
+        sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { (world: World, token: Token) ->
             world.popStatus()
             val key = world.popValue() as JsonString
             world.parent = world.valueStack.getFirst()
@@ -138,7 +153,7 @@ public class Parser2 {
             value.add(token.value!!)
             world
         })
-        sm.put(Status.IN_ARRAY, Type.VALUE, { (world: World, token: Token) ->
+        sm.put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { (world: World, token: Token) ->
             if (world.valueStack.size() > 1) {
                 world.popStatus()
                 world.popValue()
@@ -148,13 +163,13 @@ public class Parser2 {
             }
             world
         })
-        sm.put(Status.IN_ARRAY, Type.VALUE, { (world: World, token: Token) ->
+        sm.put(Status.IN_ARRAY, Type.LEFT_BRACE, { (world: World, token: Token) ->
             val value = world.valueStack.getFirst() as JsonArray
             val newObject = JsonObject()
             value.add(newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
         })
-        sm.put(Status.IN_ARRAY, Type.VALUE, { (world: World, token: Token) ->
+        sm.put(Status.IN_ARRAY, Type.LEFT_BRACKET, { (world: World, token: Token) ->
             val value = world.valueStack.getFirst() as JsonArray
             val newArray = JsonArray()
             value.add(newArray)
@@ -163,15 +178,12 @@ public class Parser2 {
         // else error
 
         val lexer = Lexer(inputStream)
-        var token = lexer.nextToken()
-        var tokenType = token.tokenType
 
         var world = World(Status.INIT)
-        while (world.status != Status.END) {
+        do {
+            var token = lexer.nextToken()
             world = sm.next(world, token)
-            token = lexer.nextToken()
-            tokenType = token.tokenType
-        }
+        } while (token.tokenType != Type.EOF)
 
         return world.result
     }

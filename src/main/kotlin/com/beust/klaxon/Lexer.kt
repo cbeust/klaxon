@@ -11,7 +11,7 @@ public enum class Type {
     RIGHT_BRACKET;
     COMMA;
     COLON;
-    END;
+    EOF;
 }
 
 class Token(val tokenType: Type, val value: JsonObject?) {
@@ -24,7 +24,7 @@ class Token(val tokenType: Type, val value: JsonObject?) {
 
 public class Lexer(val inputStream : InputStream) {
     val bytes = inputStream.readBytes()
-    val END = Token(Type.END, null)
+    val EOF = Token(Type.EOF, null)
     var index = 0
 
     val LONG = Pattern.compile("[-]?[0-9]+")
@@ -58,10 +58,10 @@ public class Lexer(val inputStream : InputStream) {
     fun nextToken() : Token {
 
         if (isDone()) {
-            return END
+            return EOF
         }
 
-        var tokenType = Type.END
+        var tokenType = Type.EOF
         var c = nextChar()
         var currentValue = StringBuilder()
         var jsonValue: JsonObject? = null
@@ -118,6 +118,8 @@ public class Lexer(val inputStream : InputStream) {
                 jsonValue = JsonBoolean(false)
             }
             tokenType = Type.VALUE
+        } else {
+            tokenType = Type.EOF
         }
 
         val value = currentValue.toString()

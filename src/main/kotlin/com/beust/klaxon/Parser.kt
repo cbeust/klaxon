@@ -13,8 +13,8 @@ public enum class Status {
     IN_ARRAY;
     PASSED_PAIR_KEY;
     PAIR_VALUE;
-    END;
     IN_ERROR;
+    EOF;
 }
 
 /**
@@ -61,7 +61,7 @@ public class Parser {
                 }
 
             } else if (status == Status.IN_FINISHED_VALUE) {
-                if (token.tokenType == Type.END) {
+                if (token.tokenType == Type.EOF) {
                     result = valueStack.removeFirst()
                 } else {
                     throw RuntimeException("Unexpected token")
@@ -152,7 +152,7 @@ public class Parser {
                 throw RuntimeException("Unexpected token: " + token)
             }
 
-        } while (token.tokenType != Type.END)
+        } while (token.tokenType != Type.EOF)
 
         return result
     }
@@ -164,7 +164,7 @@ fun main(args : Array<String>) {
     if (false) {
         val lexer = Lexer(inputStream)
         var token = lexer.nextToken()
-        while (token.tokenType != Type.END) {
+        while (token.tokenType != Type.EOF) {
             println("Read : ${token}")
             token = lexer.nextToken()
         }

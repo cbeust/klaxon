@@ -12,7 +12,7 @@ class KlaxonTest {
 
     private fun read(name: String) : JsonObject  {
         val cls = javaClass<KlaxonTest>()
-        return Parser().parse(cls.getResourceAsStream(name)!!)
+        return Parser2().parse(cls.getResourceAsStream(name)!!)
     }
 
     Test
