@@ -35,27 +35,8 @@ class World(var status : Status) {
     }
 }
 
-class Pair(val status: Status, val tokenType: Type) {
-    fun equals(other : Any?) : Boolean {
-        val o = other as Pair
-        return o.status == status && o.tokenType == tokenType
-    }
+data class Pair(val status: Status, val tokenType: Type)
 
-    fun hashCode() : Int {
-        return status.hashCode() + tokenType.hashCode()
-    }
-
-}
-
-trait Processor {
-    fun process(): World
-}
-
-class DefaultProcessor : Processor {
-    override fun process(): World {
-        throw RuntimeException("ERROR")
-    }
-}
 class StateMachine {
     val map = hashMapOf<Pair, (world: World, token: Token) -> World>()
 
