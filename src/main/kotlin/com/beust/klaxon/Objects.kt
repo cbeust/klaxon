@@ -47,7 +47,7 @@ open public class JsonObject {
     }
 }
 
-public class JsonString(val value: String) : JsonObject() {
+data public class JsonString(val value: String) : JsonObject() {
     override fun asString() : String {
         return value
     }
@@ -55,17 +55,9 @@ public class JsonString(val value: String) : JsonObject() {
     override fun toString() : String {
         return "{String: \"$value\"}"
     }
-
-    override fun equals(other : Any?) : Boolean {
-        return (other as JsonString).value.equals(value)
-    }
-
-    override fun hashCode() : Int {
-        return value.hashCode()
-    }
 }
 
-public class JsonLong(val value: Long) : JsonObject() {
+data public class JsonLong(val value: Long) : JsonObject() {
     override fun asLong() : Long {
         return value
     }
@@ -73,17 +65,9 @@ public class JsonLong(val value: Long) : JsonObject() {
     override fun toString() : String {
         return "{Long: $value}"
     }
-
-    override fun equals(other : Any?) : Boolean {
-        return (other as JsonLong).value.equals(value)
-    }
-
-    override fun hashCode() : Int {
-        return value.hashCode()
-    }
 }
 
-public class JsonDouble(val value: Double): JsonObject() {
+data public class JsonDouble(val value: Double): JsonObject() {
     override fun asDouble() : Double {
         return value
     }
@@ -92,30 +76,15 @@ public class JsonDouble(val value: Double): JsonObject() {
         return "{Double: $value}"
     }
 
-    override fun equals(other : Any?) : Boolean {
-        return (other as JsonDouble).value.equals(value)
-    }
-
-    override fun hashCode() : Int {
-        return value.hashCode()
-    }
 }
 
-public class JsonBoolean(val value: Boolean) : JsonObject() {
+data public class JsonBoolean(val value: Boolean) : JsonObject() {
     override fun asBoolean() : Boolean {
         return value
     }
 
     override fun toString() : String {
         return "{Boolean: $value}"
-    }
-
-    override fun equals(other : Any?) : Boolean {
-        return (other as JsonBoolean).value == value
-    }
-
-    override fun hashCode() : Int {
-        return value.hashCode()
     }
 }
 
