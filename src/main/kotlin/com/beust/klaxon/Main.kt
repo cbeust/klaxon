@@ -5,11 +5,13 @@ import java.io.FileInputStream
 import java.io.File
 
 fun main(args : Array<String>) {
-    val fileName =
+    val name =
 //            "/Users/cbeust/kotlin/klaxon/src/test/resources/c.json"
-//            "/tmp/f.json"
+            "/d.json"
 //            "/Users/cbeust/kotlin/klaxon/src/test/resources/b.json"
-    val inputStream = FileInputStream(File(fileName))
+    val cls = javaClass<Parser2>()
+    val inputStream = cls.getResourceAsStream(name)!!
+
     if (false) {
         val lexer = Lexer(inputStream)
         var token = lexer.nextToken()
@@ -18,7 +20,7 @@ fun main(args : Array<String>) {
             token = lexer.nextToken()
         }
     } else {
-//        val jo = Parser2().parse(inputStream)
-//        println("Parsed ${jo}")
+        val jo = Parser2().parse(inputStream)
+        println("Parsed ${jo}")
     }
 }
