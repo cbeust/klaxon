@@ -1,3 +1,22 @@
 {
-  "a" : "b"
+    "first": "John",
+    "last": "Doe",
+    "age": 39,
+    "sex": "M",
+    "salary": 70000,
+    "registered": true,
+    "interests": [ "Reading", "Mountain Biking", "Hacking" ],
+    "favorites": {
+        "color": "Blue",
+        "sport": "Soccer",
+        "food": "Spaghetti"
+    },
+    "schoolResults" : {
+        "scores": [
+            { "math" : 75 },
+            { "physics": 90 },
+            { "history": 55 }
+        ],
+        "location" : "Stanford"
+    }
 }

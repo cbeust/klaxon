@@ -1,37 +1,38 @@
 package com.beust.klaxon
 
-import java.util.Arrays
+import java.util.ArrayList
+import java.util.HashMap
 
-open public class JsonObject {
-    val map = hashMapOf<JsonString, JsonObject>()
-
-    fun put(key: String, value: JsonObject) : JsonObject {
-        return put(JsonString(key), value)
-    }
-
+open public class JsonObject(val map: MutableMap<String, JsonObject>
+                             = HashMap<String, JsonObject>())
+        : Map<String, JsonObject> by map {
     fun put(key: String, value: String) : JsonObject {
-        return put(JsonString(key), JsonString(value))
+        return put(key, JsonString(value))
     }
 
     fun put(key: String, value: Long) : JsonObject {
-        return put(JsonString(key), JsonLong(value))
+        return put(key, JsonLong(value))
     }
 
     fun put(key: String, value: Double) : JsonObject {
-        return put(JsonString(key), JsonDouble(value))
+        return put(key, JsonDouble(value))
     }
 
-    fun put(key: String, value: Boolean) : JsonObject {
-        return put(JsonString(key), JsonBoolean(value))
-    }
-
-    fun put(key: JsonString, value: JsonObject) : JsonObject {
+    fun put(key: String, value: JsonObject) : JsonObject {
         map.put(key, value)
         return this
     }
 
     open fun toString() : String {
         return map.toString()
+    }
+
+    open fun getArray() : ArrayList<JsonObject>? {
+        return null
+    }
+
+    open fun asArray() : ArrayList<JsonObject>{
+        throw RuntimeException("Not an array")
     }
 
     open fun asString() : String {
@@ -54,10 +55,6 @@ open public class JsonObject {
         throw RuntimeException("Not an array")
     }
 
-    fun get(key : String) : JsonObject? {
-        return map.get(key)
-    }
-
     open fun equals(other : Any?) : Boolean {
         return (other as JsonObject).map.equals(map)
     }
@@ -73,7 +70,7 @@ data public class JsonString(val value: String) : JsonObject() {
     }
 
     override fun toString() : String {
-        return "{String: \"$value\"}"
+        return "\"${value}\""
     }
 }
 
@@ -83,7 +80,7 @@ data public class JsonLong(val value: Long) : JsonObject() {
     }
 
     override fun toString() : String {
-        return "{Long: $value}"
+        return "${value}"
     }
 }
 
@@ -93,7 +90,7 @@ data public class JsonDouble(val value: Double): JsonObject() {
     }
 
     override fun toString() : String {
-        return "{Double: $value}"
+        return "${value}"
     }
 
 }
@@ -104,12 +101,40 @@ data public class JsonBoolean(val value: Boolean) : JsonObject() {
     }
 
     override fun toString() : String {
-        return "{Boolean: $value}"
+        return "${value}"
     }
 }
 
-public class JsonArray() : JsonObject() {
-    val value = arrayListOf<JsonObject>()
+public class JsonArray(val value : ArrayList<JsonObject> = ArrayList<JsonObject>())
+        : JsonObject(), Collection<JsonObject> by value {
+
+    override fun getArray() : ArrayList<JsonObject>? {
+        return asArray()
+    }
+
+    override fun size() : Int {
+        return value.size()
+    }
+
+    override fun isEmpty() : Boolean {
+        return value.isEmpty()
+    }
+
+    override fun asArray() : ArrayList<JsonObject>{
+        return value
+    }
+
+    //    override fun get(key: String, filter: (JsonObject?) -> Boolean) : JsonObject? {
+//        value.filter {  }
+//        val result = JsonArray()
+//        value.forEach {
+//            val jo = it.get(key)
+//            if (filter(jo)) {
+//                result.add(jo!!)
+//            }
+//        }
+//        return result
+//    }
 
     fun add(value: Long) : JsonArray {
         return add(JsonLong(value))
@@ -137,7 +162,7 @@ public class JsonArray() : JsonObject() {
     }
 
     override fun toString() : String {
-        val result = "{Array: " + value.toString() + "}"
+        val result = value.toString()
         return result
     }
 

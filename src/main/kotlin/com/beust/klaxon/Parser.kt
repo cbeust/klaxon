@@ -90,14 +90,14 @@ public class Parser {
                     statusStack.removeFirst()
                     key = valueStack.removeFirst() as JsonString
                     parent = valueStack.getFirst()
-                    parent.put(key!!, token.value!!)
+                    parent.put(key!!.asString(), token.value!!)
                     status = statusStack.get(0)
                 } else if (tokenType == Type.LEFT_BRACKET) {
                     statusStack.removeFirst()
                     key = valueStack.removeFirst() as JsonString
                     parent = valueStack.getFirst()
                     val newArray = JsonArray()
-                    parent.put(key!!, newArray)
+                    parent.put(key!!.asString(), newArray)
                     status = Status.IN_ARRAY
                     statusStack.addFirst(status)
                     valueStack.addFirst(newArray);
@@ -106,7 +106,7 @@ public class Parser {
                     key = valueStack.removeFirst() as JsonString
                     parent = valueStack.getFirst()
                     val newObject = JsonObject()
-                    parent.put(key!!, newObject)
+                    parent.put(key!!.asString(), newObject)
                     status = Status.IN_OBJECT
                     statusStack.addFirst(status)
                     valueStack.addFirst(newObject)

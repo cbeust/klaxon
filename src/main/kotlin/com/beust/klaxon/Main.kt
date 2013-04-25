@@ -1,9 +1,5 @@
 package com.beust.klaxon
 
-import java.io.InputStream
-import java.io.FileInputStream
-import java.io.File
-
 fun main(args : Array<String>) {
     val name =
 //            "/Users/cbeust/kotlin/klaxon/src/test/resources/c.json"
@@ -21,6 +17,13 @@ fun main(args : Array<String>) {
         }
     } else {
         val jo = Parser2().parse(inputStream)
-        println("Parsed ${jo}")
+        var results = jo.get("schoolResults")
+        val scores = results?.get("scores")?.getArray()?.filter {
+            it.values().iterator().next().asLong() > 70
+        }
+//                .forEach( {
+//            it?.asLong()!! > 90
+//        })
+        println("Tests greater than 70: ${scores}")
     }
 }

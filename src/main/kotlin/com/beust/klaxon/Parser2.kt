@@ -114,7 +114,7 @@ public class Parser2 {
             world.popStatus()
             val key = world.popValue() as JsonString
             world.parent = world.valueStack.getFirst()
-            world.parent.put(key, token.value!!)
+            world.parent.put(key.asString(), token.value!!)
             world.status = world.statusStack.get(0)
             world
         })
@@ -123,7 +123,7 @@ public class Parser2 {
             val key = world.popValue()as JsonString
             world.parent = world.valueStack.getFirst()
             val newArray = JsonArray()
-            world.parent.put(key, newArray)
+            world.parent.put(key.asString(), newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
         sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { (world: World, token: Token) ->
@@ -131,7 +131,7 @@ public class Parser2 {
             val key = world.popValue() as JsonString
             world.parent = world.valueStack.getFirst()
             val newObject = JsonObject()
-            world.parent.put(key, newObject)
+            world.parent.put(key.asString(), newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
         })
         // else error
