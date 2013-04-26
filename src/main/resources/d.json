@@ -1,22 +1,26 @@
-{
-    "first": "John",
-    "last": "Doe",
-    "age": 39,
-    "sex": "M",
-    "salary": 70000,
-    "registered": true,
-    "interests": [ "Reading", "Mountain Biking", "Hacking" ],
-    "favorites": {
-        "color": "Blue",
-        "sport": "Soccer",
-        "food": "Spaghetti"
+[
+    {
+        "first": "Simon",
+        "last": "Barr",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 90 },
+                { "name": "physics", "grade" : 50 },
+                { "name": "history", "grade:" : 85 }
+            ],
+            "location" : "Berkeley"
+        }
     },
-    "schoolResults" : {
-        "scores": [
-            { "math" : 75 },
-            { "physics": 90 },
-            { "history": 55 }
-        ],
-        "location" : "Stanford"
+    {
+        "first": "John",
+        "last": "Doe",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 75 },
+                { "name": "physics", "grade" : 90 },
+                { "name": "history", "grade" : 55 }
+            ],
+            "location" : "Stanford"
+        }
     }
-}
+]

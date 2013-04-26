@@ -1,5 +1,7 @@
 package com.beust.klaxon
 
+import java.io.File
+
 fun main(args : Array<String>) {
     val name =
 //            "/Users/cbeust/kotlin/klaxon/src/test/resources/c.json"
@@ -16,14 +18,24 @@ fun main(args : Array<String>) {
             token = lexer.nextToken()
         }
     } else {
-        val jo = Parser2().parse(inputStream)
-        var results = jo.get("schoolResults")
-        val scores = results?.get("scores")?.getArray()?.filter {
-            it.values().iterator().next().asLong() > 70
+        val jo = Parser2().parse(inputStream) as JsonArray
+        println("JO: ${jo}")
+        val john = jo?.find {
+            (it as JsonObject).string("first") == "Simon"
+        } as JsonObject
+        println("Simon: ${john}")
+        val scores = john?.obj("schoolResults")?.array("scores")?.filter {
+//            val grade = it.get("grade")
+            println("${it}")
+            true
+//            (it as JsonObject).long("grade")!! > 80
         }
+//            ?.getArray()?.filter {
+//            it.values().iterator().next().asLong() > 70
+//        }
 //                .forEach( {
 //            it?.asLong()!! > 90
 //        })
-        println("Tests greater than 70: ${scores}")
+        println("Scores: ${scores}")
     }
 }

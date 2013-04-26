@@ -14,7 +14,7 @@ public enum class Type {
     EOF;
 }
 
-class Token(val tokenType: Type, val value: JsonObject?) {
+class Token(val tokenType: Type, val value: Any?) {
     fun toString() : String {
         val v = if (value != null) { " (" + value + ")" } else {""}
         val result = tokenType.toString() + v
@@ -64,7 +64,7 @@ public class Lexer(val inputStream : InputStream) {
         var tokenType = Type.EOF
         var c = nextChar()
         var currentValue = StringBuilder()
-        var jsonValue: JsonObject? = null
+        var jsonValue: Any? = null
 
         while (! isDone() && isSpace(c)) {
             c = nextChar()
@@ -82,7 +82,7 @@ public class Lexer(val inputStream : InputStream) {
                     }
                     c = nextChar()
                 }
-                jsonValue = JsonString(currentValue.toString())
+                jsonValue = currentValue.toString()
             } else {
                 throw RuntimeException("Unterminated string")
             }
@@ -109,13 +109,13 @@ public class Lexer(val inputStream : InputStream) {
             }
             val v = currentValue.toString()
             if (LONG.matcher(v).matches()) {
-                jsonValue = JsonLong(java.lang.Long.parseLong(v))
+                jsonValue = java.lang.Long.parseLong(v)
             } else if (DOUBLE.matcher(v).matches()) {
-                jsonValue = JsonDouble(java.lang.Double.parseDouble(v))
+                jsonValue = java.lang.Double.parseDouble(v)
             } else if ("true".equals(v.toLowerCase())) {
-                jsonValue = JsonBoolean(true)
+                jsonValue = true
             } else if ("false".equals(v.toLowerCase())) {
-                jsonValue = JsonBoolean(false)
+                jsonValue = false
             } else {
                 throw RuntimeException("Unexpected characted at position ${index}"
                     + ": '${c} (${c.toInt()})'")

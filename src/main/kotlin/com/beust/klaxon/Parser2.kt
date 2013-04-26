@@ -5,11 +5,11 @@ import java.util.LinkedList
 
 class World(var status : Status) {
     val statusStack = LinkedList<Status>()
-    val valueStack = LinkedList<JsonObject>()
-    var result = JsonObject()
+    val valueStack = LinkedList<Any>()
+    var result : Any? = null
     var parent = JsonObject()
 
-    fun pushAndSet(status: Status, value: JsonObject) : World {
+    fun pushAndSet(status: Status, value: Any) : World {
         pushStatus(status)
         pushValue(value)
         this.status = status
@@ -21,12 +21,12 @@ class World(var status : Status) {
         return this
     }
 
-    fun pushValue(value: JsonObject) : World {
+    fun pushValue(value: Any) : World {
         valueStack.addFirst(value)
         return this
     }
 
-    fun popValue() : JsonObject {
+    fun popValue() : Any {
         return valueStack.removeFirst()
     }
 
@@ -67,7 +67,7 @@ public class Parser2 {
             println("[Parser2] ${s}")
         }
     }
-    public fun parse(inputStream : InputStream) : JsonObject {
+    public fun parse(inputStream : InputStream) : Any? {
 
         val sm = StateMachine()
 
@@ -112,26 +112,26 @@ public class Parser2 {
         })
         sm.put(Status.PASSED_PAIR_KEY, Type.VALUE, { (world: World, token: Token) ->
             world.popStatus()
-            val key = world.popValue() as JsonString
-            world.parent = world.valueStack.getFirst()
-            world.parent.put(key.asString(), token.value!!)
+            val key = world.popValue() as String
+            world.parent = world.valueStack.getFirst() as JsonObject
+            world.parent.put(key, token.value!!)
             world.status = world.statusStack.get(0)
             world
         })
         sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACKET, { (world: World, token: Token) ->
             world.popStatus()
-            val key = world.popValue()as JsonString
-            world.parent = world.valueStack.getFirst()
+            val key = world.popValue() as String
+            world.parent = world.valueStack.getFirst() as JsonObject
             val newArray = JsonArray()
-            world.parent.put(key.asString(), newArray)
+            world.parent.put(key, newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
         sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { (world: World, token: Token) ->
             world.popStatus()
-            val key = world.popValue() as JsonString
-            world.parent = world.valueStack.getFirst()
+            val key = world.popValue() as String
+            world.parent = world.valueStack.getFirst() as JsonObject
             val newObject = JsonObject()
-            world.parent.put(key.asString(), newObject)
+            world.parent.put(key, newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
         })
         // else error
