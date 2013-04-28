@@ -78,7 +78,7 @@ public class Parser2 {
             world.pushAndSet(Status.IN_OBJECT, JsonObject())
         })
         sm.put(Status.INIT, Type.LEFT_BRACKET, { (world: World, token: Token) ->
-            world.pushAndSet(Status.IN_ARRAY, JsonArray())
+            world.pushAndSet(Status.IN_ARRAY, JsonArray<Any>())
         })
         // else error
 
@@ -122,7 +122,7 @@ public class Parser2 {
             world.popStatus()
             val key = world.popValue() as String
             world.parent = world.valueStack.getFirst() as JsonObject
-            val newArray = JsonArray()
+            val newArray = JsonArray<Any>()
             world.parent.put(key, newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
@@ -140,7 +140,7 @@ public class Parser2 {
             world
         })
         sm.put(Status.IN_ARRAY, Type.VALUE, { (world: World, token: Token) ->
-            val value = world.valueStack.getFirst() as JsonArray
+            val value = world.valueStack.getFirst() as JsonArray<Any>
             value.add(token.value!!)
             world
         })
@@ -155,14 +155,14 @@ public class Parser2 {
             world
         })
         sm.put(Status.IN_ARRAY, Type.LEFT_BRACE, { (world: World, token: Token) ->
-            val value = world.valueStack.getFirst() as JsonArray
+            val value = world.valueStack.getFirst() as JsonArray<Any>
             val newObject = JsonObject()
             value.add(newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
         })
         sm.put(Status.IN_ARRAY, Type.LEFT_BRACKET, { (world: World, token: Token) ->
-            val value = world.valueStack.getFirst() as JsonArray
-            val newArray = JsonArray()
+            val value = world.valueStack.getFirst() as JsonArray<Any>
+            val newArray = JsonArray<Any>()
             value.add(newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })

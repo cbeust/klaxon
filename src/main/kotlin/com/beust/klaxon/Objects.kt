@@ -20,8 +20,8 @@ data open public class JsonObject(val map: MutableMap<String, Any>
         return map.get(id) as JsonObject
     }
 
-    open fun array(id: String) : JsonArray? {
-        return map.get(id) as JsonArray
+    open fun <T> array(thisType: T, id: String) : JsonArray<T>? {
+        return map.get(id) as JsonArray<T>
     }
 
     open fun long(id: String) : Long? {
@@ -53,20 +53,61 @@ data open public class JsonObject(val map: MutableMap<String, Any>
     }
 }
 
-data public class JsonArray(val value : MutableList<Any> = ArrayList<Any>()) {
-    fun add(a: Any) : JsonArray {
+// Because of http://youtrack.jetbrains.com/issue/KT-3546, I need to do some
+// manual delegation here
+data public class JsonArray<T>(val value : MutableList<T> = ArrayList<T>()) {
+    fun add(a: T) : JsonArray<T> {
         value.add(a)
+        value.forEach {  }
         return this
     }
 
-    fun find(predicate: (Any) -> Boolean) : Any? {
+    public fun filter(predicate: (T) -> Boolean) : List<T> {
+        return value?.filter(predicate)
+    }
+
+    public fun <R> flatMap(transform: (T)-> Iterable<R>) : List<R> {
+        return value?.flatMap(transform)
+    }
+
+    open fun string(id: String) : JsonArray<String> {
+        var result = JsonArray<String>()
+        value.forEach {
+            val obj = (it as JsonObject).string(id)
+            result.add(obj!!)
+        }
+        return result
+    }
+
+    open fun obj(id: String) : JsonArray<JsonObject> {
+        var result = JsonArray<JsonObject>()
+        value.forEach {
+            val obj = (it as JsonObject).obj(id)
+            result.add(obj!!)
+        }
+        return result
+    }
+
+//    open fun arrayObj(id: String) : JsonArray<JsonObject> {
+//        var result = JsonArray<JsonObject>()
+//        value.forEach {
+//            val o = it as JsonObject
+//            val obj = o.array(id)
+//            result.addAll(obj!!)
+//        }
+//        return result
+//    }
+
+    public fun forEach(field: String, operation: (JsonObject) -> Unit) : Unit {
+        for (element in value) operation(element as JsonObject)
+    }
+
+    fun find(predicate: (T) -> Boolean) : T? {
         return value.find(predicate)
     }
 
-    fun filter(predicate: (Any) -> Boolean) : Any? {
-        return value.filter(predicate)
-    }
-//{
+
+    //{
 //
 //    override fun isEmpty() : Boolean {
 //        return value.isEmpty()
