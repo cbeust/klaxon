@@ -2,6 +2,8 @@
 
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
+## API
+
 Values parsed from a valid JSON file can be of the following type:
 
 * Long
@@ -33,6 +35,8 @@ fun parse(name: String) : Any {
 
     val obj = parse("/object.json") as JsonObject
 ```
+
+You can also access the JSON content as a file, or any other resource you can get an `InputStream` from.
 
 Let's query these values:
 
@@ -181,5 +185,26 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
     // Prints:
     // Result: [[JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85})], [JsonObject(map={name=physics, grade=90})], [JsonObject(    map={name=physics, grade=82})]]
 ```
+
+## Implementation
+
+The Parser is implemented as a mutable state machine supported by a simplistic `State` monad, making the main loop very simple:
+
+```
+val sm = StateMachine()
+val lexer = Lexer(inputStream)
+var world = World(Status.INIT)
+do {
+    val token = lexer.nextToken()
+    world = sm.next(world, token)
+} while (token.tokenType != Type.EOF)
+```
+
+## Limitations
+
+* Because of [Issue 3546](http://youtrack.jetbrains.com/issue/KT-3546), the delegation of `JsonArray` to `List` is currently performed manually, so not all methods available on `List` are available on `JsonArray`.
+* Currently reads the entire JSON content in memory. Streaming will be available soon for large files.
+* No pretty printing
+* Error handling is very primitive
 
 
