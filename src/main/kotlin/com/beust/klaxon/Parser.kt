@@ -2,10 +2,12 @@ package com.beust.klaxon
 
 import java.io.InputStream
 import java.util.LinkedList
+import java.io.File
+import java.io.FileInputStream
 
 class World(var status : Status) {
-    val statusStack = LinkedList<Status>()
-    val valueStack = LinkedList<Any>()
+    private val statusStack = LinkedList<Status>()
+    private val valueStack = LinkedList<Any>()
     var result : Any? = null
     var parent = JsonObject()
 
@@ -33,6 +35,22 @@ class World(var status : Status) {
     fun popStatus() : Status {
         return statusStack.removeFirst()
     }
+
+    fun getFirstObject() : JsonObject {
+        return valueStack.getFirst() as JsonObject
+    }
+
+    fun getFirstArray() : JsonArray<Any> {
+        return valueStack.getFirst() as JsonArray<Any>
+    }
+
+    fun peekStatus() : Status {
+        return statusStack.get(0)
+    }
+
+    fun hasValues() : Boolean {
+        return valueStack.size() > 1
+    }
 }
 
 data class Pair(val status: Status, val tokenType: Type)
@@ -59,7 +77,7 @@ class StateMachine {
     }
 }
 
-public class Parser2 {
+public class Parser {
     val verbose = false
 
     fun log(s: String) {
@@ -67,6 +85,11 @@ public class Parser2 {
             println("[Parser2] ${s}")
         }
     }
+
+    public fun parse(fileName: String) : Any? {
+        return parse(FileInputStream(File(fileName)))
+    }
+
     public fun parse(inputStream : InputStream) : Any? {
 
         val sm = StateMachine()
@@ -96,10 +119,10 @@ public class Parser2 {
             world.pushAndSet(Status.PASSED_PAIR_KEY, token.value!!)
         })
         sm.put(Status.IN_OBJECT, Type.RIGHT_BRACE, { (world: World, token: Token) ->
-            if (world.valueStack.size() > 1) {
+            if (world.hasValues()) {
                 world.popStatus()
                 world.popValue()
-                world.status = world.statusStack.get(0)
+                world.status = world.peekStatus()
             } else {
                 world.status = Status.IN_FINISHED_VALUE
             }
@@ -113,15 +136,15 @@ public class Parser2 {
         sm.put(Status.PASSED_PAIR_KEY, Type.VALUE, { (world: World, token: Token) ->
             world.popStatus()
             val key = world.popValue() as String
-            world.parent = world.valueStack.getFirst() as JsonObject
+            world.parent = world.getFirstObject()
             world.parent.put(key, token.value!!)
-            world.status = world.statusStack.get(0)
+            world.status = world.peekStatus()
             world
         })
         sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACKET, { (world: World, token: Token) ->
             world.popStatus()
             val key = world.popValue() as String
-            world.parent = world.valueStack.getFirst() as JsonObject
+            world.parent = world.getFirstObject()
             val newArray = JsonArray<Any>()
             world.parent.put(key, newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
@@ -129,7 +152,7 @@ public class Parser2 {
         sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { (world: World, token: Token) ->
             world.popStatus()
             val key = world.popValue() as String
-            world.parent = world.valueStack.getFirst() as JsonObject
+            world.parent = world.getFirstObject()
             val newObject = JsonObject()
             world.parent.put(key, newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
@@ -140,28 +163,28 @@ public class Parser2 {
             world
         })
         sm.put(Status.IN_ARRAY, Type.VALUE, { (world: World, token: Token) ->
-            val value = world.valueStack.getFirst() as JsonArray<Any>
+            val value = world.getFirstArray()
             value.add(token.value!!)
             world
         })
         sm.put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { (world: World, token: Token) ->
-            if (world.valueStack.size() > 1) {
+            if (world.hasValues()) {
                 world.popStatus()
                 world.popValue()
-                world.status = world.statusStack.get(0) // peek
+                world.status = world.peekStatus()
             } else {
                 world.status = Status.IN_FINISHED_VALUE
             }
             world
         })
         sm.put(Status.IN_ARRAY, Type.LEFT_BRACE, { (world: World, token: Token) ->
-            val value = world.valueStack.getFirst() as JsonArray<Any>
+            val value = world.getFirstArray()
             val newObject = JsonObject()
             value.add(newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
         })
         sm.put(Status.IN_ARRAY, Type.LEFT_BRACKET, { (world: World, token: Token) ->
-            val value = world.valueStack.getFirst() as JsonArray<Any>
+            val value = world.getFirstArray()
             val newArray = JsonArray<Any>()
             value.add(newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)

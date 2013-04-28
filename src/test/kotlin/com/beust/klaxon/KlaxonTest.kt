@@ -12,13 +12,13 @@ class KlaxonTest {
 
     private fun read(name: String) : Any?  {
         val cls = javaClass<KlaxonTest>()
-        return Parser2().parse(cls.getResourceAsStream(name)!!)
+        return Parser().parse(cls.getResourceAsStream(name)!!)
     }
 
     Test
     fun simple() {
         val j = read("/b.json")
-        val expected = JsonArray()
+        val expected = JsonArray<Any>()
                 .add(1.toLong())
                 .add("abc")
                 .add(2.34)
@@ -31,7 +31,7 @@ class KlaxonTest {
         val j = read("/a.json")
         val expected = JsonObject()
             .put("a", "b")
-            .put("c", JsonArray()
+            .put("c", JsonArray<Any>()
                 .add(1.toLong())
                 .add(2.34)
                 .add("abc")

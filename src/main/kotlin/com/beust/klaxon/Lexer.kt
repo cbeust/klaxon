@@ -126,7 +126,6 @@ public class Lexer(val inputStream : InputStream) {
             tokenType = Type.EOF
         }
 
-        val value = currentValue.toString()
         return Token(tokenType, jsonValue)
     }
 }
