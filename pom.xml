@@ -6,16 +6,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.beust</groupId>
-    <artifactId>kotlin</artifactId>
+    <artifactId>klaxon</artifactId>
     <version>0.1-SNAPSHOT</version>
 
     <properties>
         <kotlin.version>0.5.429</kotlin.version>
-        <junit.version>4.10</junit.version>
         <testng.version>6.8.1</testng.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <scm>
+        <connection>scm:git:git@github.com:cbeust/klaxon.git</connection>
+        <developerConnection>scm:git:git@github.com:cbeust/klaxon.git</developerConnection>
+        <url>git@github.com:cbeust/klaxon.git</url>
+    </scm>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>3</version>
+    </parent>
 
     <dependencies>
         <dependency>
@@ -83,6 +94,43 @@
                 <configuration>
                     <mainClass>com.beust.klaxon.KlaxonPackage</mainClass>
                 </configuration>
+            </plugin>
+
+            <!-- Bundle sources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Generating Javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+
+            <!-- Signing with gpg -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
