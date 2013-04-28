@@ -111,9 +111,8 @@
 
             <!-- Generating Javadoc -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kdoc-maven-plugin</artifactId>
             </plugin>
 
             <!-- Signing with gpg -->
