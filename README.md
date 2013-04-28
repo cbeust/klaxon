@@ -94,3 +94,90 @@ Since a `JsonArray` behaves like a `List`, we can apply closures on them, such a
     // Prints: Old people: [JsonObject(map={age=38, name=Jessica})]
 ```
 
+Let's look at a more complex example:
+
+```
+[
+    {
+        "first": "Dale",
+        "last": "Cooper",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 90 },
+                { "name": "physics", "grade" : 50 },
+                { "name": "history", "grade" : 85 }
+            ],
+            "location" : "Berkeley"
+        }
+    },
+    {
+        "first": "Kara",
+        "last": "Thrace",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 75 },
+                { "name": "physics", "grade" : 90 },
+                { "name": "history", "grade" : 55 }
+            ],
+            "location" : "Stanford"
+        }
+    },
+    {
+        "first": "Jack",
+        "last": "Harkness",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 40 },
+                { "name": "physics", "grade" : 82 },
+                { "name": "history", "grade" : 60 }
+            ],
+            "location" : "Berkeley"
+        }
+    }
+]
+```
+
+Let's chain a few operations, for example, finding the last names of all the people who studied in Berkeley:
+
+```
+    println("=== Everyone who studied in Berkeley:")
+    val berkeley = array.filter {
+        it.obj("schoolResults")?.string("location") == "Berkeley"
+    }.map {
+        it.string("last")
+    }
+    println("${berkeley}")
+
+    // Prints:
+    // === Everyone who studied in Berkeley:
+    // [Cooper, Harkness]
+
+```
+
+All the grades over 75:
+
+```
+    println("=== All grades bigger than 75")
+    val result = array.flatMap {
+        it.obj("schoolResults")
+                ?.array(JsonObject(), "scores")?.filter {
+                    it.long("grade")!! > 75
+                }!!
+    }
+    println("Result: ${result}")
+
+    // Prints:
+    // === All grades bigger than 75
+    // Result: [JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85}), JsonObject(map={name=physics, grade=90}), JsonObject(map={name=physics, grade=82})]
+
+```
+
+Note the use of `flatMap` which transforms an initial result of a list of lists into a single list. If you use `map`, you will get a list of three lists:
+
+```
+    // Using map instead of flatMap
+    // Prints:
+    // Result: [[JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85})], [JsonObject(map={name=physics, grade=90})], [JsonObject(    map={name=physics, grade=82})]]
+```
+
+

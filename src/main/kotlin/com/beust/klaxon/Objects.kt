@@ -71,6 +71,10 @@ data public class JsonArray<T>(val value : MutableList<T> = ArrayList<T>()) {
         return value.flatMap(transform)
     }
 
+    public fun <R> map(transform: (T)-> R) : List<R> {
+        return value.map(transform)
+    }
+
     fun string(id: String) : JsonArray<String>? {
         var result = JsonArray<String>()
         value.forEach {

@@ -3,8 +3,8 @@ package com.beust.klaxon
 import java.util.ArrayList
 
 fun main(args : Array<String>) {
-//    example1()
-    example2()
+    example1()
+//    example2()
 //    example3()
 }
 
@@ -41,7 +41,7 @@ fun example1() {
     val jack = array.find {
         it.string("first") == "Jack"
     }
-    println("Simon: ${jack}")
+    println("Jack: ${jack}")
 
     println("=== Everyone who studied in Berkeley:")
     val berkeley = array.filter {
@@ -56,7 +56,7 @@ fun example1() {
     println("${lastNames}")
 
     println("=== All grades bigger than 75")
-    val result = array.flatMap {
+    val result = array.map {
         it.obj("schoolResults")
                 ?.array(JsonObject(), "scores")?.filter {
                     it.long("grade")!! > 75
