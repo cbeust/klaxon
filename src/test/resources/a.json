@@ -1,4 +1,8 @@
 {
-    "firstName" : "Cedric",
-    "lastName" : "Beust"
+  "a" : "b",
+  "c" : [ 1, 2.34, "abc", false ],
+  "e" : {
+      "f" : 30,
+      "g" : 31
+  }
 }

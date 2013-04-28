@@ -1,3 +1,5 @@
+# Klaxon: A relaxed JSON library for your Kotlin needs
+
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
 Values parsed from a valid JSON file can be of the following type:
