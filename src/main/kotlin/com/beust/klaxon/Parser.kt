@@ -77,6 +77,9 @@ class StateMachine {
     }
 }
 
+/**
+ * Main entry for Klaxon's parser.
+ */
 public class Parser {
     val verbose = false
 
@@ -195,7 +198,7 @@ public class Parser {
 
         var world = World(Status.INIT)
         do {
-            var token = lexer.nextToken()
+            val token = lexer.nextToken()
             log("Token: ${token}")
             world = sm.next(world, token)
         } while (token.tokenType != Type.EOF)
