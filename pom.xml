@@ -113,6 +113,12 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kdoc-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <configuration>
+                    <sources>
+                        <source>src/main/kotlin</source>
+                    </sources>
+                </configuration>
             </plugin>
 
             <!-- Signing with gpg -->
