@@ -20,7 +20,7 @@ data open public class JsonObject(val map: MutableMap<String, Any>
         return map.get(fieldName) as JsonObject
     }
 
-    fun <T> array(tokenType: T, fieldName: String) : JsonArray<T>? {
+    fun <T> array(fieldName: String) : JsonArray<T>? {
         return map.get(fieldName) as JsonArray<T>
     }
 

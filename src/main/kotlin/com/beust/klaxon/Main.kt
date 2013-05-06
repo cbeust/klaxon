@@ -86,7 +86,7 @@ fun example1() {
     println("=== All grades bigger than 75")
     val result = array.map {
         it.obj("schoolResults")
-                ?.array(JsonObject(), "scores")?.filter {
+                ?.array<JsonObject>("scores")?.filter {
                     it.long("grade")!! > 75
                 }!!
     }
