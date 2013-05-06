@@ -27,8 +27,8 @@ public class Lexer(val inputStream : InputStream) {
     val EOF = Token(Type.EOF, null)
     var index = 0
 
-    val LONG = Pattern.compile("[-]?[0-9]+")
-    val DOUBLE = Pattern.compile(LONG.toString() + "((\\.[0-9]+)?([eE][-+]?[0-9]+)?)")
+    val NUMERIC = Pattern.compile("[-]?[0-9]+")
+    val DOUBLE = Pattern.compile(NUMERIC.toString() + "((\\.[0-9]+)?([eE][-+]?[0-9]+)?)")
 
     fun isSpace(c: Char): Boolean {
         return c == ' ' || c == '\r' || c == '\n' || c == '\t'
@@ -108,8 +108,8 @@ public class Lexer(val inputStream : InputStream) {
                 }
             }
             val v = currentValue.toString()
-            if (LONG.matcher(v).matches()) {
-                jsonValue = java.lang.Long.parseLong(v)
+            if (NUMERIC.matcher(v).matches()) {
+                jsonValue = java.lang.Integer.parseInt(v)
             } else if (DOUBLE.matcher(v).matches()) {
                 jsonValue = java.lang.Double.parseDouble(v)
             } else if ("true".equals(v.toLowerCase())) {

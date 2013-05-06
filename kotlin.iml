@@ -14,6 +14,15 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:0.5.429" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-runtime:0.5.429" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kdoc:0.5.429" level="project" />
+    <orderEntry type="library" name="Maven: org.pegdown:pegdown:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.parboiled:parboiled-core:1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.parboiled:parboiled-java:1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm:3.3.1" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-util:3.3.1" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-tree:3.3.1" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-analysis:3.3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-compiler:0.5.429" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.testng:testng:6.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.10" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.1" level="project" />
