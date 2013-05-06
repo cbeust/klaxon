@@ -20,7 +20,7 @@ data open public class JsonObject(val map: MutableMap<String, Any>
         return map.get(fieldName) as JsonObject
     }
 
-    fun <T> array(thisType: T, fieldName: String) : JsonArray<T>? {
+    fun <T> array(tokenType: T, fieldName: String) : JsonArray<T>? {
         return map.get(fieldName) as JsonArray<T>
     }
 
@@ -43,15 +43,6 @@ data open public class JsonObject(val map: MutableMap<String, Any>
     open fun asString() : String {
         throw RuntimeException("Not a String")
     }
-
-    open fun equals(other : Any?) : Boolean {
-        return (other as JsonObject).map.equals(map)
-    }
-
-    open fun hashCode() : Int {
-        return map.hashCode()
-    }
-
 }
 
 // Because of http://youtrack.jetbrains.com/issue/KT-3546, I need to do some
@@ -109,13 +100,5 @@ data public class JsonArray<T>(val value : MutableList<T> = ArrayList<T>()) {
 
     fun find(predicate: (T) -> Boolean) : T? {
         return value.find(predicate)
-    }
-
-    open fun equals(other : Any?) : Boolean {
-        return (other as JsonArray<*>).value.equals(value)
-    }
-
-    open fun hashCode() : Int {
-        return value.hashCode()
     }
 }

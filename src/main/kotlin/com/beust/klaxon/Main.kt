@@ -2,21 +2,6 @@ package com.beust.klaxon
 
 import java.util.ArrayList
 
-class JJ {
-
-}
-
-fun String.toJ() : JJ {
-    return JJ()
-}
-
-fun foo(a: String) {
-
-}
-fun foo(a: JJ) {
-
-}
-
 fun main(args : Array<String>) {
     val a1 = json {
         obj("a", 1.1, "b", "value", "c", array(1))
@@ -27,7 +12,7 @@ fun main(args : Array<String>) {
     val result = a1.equals(a2)
     println("Equals: ${result}")
 
-    foo("a")
+//    foo("a")
 //    example1()
 //    example2()
 //    example3()
