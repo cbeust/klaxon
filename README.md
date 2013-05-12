@@ -187,7 +187,7 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 
 ## Pretty printing
 
-You can convert any JsonObject to a valid JSON string by calling toJsonString() on it.
+You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it.
 
 ## Advanced DSL
 
