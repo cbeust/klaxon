@@ -29,6 +29,15 @@ class JSON() {
         return result
     }
 
+    fun array(args: List<Any>) : JsonArray<Any> {
+        val result = JsonArray<Any>()
+        var i = 0
+        while (i < args.size) {
+            result.add(convert(args[i++]))
+        }
+        return result
+    }
+
     fun obj(vararg args: Any): JsonObject {
         val result = JsonObject()
         var i = 0

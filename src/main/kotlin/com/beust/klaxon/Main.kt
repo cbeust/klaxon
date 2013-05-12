@@ -3,37 +3,46 @@ package com.beust.klaxon
 import java.util.ArrayList
 
 fun main(args : Array<String>) {
-    val a1 = json {
-        obj("a", 1.1, "b", "value", "c", array(1))
-    }
-    val a2 = json {
-        obj("a", 1.1, "b", "value", "c", array(1))
-    }
-    val result = a1.equals(a2)
-    println("Equals: ${result}")
+//    val a1 = json {
+//        obj("a", 1.1, "b", "value", "c", array(1))
+//    }
+//    val a2 = json {
+//        obj("a", 1.1, "b", "value", "c", array(1))
+//    }
+//    val result = a1.equals(a2)
+//    println("Equals: ${result}")
+//
+////    foo("a")
+////    example1()
+////    example2()
+////    example3()
+//    val anObject = json {
+//        obj("a", 1, "b", "value")
+//    }
+//    println("Json object: ${anObject}")
+//
+//    val anArray = json {
+//        array("a", 1, false)
+//    }
+//    println("Json array: ${anArray}")
+//
+//    val aMix = json {
+//        obj (
+//            "theArray", anArray,
+//            "theObject", anObject,
+//            "anInt", 4
+//        )
+//    }
+//    println("Mix: ${aMix}")
 
-//    foo("a")
-//    example1()
-//    example2()
-//    example3()
-    val anObject = json {
-        obj("a", 1, "b", "value")
+    println("=== Logic into the DSL")
+    val logic = json {
+        array(arrayListOf(1,2,3).map {
+            obj(it.toString(), it)
+        })
     }
-    println("Json object: ${anObject}")
+    println("Result: ${logic}")
 
-    val anArray = json {
-        array("a", 1, false)
-    }
-    println("Json array: ${anArray}")
-
-    val aMix = json {
-        obj (
-            "theArray", anArray,
-            "theObject", anObject,
-            "anInt", 4
-        )
-    }
-    println("Mix: ${aMix}")
 }
 
 fun parse(name: String) : Any {
