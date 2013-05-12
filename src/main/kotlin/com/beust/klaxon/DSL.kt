@@ -3,9 +3,24 @@ package com.beust.klaxon
 import java.util.ArrayList
 import java.util.HashMap
 
+trait JsonBase {
+    fun valueToString(v: Any) : String {
+        val result = StringBuilder()
+
+        when (v) {
+            is JsonObject -> result.append(v.toJsonString())
+            is JsonArray<*> -> result.append(v.toJsonString())
+            is String -> result.append("\"").append(v).append("\"")
+            else -> result.append(v)
+        }
+
+        return result.toString()
+    }
+}
+
 data open public class JsonObject(val map: MutableMap<String, Any>
                              = HashMap<String, Any>())
-        : MutableMap<String, Any> by map {
+        : JsonBase, MutableMap<String, Any> by map {
 
     override fun put(key: String, value: Any) : JsonObject {
         map.put(key, value)
@@ -43,11 +58,30 @@ data open public class JsonObject(val map: MutableMap<String, Any>
     open fun asString() : String {
         throw RuntimeException("Not a String")
     }
+
+    open fun toJsonString() : String {
+        val result = StringBuilder();
+        result.append("{ ")
+        var comma = false
+        for ((k, v) in map) {
+            if (comma) {
+                result.append(", ")
+            } else {
+                comma = true
+            }
+            result.append("\"").append(k).append("\" : ")
+            result.append(valueToString(v)).append(" ")
+        }
+        result.append("} ")
+
+        return result.toString()
+    }
 }
 
 // Because of http://youtrack.jetbrains.com/issue/KT-3546, I need to do some
 // manual delegation here
-data public class JsonArray<T>(val value : MutableList<T> = ArrayList<T>()) {
+data public class JsonArray<T>(val value : MutableList<T> = ArrayList<T>())
+    : JsonBase {
 
     fun add(a: T) : JsonArray<T> {
         value.add(a)
@@ -92,6 +126,23 @@ data public class JsonArray<T>(val value : MutableList<T> = ArrayList<T>()) {
             result.add(obj!!)
         }
         return result
+    }
+
+    open fun toJsonString() : String {
+        val result = StringBuilder();
+        result.append("[ ")
+        var comma = false
+        value.forEach {
+            if (comma) {
+                result.append(", ")
+            } else {
+                comma = true
+            }
+            result.append(valueToString(it)).append(" ")
+        }
+        result.append("] ")
+
+        return result.toString()
     }
 
     public fun forEach(field: String, operation: (JsonObject) -> Unit) : Unit {

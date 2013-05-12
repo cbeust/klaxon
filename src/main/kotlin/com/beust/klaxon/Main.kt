@@ -11,29 +11,29 @@ fun main(args : Array<String>) {
 //    }
 //    val result = a1.equals(a2)
 //    println("Equals: ${result}")
-//
-////    foo("a")
-////    example1()
-////    example2()
-////    example3()
-//    val anObject = json {
-//        obj("a", 1, "b", "value")
-//    }
-//    println("Json object: ${anObject}")
-//
-//    val anArray = json {
-//        array("a", 1, false)
-//    }
-//    println("Json array: ${anArray}")
-//
-//    val aMix = json {
-//        obj (
-//            "theArray", anArray,
-//            "theObject", anObject,
-//            "anInt", 4
-//        )
-//    }
-//    println("Mix: ${aMix}")
+
+//    foo("a")
+//    example1()
+//    example2()
+//    example3()
+    val anObject = json {
+        obj("a", 1, "b", "value")
+    }
+    println("Json object: ${anObject.toJsonString()}")
+
+    val anArray = json {
+        array("a", 1, false)
+    }
+    println("Json array: ${anArray.toJsonString()}")
+
+    val aMix = json {
+        obj (
+            "theArray", anArray,
+            "theObject", anObject,
+            "anInt", 4
+        )
+    }
+    println("Mix: ${aMix.toJsonString()}")
 
     println("=== Logic into the DSL")
     val logic = json {
@@ -41,7 +41,7 @@ fun main(args : Array<String>) {
             obj(it.toString(), it)
         })
     }
-    println("Result: ${logic}")
+    println("Result: ${logic.toJsonString()}")
 
 }
 
