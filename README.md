@@ -205,7 +205,7 @@ println("Result: ${logic.toJsonString()}")
 will output:
 
 ```
-Result: [ { "1" : 1 }  , { "2" : 2 }  , { "3" : 3 }  ]
+Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
 ```
 
 ## Implementation
