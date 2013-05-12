@@ -81,23 +81,23 @@ Let's query these values:
 We can easily collect all the ages as follows:
 
 ```
-    val array = parse("/e.json") as JsonArray<JsonObject>
+val array = parse("/e.json") as JsonArray<JsonObject>
 
-    val ages = array.long("age")
-    println("Ages: ${ages}")
+val ages = array.long("age")
+println("Ages: ${ages}")
 
-    // Prints: Ages: JsonArray(value=[20, 25, 38])
+// Prints: Ages: JsonArray(value=[20, 25, 38])
 ```
 
 Since a `JsonArray` behaves like a `List`, we can apply closures on them, such as `filter`:
 
 ```
-    val oldPeople = array.filter {
-        it.long("age")!! > 30
-    }
-    println("Old people: ${oldPeople}")
+val oldPeople = array.filter {
+    it.long("age")!! > 30
+}
+println("Old people: ${oldPeople}")
 
-    // Prints: Old people: [JsonObject(map={age=38, name=Jessica})]
+// Prints: Old people: [JsonObject(map={age=38, name=Jessica})]
 ```
 
 Let's look at a more complex example:
@@ -146,44 +146,66 @@ Let's look at a more complex example:
 Let's chain a few operations, for example, finding the last names of all the people who studied in Berkeley:
 
 ```
-    println("=== Everyone who studied in Berkeley:")
-    val berkeley = array.filter {
-        it.obj("schoolResults")?.string("location") == "Berkeley"
-    }.map {
-        it.string("last")
-    }
-    println("${berkeley}")
+println("=== Everyone who studied in Berkeley:")
+val berkeley = array.filter {
+    it.obj("schoolResults")?.string("location") == "Berkeley"
+}.map {
+    it.string("last")
+}
+println("${berkeley}")
 
-    // Prints:
-    // === Everyone who studied in Berkeley:
-    // [Cooper, Harkness]
-
+// Prints:
+// === Everyone who studied in Berkeley:
+// [Cooper, Harkness]
 ```
 
 All the grades over 75:
 
 ```
-    println("=== All grades bigger than 75")
-    val result = array.flatMap {
-        it.obj("schoolResults")
-                ?.array(JsonObject(), "scores")?.filter {
-                    it.long("grade")!! > 75
-                }!!
-    }
-    println("Result: ${result}")
+println("=== All grades bigger than 75")
+val result = array.flatMap {
+    it.obj("schoolResults")
+            ?.array(JsonObject(), "scores")?.filter {
+                it.long("grade")!! > 75
+            }!!
+}
+println("Result: ${result}")
 
-    // Prints:
-    // === All grades bigger than 75
-    // Result: [JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85}), JsonObject(map={name=physics, grade=90}), JsonObject(map={name=physics, grade=82})]
+// Prints:
+// === All grades bigger than 75
+// Result: [JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85}), JsonObject(map={name=physics, grade=90}), JsonObject(map={name=physics, grade=82})]
 
 ```
 
 Note the use of `flatMap` which transforms an initial result of a list of lists into a single list. If you use `map`, you will get a list of three lists:
 
 ```
-    // Using map instead of flatMap
-    // Prints:
-    // Result: [[JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85})], [JsonObject(map={name=physics, grade=90})], [JsonObject(    map={name=physics, grade=82})]]
+// Using map instead of flatMap
+// Prints:
+// Result: [[JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85})], [JsonObject(map={name=physics, grade=90})], [JsonObject(    map={name=physics, grade=82})]]
+```
+
+## Pretty printing
+
+You can convert any JsonObject to a valid JSON string by calling toJsonString() on it.
+
+## Advanced DSL
+
+Creating a JSON object with the Klaxon DSL makes it possible to insert arbitrary pieces of Kotlin code anywhere you want. For example, the following creates an object that maps each number from 1 to 3 with its string key:
+
+```
+val logic = json {
+    array(arrayListOf(1,2,3).map {
+        obj(it.toString(), it)
+    })
+}
+println("Result: ${logic.toJsonString()}")
+```
+
+will output:
+
+```
+Result: [ { "1" : 1 }  , { "2" : 2 }  , { "3" : 3 }  ]
 ```
 
 ## Implementation
