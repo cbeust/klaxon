@@ -15,7 +15,7 @@ public enum class Type {
 }
 
 class Token(val tokenType: Type, val value: Any?) {
-    fun toString() : String {
+    override fun toString() : String {
         val v = if (value != null) { " (" + value + ")" } else {""}
         val result = tokenType.toString() + v
         return result
@@ -43,7 +43,7 @@ public class Lexer(val inputStream : InputStream) {
     }
 
     private fun isDone() : Boolean {
-        return index >= bytes.size
+        return index >= bytes.size()
     }
 
     val BOOLEAN_LETTERS = hashSetOf('f', 'a', 'l', 's', 'e', 't', 'r', 'u')
@@ -61,7 +61,7 @@ public class Lexer(val inputStream : InputStream) {
             return EOF
         }
 
-        var tokenType = Type.EOF
+        var tokenType: Type
         var c = nextChar()
         var currentValue = StringBuilder()
         var jsonValue: Any? = null
@@ -74,9 +74,9 @@ public class Lexer(val inputStream : InputStream) {
             tokenType = Type.VALUE
             if (! isDone()) {
                 c = nextChar()
-                while (index < bytes.size && c != '"') {
+                while (index < bytes.size() && c != '"') {
                     currentValue.append(c)
-                    if (c == '\\' && index < bytes.size) {
+                    if (c == '\\' && index < bytes.size()) {
                         c = nextChar()
                         currentValue.append(c)
                     }
@@ -117,7 +117,7 @@ public class Lexer(val inputStream : InputStream) {
             } else if ("false".equals(v.toLowerCase())) {
                 jsonValue = false
             } else {
-                throw RuntimeException("Unexpected characted at position ${index}"
+                throw RuntimeException("Unexpected character at position ${index}"
                     + ": '${c} (${c.toInt()})'")
             }
 

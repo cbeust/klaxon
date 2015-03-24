@@ -1,6 +1,6 @@
 package com.beust.klaxon
 
-public enum class Status {
+enum class Status {
     INIT;
     IN_FINISHED_VALUE;
     IN_OBJECT;
