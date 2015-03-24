@@ -1,7 +1,5 @@
 package com.beust.klaxon
 
-import java.util.HashMap
-
 fun convert(value: Any?) : Any? = when (value) {
         is Int -> value
         is Long -> value
@@ -21,7 +19,7 @@ class JSON() {
 
     fun array(args: List<Any>) : JsonArray<Any?> = JsonArray(args.map(::convert))
 
-    fun obj(vararg args: Pair<String, *>): JsonObject = JsonObject(hashMapOf(*args).mapValues {convert(it.getValue())})
+    fun obj(vararg args: Pair<String, *>): JsonObject = JsonObject(linkedMapOf(*args).mapValues {convert(it.getValue())})
 }
 
 public fun <T> json(init : JSON.() -> T) : T {
