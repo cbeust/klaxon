@@ -1,58 +1,25 @@
 package com.beust.klaxon
 
-import java.util.HashMap
+fun convert(value: Any?) : Any? = when (value) {
+        is Int -> value
+        is Long -> value
+        is String -> value
+        is Boolean -> value
+        is Float -> value
+        is Double -> value
+        is JsonObject -> value
+        is JsonArray<*> -> value
+        null -> null
+        else -> throw IllegalArgumentException("Unrecognized type: " + value)
+    }
 
 class JSON() {
 
-    private fun convert(value: Any) : Any {
-        val result: Any
-        when (value) {
-            is Int -> result = value
-            is Long -> result = value
-            is String -> result = value
-            is Boolean -> result = value
-            is Float -> result = value
-            is Double -> result = value
-            is JsonObject -> result = value
-            is JsonArray<*> -> result = value
-            else -> throw IllegalArgumentException("Unrecognized type: " + value)
-        }
-        return result
-    }
+    fun array(vararg args: Any?) : JsonArray<Any?> = JsonArray(args.map(::convert))
 
-    fun array(vararg args: Any) : JsonArray<Any> {
-        val result = JsonArray<Any>()
-        var i = 0
-        while (i < args.size()) {
-            result.add(convert(args[i++]))
-        }
-        return result
-    }
+    fun array(args: List<Any?>) : JsonArray<Any?> = JsonArray(args.map(::convert))
 
-    fun array(args: List<Any>) : JsonArray<Any> {
-        val result = JsonArray<Any>()
-        var i = 0
-        while (i < args.size()) {
-            result.add(convert(args[i++]))
-        }
-        return result
-    }
-
-    fun obj(vararg args: Any): JsonObject {
-        val result = JsonObject()
-        var i = 0
-        while (i < args.size()) {
-            val key = args[i]
-            if (key !is String) {
-                throw IllegalArgumentException("Key should be a string: ${key}")
-            }
-
-            val value = args[i + 1]
-            result.put(key, convert(value))
-            i += 2
-        }
-        return result
-    }
+    fun obj(vararg args: Pair<String, *>): JsonObject = JsonObject(linkedMapOf(*args).mapValues {convert(it.getValue())})
 }
 
 public fun <T> json(init : JSON.() -> T) : T {

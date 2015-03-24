@@ -41,8 +41,8 @@ class World(var status : Status) {
     }
 
     [suppress("UNCHECKED_CAST")]
-    fun getFirstArray() : JsonArray<Any> {
-        return valueStack.getFirst() as JsonArray<Any>
+    fun getFirstArray() : JsonArray<Any?> {
+        return valueStack.getFirst() as JsonArray<Any?>
     }
 
     fun peekStatus() : Status {
@@ -54,17 +54,17 @@ class World(var status : Status) {
     }
 }
 
-data class Pair(val status: Status, val tokenType: Type)
+private data class TokenStatus(val status: Status, val tokenType: Type)
 
 class StateMachine {
-    val map = hashMapOf<Pair, (world: World, token: Token) -> World>()
+    val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
 
     fun put(status: Status, tokenType: Type, processor: (world: World, token: Token) -> World) {
-        map.put(Pair(status, tokenType), processor)
+        map.put(TokenStatus(status, tokenType), processor)
     }
 
     fun next(world: World, token: Token) : World {
-        val pair = Pair(world.status, token.tokenType)
+        val pair = TokenStatus(world.status, token.tokenType)
         val processor = map.get(pair)
         val result = if (processor != null) {
             processor(world, token)
@@ -142,7 +142,7 @@ public class Parser {
             world.popStatus()
             val key = world.popValue() as String
             world.parent = world.getFirstObject()
-            world.parent.put(key, token.value!!)
+            world.parent.put(key, token.value)
             world.status = world.peekStatus()
             world
         })
@@ -169,7 +169,7 @@ public class Parser {
         })
         sm.put(Status.IN_ARRAY, Type.VALUE, { world: World, token: Token ->
             val value = world.getFirstArray()
-            value.add(token.value!!)
+            value.add(token.value)
             world
         })
         sm.put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { world: World, token: Token ->
