@@ -1,6 +1,7 @@
-package com.beust.klaxon
+package com.beust.klaxon.test
 
 import java.util.ArrayList
+import com.beust.klaxon.*
 
 fun main(args : Array<String>) {
 //    val a1 = json {
@@ -28,16 +29,16 @@ fun main(args : Array<String>) {
 
     val aMix = json {
         obj (
-            "theArray", anArray,
-            "theObject", anObject,
-            "anInt", 4
+                "theArray", anArray,
+                "theObject", anObject,
+                "anInt", 4
         )
     }
     println("Mix: ${aMix.toJsonString()}")
 
     println("=== Logic into the DSL")
     val logic = json {
-        array(arrayListOf(1,2,3).map {
+        array(arrayListOf(1, 2, 3).map {
             obj(it.toString(), it)
         })
     }
@@ -75,7 +76,7 @@ fun example1() {
     val array = parse("/d.json") as JsonArray<JsonObject>
 
     println("=== Finding Jack:")
-    val jack = array.find {
+    val jack = array.first {
         it.string("first") == "Jack"
     }
     println("Jack: ${jack}")

@@ -8,7 +8,7 @@
     <version>0.6-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>0.5.429</kotlin.version>
+        <kotlin.version>0.11.91</kotlin.version>
         <testng.version>6.8.1</testng.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -95,7 +95,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.beust.klaxon.KlaxonPackage</mainClass>
+                    <mainClass>com.beust.klaxon.test.TestPackage</mainClass>
+                    <classpathScope>test</classpathScope>
                 </configuration>
             </plugin>
 

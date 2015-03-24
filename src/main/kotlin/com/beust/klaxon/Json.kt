@@ -23,7 +23,7 @@ class JSON() {
     fun array(vararg args: Any) : JsonArray<Any> {
         val result = JsonArray<Any>()
         var i = 0
-        while (i < args.size) {
+        while (i < args.size()) {
             result.add(convert(args[i++]))
         }
         return result
@@ -32,7 +32,7 @@ class JSON() {
     fun array(args: List<Any>) : JsonArray<Any> {
         val result = JsonArray<Any>()
         var i = 0
-        while (i < args.size) {
+        while (i < args.size()) {
             result.add(convert(args[i++]))
         }
         return result
@@ -41,12 +41,12 @@ class JSON() {
     fun obj(vararg args: Any): JsonObject {
         val result = JsonObject()
         var i = 0
-        while (i < args.size) {
-            val k = args[i]
-            if (k !is String) {
-                throw IllegalArgumentException("Key should be a string: ${k}")
+        while (i < args.size()) {
+            val key = args[i]
+            if (key !is String) {
+                throw IllegalArgumentException("Key should be a string: ${key}")
             }
-            val key = k as String
+
             val value = args[i + 1]
             result.put(key, convert(value))
             i += 2
@@ -55,6 +55,6 @@ class JSON() {
     }
 }
 
-fun <T> json(init : JSON.() -> T) : T {
+public fun <T> json(init : JSON.() -> T) : T {
     return JSON().init()
 }
