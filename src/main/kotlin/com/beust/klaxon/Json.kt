@@ -15,9 +15,9 @@ fun convert(value: Any?) : Any? = when (value) {
 
 class JSON() {
 
-    fun array(vararg args: Any) : JsonArray<Any?> = JsonArray(args.map(::convert))
+    fun array(vararg args: Any?) : JsonArray<Any?> = JsonArray(args.map(::convert))
 
-    fun array(args: List<Any>) : JsonArray<Any?> = JsonArray(args.map(::convert))
+    fun array(args: List<Any?>) : JsonArray<Any?> = JsonArray(args.map(::convert))
 
     fun obj(vararg args: Pair<String, *>): JsonObject = JsonObject(linkedMapOf(*args).mapValues {convert(it.getValue())})
 }

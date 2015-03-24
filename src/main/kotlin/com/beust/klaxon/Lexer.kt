@@ -46,13 +46,15 @@ public class Lexer(val inputStream : InputStream) {
         return index >= bytes.size()
     }
 
-    val BOOLEAN_LETTERS = hashSetOf('f', 'a', 'l', 's', 'e', 't', 'r', 'u')
+    val BOOLEAN_LETTERS = "falsetrue".toSet()
     private fun isBooleanLetter(c: Char) : Boolean {
         return BOOLEAN_LETTERS.contains(Character.toLowerCase(c))
     }
 
+    val NULL_LETTERS = "null".toSet()
+
     fun isValueLetter(c: Char) : Boolean {
-        return c == '-' || c == '+' || c == '.' || c.isDigit() || isBooleanLetter(c)
+        return c == '-' || c == '+' || c == '.' || c.isDigit() || isBooleanLetter(c) || c in NULL_LETTERS
     }
 
     fun nextToken() : Token {
@@ -116,6 +118,8 @@ public class Lexer(val inputStream : InputStream) {
                 jsonValue = true
             } else if ("false".equals(v.toLowerCase())) {
                 jsonValue = false
+            } else if (v == "null") {
+                jsonValue = null
             } else {
                 throw RuntimeException("Unexpected character at position ${index}"
                     + ": '${c} (${c.toInt()})'")

@@ -41,8 +41,8 @@ class World(var status : Status) {
     }
 
     [suppress("UNCHECKED_CAST")]
-    fun getFirstArray() : JsonArray<Any> {
-        return valueStack.getFirst() as JsonArray<Any>
+    fun getFirstArray() : JsonArray<Any?> {
+        return valueStack.getFirst() as JsonArray<Any?>
     }
 
     fun peekStatus() : Status {
@@ -142,7 +142,7 @@ public class Parser {
             world.popStatus()
             val key = world.popValue() as String
             world.parent = world.getFirstObject()
-            world.parent.put(key, token.value!!)
+            world.parent.put(key, token.value)
             world.status = world.peekStatus()
             world
         })
@@ -169,7 +169,7 @@ public class Parser {
         })
         sm.put(Status.IN_ARRAY, Type.VALUE, { world: World, token: Token ->
             val value = world.getFirstArray()
-            value.add(token.value!!)
+            value.add(token.value)
             world
         })
         sm.put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { world: World, token: Token ->

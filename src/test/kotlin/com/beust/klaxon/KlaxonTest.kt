@@ -37,7 +37,17 @@ class KlaxonTest {
     }
 
     Test
-    fun nulls() {
+    fun nullsParse() {
+        assertEquals(json {
+            array(1, null, obj(
+                    "a" to 1,
+                    "." to null
+            ))
+        }, read("/nulls.json"))
+    }
+
+    Test
+    fun nullsDSL() {
         val j = json {
             obj(
                     "1" to null,
