@@ -1,7 +1,7 @@
 package com.beust.klaxon
 
 import java.util.ArrayList
-import java.util.HashMap
+import java.util.LinkedHashMap
 
 public fun valueToString(v: Any?) : String =
     StringBuilder {
@@ -20,7 +20,7 @@ public trait JsonBase {
     fun toJsonString() : String = StringBuilder { appendJsonString(this) }.toString()
 }
 
-public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject = JsonObject(HashMap(map))
+public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject = JsonObject(LinkedHashMap(map))
 
 public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, Map<String, Any?> by map {
 
