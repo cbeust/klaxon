@@ -28,16 +28,16 @@ fun main(args : Array<String>) {
 
     val aMix = json {
         obj (
-            "theArray", anArray,
-            "theObject", anObject,
-            "anInt", 4
+                "theArray", anArray,
+                "theObject", anObject,
+                "anInt", 4
         )
     }
     println("Mix: ${aMix.toJsonString()}")
 
     println("=== Logic into the DSL")
     val logic = json {
-        array(arrayListOf(1,2,3).map {
+        array(arrayListOf(1, 2, 3).map {
             obj(it.toString(), it)
         })
     }
