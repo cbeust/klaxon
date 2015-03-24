@@ -95,7 +95,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.beust.klaxon.KlaxonPackage</mainClass>
+                    <mainClass>com.beust.klaxon.test.TestPackage</mainClass>
+                    <classpathScope>test</classpathScope>
                 </configuration>
             </plugin>
 
