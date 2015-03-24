@@ -54,17 +54,17 @@ class World(var status : Status) {
     }
 }
 
-data class Pair(val status: Status, val tokenType: Type)
+private data class TokenStatus(val status: Status, val tokenType: Type)
 
 class StateMachine {
-    val map = hashMapOf<Pair, (world: World, token: Token) -> World>()
+    val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
 
     fun put(status: Status, tokenType: Type, processor: (world: World, token: Token) -> World) {
-        map.put(Pair(status, tokenType), processor)
+        map.put(TokenStatus(status, tokenType), processor)
     }
 
     fun next(world: World, token: Token) : World {
-        val pair = Pair(world.status, token.tokenType)
+        val pair = TokenStatus(world.status, token.tokenType)
         val processor = map.get(pair)
         val result = if (processor != null) {
             processor(world, token)

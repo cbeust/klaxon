@@ -18,7 +18,7 @@ fun main(args : Array<String>) {
 //    example2()
 //    example3()
     val anObject = json {
-        obj("a", 1, "b", "value")
+        obj("a" to 1, "b" to "value")
     }
     println("Json object: ${anObject.toJsonString()}")
 
@@ -29,9 +29,9 @@ fun main(args : Array<String>) {
 
     val aMix = json {
         obj (
-                "theArray", anArray,
-                "theObject", anObject,
-                "anInt", 4
+                "theArray" to anArray,
+                "theObject" to anObject,
+                "anInt" to 4
         )
     }
     println("Mix: ${aMix.toJsonString()}")
@@ -39,7 +39,7 @@ fun main(args : Array<String>) {
     println("=== Logic into the DSL")
     val logic = json {
         array(arrayListOf(1, 2, 3).map {
-            obj(it.toString(), it)
+            obj(it.toString() to it)
         })
     }
     println("Result: ${logic.toJsonString()}")
@@ -61,28 +61,28 @@ fun example3() {
 }
 
 fun example2() {
-    val array = parse("/e.json") as JsonArray<JsonObject>
+    val array = parse("/e.json") as JsonArray<*>
 
     val ages = array.long("age")
     println("Ages: ${ages}")
 
     val oldPeople = array.filter {
-        it.long("age")!! > 30
+        it is JsonObject && it.long("age")?.let { it > 30 } ?: false
     }
     println("Old people: ${oldPeople}")
 }
 
 fun example1() {
-    val array = parse("/d.json") as JsonArray<JsonObject>
+    val array = parse("/d.json") as JsonArray<*>
 
     println("=== Finding Jack:")
     val jack = array.first {
-        it.string("first") == "Jack"
+        it is JsonObject && it.string("first") == "Jack"
     }
     println("Jack: ${jack}")
 
     println("=== Everyone who studied in Berkeley:")
-    val berkeley = array.filter {
+    val berkeley = array.filterIsInstance<JsonObject>().filter {
         it.obj("schoolResults")?.string("location") == "Berkeley"
     }.map {
         it.string("last")
@@ -94,7 +94,7 @@ fun example1() {
     println("${lastNames}")
 
     println("=== All grades bigger than 75")
-    val result = array.map {
+    val result = array.filterIsInstance<JsonObject>().map {
         it.obj("schoolResults")
                 ?.array<JsonObject>("scores")?.filter {
                     it.long("grade")!! > 75
