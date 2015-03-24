@@ -20,7 +20,8 @@ public trait JsonBase {
     fun toJsonString() : String = StringBuilder { appendJsonString(this) }.toString()
 }
 
-public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject = JsonObject(LinkedHashMap(map))
+public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
+        JsonObject(LinkedHashMap(map))
 
 public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, Map<String, Any?> by map {
 
@@ -55,7 +56,8 @@ public fun JsonObject.double(fieldName: String) : Double? = get(fieldName) as Do
 public fun JsonObject.boolean(fieldName: String) : Boolean? = get(fieldName) as Boolean?
 
 
-public fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> = JsonArray(list.toArrayList())
+public fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
+        JsonArray(list.toArrayList())
 
 public data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
 

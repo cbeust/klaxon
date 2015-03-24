@@ -54,7 +54,8 @@ public class Lexer(val inputStream : InputStream) {
     val NULL_LETTERS = "null".toSet()
 
     fun isValueLetter(c: Char) : Boolean {
-        return c == '-' || c == '+' || c == '.' || c.isDigit() || isBooleanLetter(c) || c in NULL_LETTERS
+        return c == '-' || c == '+' || c == '.' || c.isDigit() || isBooleanLetter(c)
+                || c in NULL_LETTERS
     }
 
     fun nextToken() : Token {
