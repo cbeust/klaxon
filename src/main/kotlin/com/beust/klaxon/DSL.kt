@@ -84,5 +84,7 @@ public fun JsonArray<*>.obj(id: String) : JsonArray<JsonObject?> = mapChildren {
 
 public fun JsonArray<*>.long(id: String) : JsonArray<Long?> = mapChildren { it.long(id) }
 
+public fun JsonArray<*>.double(id: String) : JsonArray<Double?> = mapChildren { it.double(id) }
+
 public inline fun <T> JsonArray<*>.mapChildren(block : (JsonObject) -> T) : JsonArray<T> =
         JsonArray(mapTo(ArrayList(size())) {block(it as JsonObject) })
