@@ -226,7 +226,9 @@ If we have the following JSON
 
 So we can find all emails by
 
+```kotlin
 parse('my.json').lookup("users.email")
+```
 
 ## Implementation
 
