@@ -208,6 +208,26 @@ will output:
 Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
 ```
 
+## Flattening and path lookup
+
+If we have the following JSON 
+```json
+{
+	"users" : [
+	    {
+	        "email" : "user@is.here"
+	    },
+	    {
+	    	"email" : "spammer@there.us"
+	    }
+	]
+}
+```
+
+So we can find all emails by
+
+parse('my.json').lookup("users.email")
+
 ## Implementation
 
 The Parser is implemented as a mutable state machine supported by a simplistic `State` monad, making the main loop very simple:

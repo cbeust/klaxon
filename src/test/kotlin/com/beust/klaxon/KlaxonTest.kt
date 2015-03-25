@@ -122,5 +122,63 @@ class KlaxonTest {
 
         assertEquals(listOf(1L), j.filterIsInstance<JsonObject>().map {it.long("a")})
     }
+
+    Test
+    fun lookupObjects() {
+        val j = json {
+            obj(
+                    "users" to
+                            array(
+                                    obj(
+                                            "name" to "Sergey",
+                                            "weight" to 65.0
+                                    ),
+                                    obj(
+                                            "name" to "Bombshell",
+                                            "weight" to 121.0
+                                    ),
+                                    null
+                            )
+            )
+        }
+
+        assertEquals(JsonArray("Sergey", "Bombshell", null), j.lookup("/users/name"))
+        assertEquals(JsonArray("Sergey", "Bombshell", null), j.lookup("users.name"))
+    }
+
+    Test
+    fun lookupArray() {
+        val j = json {
+            array(
+                    "yo", obj("a" to 1)
+            )
+        }
+
+        assertEquals(JsonArray(null, 1), j.lookup("a"))
+    }
+
+    Test
+    fun lookupNestedArrays() {
+        val j = json {
+            array (
+                    array(
+                            array(
+                                    "yo", obj("a" to 1)
+                            )
+                    )
+            )
+        }
+
+        assertEquals(JsonArray(null, 1), j.lookup("a"))
+    }
+
+    Test
+    fun lookupSingleObject() {
+        val j = json {
+            obj("a" to 1)
+        }
+
+        assertEquals(1, j.lookup("a").single())
+    }
 }
 

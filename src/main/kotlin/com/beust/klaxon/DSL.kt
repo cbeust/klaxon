@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import java.util.ArrayList
+import java.util.Arrays
 import java.util.LinkedHashMap
 
 public fun valueToString(v: Any?) : String =
@@ -47,14 +48,8 @@ public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, Map<
     }
 }
 
-[suppress("UNCHECKED_CAST")]
-public fun <T> JsonObject.array(fieldName: String) : JsonArray<T>? = get(fieldName) as JsonArray<T>?
-public fun JsonObject.obj(fieldName: String) : JsonObject? = get(fieldName) as JsonObject?
-public fun JsonObject.long(fieldName: String) : Long? = get(fieldName) as Long?
-public fun JsonObject.string(fieldName: String) : String? = get(fieldName) as String?
-public fun JsonObject.double(fieldName: String) : Double? = get(fieldName) as Double?
-public fun JsonObject.boolean(fieldName: String) : Boolean? = get(fieldName) as Boolean?
-
+public fun <T> JsonArray(vararg items : T) : JsonArray<T> =
+    JsonArray(ArrayList(Arrays.asList(*items)))
 
 public fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
         JsonArray(list.toArrayList())
@@ -77,14 +72,3 @@ public data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableLi
     }
 
 }
-
-public fun JsonArray<*>.string(id: String) : JsonArray<String?> = mapChildren { it.string(id) }
-
-public fun JsonArray<*>.obj(id: String) : JsonArray<JsonObject?> = mapChildren { it.obj(id) }
-
-public fun JsonArray<*>.long(id: String) : JsonArray<Long?> = mapChildren { it.long(id) }
-
-public fun JsonArray<*>.double(id: String) : JsonArray<Double?> = mapChildren { it.double(id) }
-
-public inline fun <T> JsonArray<*>.mapChildren(block : (JsonObject) -> T) : JsonArray<T> =
-        JsonArray(mapTo(ArrayList(size())) {block(it as JsonObject) })
