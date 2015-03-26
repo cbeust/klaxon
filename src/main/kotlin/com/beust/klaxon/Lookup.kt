@@ -18,12 +18,18 @@ public fun JsonArray<*>.long(id: String) : JsonArray<Long?> = mapChildren { it.l
 public fun JsonArray<*>.double(id: String) : JsonArray<Double?> = mapChildren { it.double(id) }
 
 public fun <T> JsonArray<*>.mapChildren(block : (JsonObject) -> T) : JsonArray<T> =
-        JsonArray(flatMapTo(ArrayList(size())) { if (it is JsonObject) listOf(block(it)) else if (it is JsonArray<*>) it.mapChildren(block) else listOf(null) })
+        JsonArray(flatMapTo(ArrayList(size())) {
+            if (it is JsonObject) listOf(block(it))
+            else if (it is JsonArray<*>) it.mapChildren(block)
+            else listOf(null)
+        })
 
 public fun JsonArray<*>.get(key : String) : JsonArray<Any?> = mapChildren { it[key] }
 
 [suppress("UNCHECKED_CAST")]
-private fun Any?.ensureArray() : JsonArray<Any?> = if (this is JsonArray<*>) this as JsonArray<Any?> else JsonArray(this)
+private fun Any?.ensureArray() : JsonArray<Any?> =
+        if (this is JsonArray<*>) this as JsonArray<Any?>
+        else JsonArray(this)
 
 public fun JsonBase.lookup(key : String) : JsonArray<Any?> =
     key.split("[/\\.]").filter{it != ""}.fold<String, JsonBase>(this) { j, part ->
