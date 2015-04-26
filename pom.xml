@@ -5,7 +5,7 @@
 
     <groupId>com.beust</groupId>
     <artifactId>klaxon</artifactId>
-    <version>0.10</version>
+    <version>0.11-SNAPSHOT</version>
 
     <properties>
         <kotlin.version>0.11.91</kotlin.version>
