@@ -5,7 +5,7 @@
 
     <groupId>com.beust</groupId>
     <artifactId>klaxon</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9</version>
 
     <properties>
         <kotlin.version>0.11.91</kotlin.version>
@@ -133,6 +133,29 @@
                         src/main/java
                     </source>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-empty-javadoc</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>lib/empty-javadoc.jar</file>
+                                    <type>jar</type>
+                                    <classifier>javadoc</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!--
