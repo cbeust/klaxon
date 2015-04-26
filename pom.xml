@@ -5,7 +5,7 @@
 
     <groupId>com.beust</groupId>
     <artifactId>klaxon</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.8</version>
 
     <properties>
         <kotlin.version>0.11.91</kotlin.version>
@@ -130,7 +130,7 @@
                 </executions>
                 <configuration>
                     <source>
-                        src/main/kotlin
+                        src/main/java
                     </source>
                 </configuration>
             </plugin>
