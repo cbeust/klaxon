@@ -116,7 +116,7 @@
             </plugin>
 
             <!-- Generating Javadoc -->
-            <plugin>
+            <!--
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
@@ -131,10 +131,12 @@
                 <configuration>
                     <source>
                         src/main/java
+                        src/main/kotlin
                     </source>
                 </configuration>
             </plugin>
-
+            -->
+<!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -148,7 +150,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>lib/empty-javadoc.jar</file>
+                                    <file>empty-javadoc.jar</file>
                                     <type>jar</type>
                                     <classifier>javadoc</classifier>
                                 </artifact>
@@ -157,14 +159,12 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--
+            -->
+<!--
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kdoc-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
+                <version>0.11.91.2</version>
                 <configuration>
                     <sources>
                         <source>./src/main/kotlin</source>
@@ -181,8 +181,8 @@
                     </execution>
                 </executions>
             </plugin>
--->
 
+    -->
         </plugins>
     </build>
 

@@ -26,6 +26,9 @@ class JSON() {
             JsonObject(linkedMapOf(*args).mapValues {convert(it.getValue())})
 }
 
+/**
+ * Main entry point.
+ */
 public fun <T> json(init : JSON.() -> T) : T {
     return JSON().init()
 }
