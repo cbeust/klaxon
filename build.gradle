@@ -20,9 +20,9 @@ apply plugin: 'com.jfrog.bintray'
 
 bintray {
     user = 'cbeust'
-    key = '60ada4b8fecb43800b68580863aa5b5b82373607'
+    key = 'xxx'
 
-    publications = ['MavenKlaxon'] //When uploading Maven-based publication files
+//    publications = ['MavenKlaxon'] //When uploading Maven-based publication files
     dryRun = true //Whether to run this as dry-run, without deploying
     publish = true //If version should be auto published after an upload
     //Package configuration. The plugin will use the repo and name properties to check if the package already exists. In that case, there's no need to configure the other package properties (like userOrg, desc, etc).
@@ -60,20 +60,20 @@ bintray {
         }
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenKlaxon) {
-                if (plugins.hasPlugin('war')) {
-                    from components.web
-                } else {
-                    from components.java
-                }
-
-                artifact sourcesJar
-                artifact javadocJar
-            }
-        }
-    }
+//    publishing {
+//        publications {
+//            mavenJava(MavenKlaxon) {
+//                if (plugins.hasPlugin('war')) {
+//                    from components.web
+//                } else {
+//                    from components.java
+//                }
+//
+//                artifact sourcesJar
+//                artifact javadocJar
+//            }
+//        }
+//    }
 
 
 }
