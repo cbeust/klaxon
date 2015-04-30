@@ -1,0 +1,97 @@
+buildscript {
+    ext.kotlinVersion = '0.11.91.4'
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://oss.sonatype.org/content/repositories/snapshots'
+        }
+    }
+    dependencies {
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:0.11.91.4'
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.1"
+}
+
+apply plugin: 'com.jfrog.bintray'
+
+bintray {
+    user = 'cbeust'
+    key = '60ada4b8fecb43800b68580863aa5b5b82373607'
+
+    publications = ['MavenKlaxon'] //When uploading Maven-based publication files
+    dryRun = true //Whether to run this as dry-run, without deploying
+    publish = true //If version should be auto published after an upload
+    //Package configuration. The plugin will use the repo and name properties to check if the package already exists. In that case, there's no need to configure the other package properties (like userOrg, desc, etc).
+    pkg {
+        repo = 'myrepo'
+        name = 'mypkg'
+        userOrg = 'com.beust' //An optional organization name when the repo belongs to one of the user's orgs
+        desc = 'JSON parsing for Kotlin'
+        websiteUrl = 'http://github.com/cbeust/klaxon'
+        issueTrackerUrl = 'https://github.com/bintray/gradle-bintray-plugin/issues'
+        vcsUrl = 'https://github.com/bintray/gradle-bintray-plugin.git'
+        licenses = ['Apache-2.0']
+        labels = ['gear', 'gore', 'gorilla']
+        publicDownloadNumbers = true
+        attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
+        //Optional version descriptor
+        version {
+            name = '1.3-Final' //Bintray logical version name
+            desc = //Optional - Version-specific description'
+            released  = //Optional - Date of the version release. 2 possible values: date in the format of 'yyyy-MM-dd'T'HH:mm:ss.SSSZZ' OR a java.util.Date instance
+            vcsTag = '1.3.0'
+            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin'] //Optional version-level attributes
+            //Optional configuration for GPG signing
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = 'passphrase' //Optional. The passphrase for GPG signing'
+            }
+            //Optional configuration for Maven Central sync of the version
+            mavenCentralSync {
+                sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
+                user = 'userToken' //OSS user token
+                password = 'paasword' //OSS user password
+                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+            }
+        }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenKlaxon) {
+                if (plugins.hasPlugin('war')) {
+                    from components.web
+                } else {
+                    from components.java
+                }
+
+                artifact sourcesJar
+                artifact javadocJar
+            }
+        }
+    }
+
+
+}
+
+apply plugin: "kotlin"
+
+compileKotlin {
+    kotlinOptions.annotations = file('annotations')
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+dependencies {
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:0.11.91.4'
+    testCompile 'org.testng:testng:6.8.21'
+}
