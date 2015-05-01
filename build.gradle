@@ -17,10 +17,23 @@ plugins {
     id "com.jfrog.bintray" version "1.1"
 }
 
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 artifacts {
     file('build/libs/klaxon.jar')
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId 'com.beust'
+            artifactId 'klaxon'
+            version '0.15'
+        }
+    }
 }
 
 Properties properties = new Properties()
@@ -30,7 +43,7 @@ bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
 
-//    publications = ['MavenKlaxon'] //When uploading Maven-based publication files
+    publications = ['mavenJava'] //When uploading Maven-based publication files
     dryRun = false //Whether to run this as dry-run, without deploying
     publish = false //If version should be auto published after an upload
     //Package configuration. The plugin will use the repo and name properties to check if the package already exists. In that case, there's no need to configure the other package properties (like userOrg, desc, etc).
@@ -62,7 +75,7 @@ bintray {
             mavenCentralSync {
                 sync = false //Optional (true by default). Determines whether to sync the version to Maven Central.
                 user = 'cbeust' //OSS user token
-                password = 'lunacabin' //OSS user password
+                password = 'xxx' //OSS user password
                 close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
             }
         }
