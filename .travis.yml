@@ -1,12 +1,5 @@
-language: java
-
+language: kotlin
 jdk:
-- oraclejdk7
-- oraclejdk8
-
-sudo: false
-
-cache:
-directories:
-- $HOME/.m2
-
+  - oraclejdk8
+  - oraclejdk7
+  - openjdk7
