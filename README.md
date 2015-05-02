@@ -2,6 +2,18 @@
 
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
+## Install
+
+```
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.beust:klaxon:0.12'
+}
+```
+
 ## API
 
 Values parsed from a valid JSON file can be of the following type:
