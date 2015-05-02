@@ -3,3 +3,6 @@ jdk:
   - oraclejdk8
   - oraclejdk7
   - openjdk7
+
+script: gradle/buildViaTravis.sh
+
