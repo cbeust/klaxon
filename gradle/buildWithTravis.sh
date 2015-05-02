@@ -1,1 +1,1 @@
-gradlew check
+../gradlew check
