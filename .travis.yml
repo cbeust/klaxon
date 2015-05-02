@@ -1,8 +1,8 @@
-language: kotlin
+language: java
 jdk:
   - oraclejdk8
   - oraclejdk7
   - openjdk7
 
-script: gradle/buildWithTravis.sh
+#script: gradle/buildWithTravis.sh
 
