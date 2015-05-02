@@ -17,97 +17,17 @@ plugins {
     id "com.jfrog.bintray" version "1.1"
 }
 
+version = '0.12'
+
+apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-artifacts {
-    file('build/libs/klaxon.jar')
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            groupId 'com.beust'
-            artifactId 'klaxon'
-            version '0.15'
-        }
-    }
-}
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    publications = ['mavenJava'] //When uploading Maven-based publication files
-    dryRun = false //Whether to run this as dry-run, without deploying
-    publish = false //If version should be auto published after an upload
-    //Package configuration. The plugin will use the repo and name properties to check if the package already exists. In that case, there's no need to configure the other package properties (like userOrg, desc, etc).
-    pkg {
-        repo = 'maven'
-        name = 'klaxon'
-//        userOrg = 'com.beust' //An optional organization name when the repo belongs to one of the user's orgs
-        desc = 'JSON parsing for Kotlin'
-        websiteUrl = 'http://github.com/cbeust/klaxon'
-        issueTrackerUrl = 'https://github.com/cbeust/klaxon/issues'
-        vcsUrl = 'https://github.com/cbeust/klaxon.git'
-        licenses = ['Apache-2.0']
-//        labels = ['gear', 'gore', 'gorilla']
-        publicDownloadNumbers = true
-//        attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
-        //Optional version descriptor
-        version {
-            name = '0.13' //Bintray logical version name
-            desc = //Optional - Version-specific description'
-//            released  = //Optional - Date of the version release. 2 possible values: date in the format of 'yyyy-MM-dd'T'HH:mm:ss.SSSZZ' OR a java.util.Date instance
-            vcsTag = name
-//            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin'] //Optional version-level attributes
-            //Optional configuration for GPG signing
-//            gpg {
-//                sign = true //Determines whether to GPG sign the files. The default is false
-//                passphrase = 'passphrase' //Optional. The passphrase for GPG signing'
-//            }
-            //Optional configuration for Maven Central sync of the version
-            mavenCentralSync {
-                sync = false //Optional (true by default). Determines whether to sync the version to Maven Central.
-                user = 'cbeust' //OSS user token
-                password = 'xxx' //OSS user password
-                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-            }
-        }
-    }
-
-//    publishing {
-//        publications {
-//            mavenJava(MavenKlaxon) {
-//                if (plugins.hasPlugin('war')) {
-//                    from components.web
-//                } else {
-//                    from components.java
-//                }
-//
-//                file('build/libs/klaxon.jar')
-//                artifact sourcesJar
-//                artifact javadocJar
-//            }
-//        }
-//    }
-
-
-}
-
-apply plugin: "kotlin"
-
-compileKotlin {
-    kotlinOptions.annotations = file('annotations')
-}
+apply from: 'gradle/publishing.gradle'
 
 repositories {
     mavenCentral()
+    jcenter()
     maven {
         url 'http://oss.sonatype.org/content/repositories/snapshots'
     }
@@ -116,4 +36,16 @@ repositories {
 dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib:0.11.91.4'
     testCompile 'org.testng:testng:6.8.21'
+}
+
+task sourceJar(type: Jar) {
+    group 'Build'
+    description 'An archive of the source code'
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    file('build/libs/klaxon.jar')
+    sourceJar
 }
