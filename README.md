@@ -45,7 +45,7 @@ fun parse(name: String) : Any {
 
 // ...
 
-    val obj = parse("/object.json") as JsonObject
+val obj = parse("/object.json") as JsonObject
 ```
 
 You can also access the JSON content as a file, or any other resource you can get an `InputStream` from.
@@ -236,7 +236,7 @@ If we have the following JSON
 }
 ```
 
-So we can find all emails by
+We can find all emails by
 
 ```kotlin
 parse('my.json').lookup("users.email")
