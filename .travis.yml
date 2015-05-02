@@ -4,5 +4,5 @@ jdk:
   - oraclejdk7
   - openjdk7
 
-script: gradle/buildViaTravis.sh
+script: gradle/buildWithTravis.sh
 
