@@ -84,6 +84,10 @@ public class Lexer(val inputStream : InputStream) {
                 c = nextChar()
                 when (c) {
                     '\\' -> {
+                        if (isDone()) {
+                            throw RuntimeException("Unterminated string")
+                        }
+
                         c = nextChar()
                         when (c) {
                             'n' -> currentValue.append("\n")
