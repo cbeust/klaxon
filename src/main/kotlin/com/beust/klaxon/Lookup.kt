@@ -3,7 +3,7 @@ package com.beust.klaxon
 import java.util.ArrayList
 
 
-[suppress("UNCHECKED_CAST")]
+suppress("UNCHECKED_CAST")
 public fun <T> JsonObject.array(fieldName: String) : JsonArray<T>? = get(fieldName) as JsonArray<T>?
 public fun JsonObject.obj(fieldName: String) : JsonObject? = get(fieldName) as JsonObject?
 public fun JsonObject.long(fieldName: String) : Long? = get(fieldName) as Long?
@@ -26,13 +26,13 @@ public fun <T> JsonArray<*>.mapChildren(block : (JsonObject) -> T) : JsonArray<T
 
 public fun JsonArray<*>.get(key : String) : JsonArray<Any?> = mapChildren { it[key] }
 
-[suppress("UNCHECKED_CAST")]
+suppress("UNCHECKED_CAST")
 private fun Any?.ensureArray() : JsonArray<Any?> =
         if (this is JsonArray<*>) this as JsonArray<Any?>
         else JsonArray(this)
 
 public fun JsonBase.lookup(key : String) : JsonArray<Any?> =
-    key.split("[/\\.]").filter{it != ""}.fold<String, JsonBase>(this) { j, part ->
+    key.split("[/\\.]".toRegex()).filter{ it != "" }.fold<String, JsonBase>(this) { j, part ->
         when (j) {
             is JsonArray<*> -> j[part]
             is JsonObject -> j[part].ensureArray()

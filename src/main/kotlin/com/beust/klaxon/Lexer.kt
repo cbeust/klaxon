@@ -4,13 +4,13 @@ import java.util.regex.Pattern
 import java.io.InputStream
 
 public enum class Type {
-    VALUE;
-    LEFT_BRACE;
-    RIGHT_BRACE;
-    LEFT_BRACKET;
-    RIGHT_BRACKET;
-    COMMA;
-    COLON;
+    VALUE,
+    LEFT_BRACE,
+    RIGHT_BRACE,
+    LEFT_BRACKET,
+    RIGHT_BRACKET,
+    COMMA,
+    COLON,
     EOF;
 }
 

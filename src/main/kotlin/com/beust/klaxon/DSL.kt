@@ -16,7 +16,7 @@ public fun valueToString(v: Any?) : String =
 
     }.toString()
 
-public trait JsonBase {
+public interface JsonBase {
     fun appendJsonString(result : StringBuilder)
     fun toJsonString() : String = StringBuilder { appendJsonString(this) }.toString()
 }
