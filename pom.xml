@@ -8,7 +8,7 @@
     <version>0.11-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>0.11.91</kotlin.version>
+        <kotlin.version>0.12.213</kotlin.version>
         <testng.version>6.8.1</testng.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
