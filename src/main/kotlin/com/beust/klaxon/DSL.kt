@@ -4,47 +4,52 @@ import java.util.ArrayList
 import java.util.Arrays
 import java.util.LinkedHashMap
 
-public fun valueToString(v: Any?) : String =
+public fun valueToString(v: Any?, prettyPrint: Boolean = false) : String =
     StringBuilder {
-
-        when (v) {
-            is JsonBase -> v.appendJsonString(this)
-
-            is String -> append("\"").append(v).append("\"")
-            else -> append(v)
-        }
-
+        renderValue(v, this, prettyPrint, 0)
     }.toString()
 
 public interface JsonBase {
-    fun appendJsonString(result : StringBuilder)
-    fun toJsonString() : String = StringBuilder { appendJsonString(this) }.toString()
+    fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int)
+    final fun appendJsonString(result : Appendable, prettyPrint: Boolean = false) = appendJsonStringImpl(result, prettyPrint, 0)
+    final fun toJsonString(prettyPrint: Boolean = false) : String = StringBuilder { appendJsonString(this, prettyPrint) }.toString()
 }
 
 public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
         JsonObject(LinkedHashMap(map))
 
-public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, Map<String, Any?> by map {
+public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?> by map {
 
-    fun put(key : String, value : Any?) {
-        map[key] = value
-    }
-
-    override fun appendJsonString(result: StringBuilder) {
-        result.append("{ ")
+    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int) {
+        result.append("{")
 
         var comma = false
         for ((k, v) in map) {
             if (comma) {
-                result.append(", ")
+                result.append(",")
             } else {
                 comma = true
             }
-            result.append("\"").append(k).append("\" : ")
-            result.append(valueToString(v)).append(" ")
+
+            if (prettyPrint) {
+                result.appendln()
+                result.indent(level + 1)
+            }
+
+            result.append("\"").append(k).append("\":")
+            if (prettyPrint) {
+                result.append(" ")
+            }
+
+            renderValue(v, result, prettyPrint, level + 1)
         }
 
-        result.append("} ")
+        if (prettyPrint && map.isNotEmpty()) {
+            result.appendln()
+            result.indent(level)
+        }
+
+        result.append("}")
     }
 }
 
@@ -56,19 +61,23 @@ public fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
 
 public data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
 
-    override fun appendJsonString(result: StringBuilder) {
-        result.append("[ ")
+    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int) {
+        result.append("[")
 
         var comma = false
         value.forEach {
             if (comma) {
-                result.append(", ")
+                result.append(",")
+                if (prettyPrint) {
+                    result.append(" ")
+                }
             } else {
                 comma = true
             }
-            result.append(valueToString(it)).append(" ")
+
+            renderValue(it, result, prettyPrint, level)
         }
-        result.append("] ")
+        result.append("]")
     }
 
 }

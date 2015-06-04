@@ -10,7 +10,7 @@ class KlaxonTest {
     fun bc() {
     }
 
-    private fun read(name: String) : Any?  {
+    private fun read(name: String): Any? {
         val cls = javaClass<KlaxonTest>()
         return Parser().parse(cls.getResourceAsStream(name)!!)
     }
@@ -29,8 +29,8 @@ class KlaxonTest {
         val j = read("/a.json")
         val expected = json {
             obj("a" to "b",
-                "c" to array(1, 2.34, "abc", false),
-                "e" to obj("f" to 30, "g" to 31)
+                    "c" to array(1, 2.34, "abc", false),
+                    "e" to obj("f" to 30, "g" to 31)
             )
         }
         assertEquals(expected, j)
@@ -55,7 +55,54 @@ class KlaxonTest {
             )
         }
 
-        assertEquals("""{ "1" : null , "2" : 2 } """, j.toJsonString())
+        assertEquals("""{"1":null,"2":2}""", j.toJsonString())
+    }
+
+    Test
+    fun prettyPrintObject() {
+        val j = json {
+            obj(
+                    "a" to 1,
+                    "b" to "text"
+            )
+        }
+
+        assertEquals("""{
+  "a": 1,
+  "b": "text"
+}""", j.toJsonString(true))
+    }
+
+    Test
+    fun prettyPrintEmptyObject() {
+        assertEquals("{}", JsonObject(emptyMap()).toJsonString(true))
+    }
+
+    Test
+    fun prettyPrintArray() {
+        assertEquals("[1, 2, 3]", JsonArray(1, 2, 3).toJsonString(true))
+    }
+
+    Test
+    fun prettyPrintNestedObjects() {
+        assertEquals("""{
+  "a": 1,
+  "obj": {
+    "b": 2
+  }
+}""", json {
+            obj(
+                    "a" to 1,
+                    "obj" to json {
+                        obj("b" to 2)
+                    }
+            )
+        }.toJsonString(true))
+    }
+
+    Test
+    fun renderStringEscapes() {
+        assertEquals(""" "test\"it\n" """.trim(), valueToString("test\"it\n"))
     }
 
     Test
@@ -120,7 +167,7 @@ class KlaxonTest {
             array(1, 2, 3, obj("a" to 1L))
         }
 
-        assertEquals(listOf(1L), j.filterIsInstance<JsonObject>().map {it.long("a")})
+        assertEquals(listOf(1L), j.filterIsInstance<JsonObject>().map { it.long("a") })
     }
 
     Test
