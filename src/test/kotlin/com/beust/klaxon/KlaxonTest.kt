@@ -106,6 +106,13 @@ class KlaxonTest {
     }
 
     Test
+    fun parseStringEscapes() {
+        assertEquals(json {
+            obj("s" to "text field \"s\"\nnext line")
+        }, read("/escaped.json"))
+    }
+
+    Test
     fun arrayLookup() {
         val j = json {
             array(
