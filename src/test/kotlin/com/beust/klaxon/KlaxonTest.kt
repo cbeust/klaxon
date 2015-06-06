@@ -143,8 +143,10 @@ class KlaxonTest {
             )
         }
 
-        assertEquals(listOf("SuperMan", "BlackOwl", "Anonymous", "Rocket"), j.string("nick").filterNotNull())
-        assertEquals(listOf("US", "UK", null, "Russia"), j.obj("address").map { it?.string("country") })
+        assertEquals(listOf("SuperMan", "BlackOwl", "Anonymous", "Rocket"),
+                j.string("nick").filterNotNull())
+        assertEquals(listOf("US", "UK", null, "Russia"),
+                j.obj("address").map { it?.string("country") })
         assertEquals(listOf(89.4, 75.7, -1.0, 72.0), j.double("weight"))
         assertEquals(listOf(1L, 1L, 1L, 1L), j.long("d"))
     }

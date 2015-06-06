@@ -32,11 +32,13 @@ private fun Any?.ensureArray() : JsonArray<Any?> =
         else JsonArray(this)
 
 public fun JsonBase.lookup(key : String) : JsonArray<Any?> =
-    key.split("[/\\.]".toRegex()).filter{ it != "" }.fold<String, JsonBase>(this) { j, part ->
-        when (j) {
-            is JsonArray<*> -> j[part]
-            is JsonObject -> j[part].ensureArray()
-            else -> throw IllegalArgumentException("unsupported type of j = $j")
-        }
-    }.ensureArray()
+    key.split("[/\\.]".toRegex())
+            .filter{ it != "" }
+            .fold<String, JsonBase>(this) { j, part ->
+                when (j) {
+                    is JsonArray<*> -> j[part]
+                    is JsonObject -> j[part].ensureArray()
+                    else -> throw IllegalArgumentException("unsupported type of j = $j")
+                }
+            }.ensureArray()
 

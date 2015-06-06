@@ -11,14 +11,17 @@ public fun valueToString(v: Any?, prettyPrint: Boolean = false) : String =
 
 public interface JsonBase {
     fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int)
-    final fun appendJsonString(result : Appendable, prettyPrint: Boolean = false) = appendJsonStringImpl(result, prettyPrint, 0)
-    final fun toJsonString(prettyPrint: Boolean = false) : String = StringBuilder { appendJsonString(this, prettyPrint) }.toString()
+    final fun appendJsonString(result : Appendable, prettyPrint: Boolean = false) =
+            appendJsonStringImpl(result, prettyPrint, 0)
+    final fun toJsonString(prettyPrint: Boolean = false) : String =
+            StringBuilder { appendJsonString(this, prettyPrint) }.toString()
 }
 
 public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
         JsonObject(LinkedHashMap(map))
 
-public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?> by map {
+public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?>
+        by map {
 
     override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int) {
         result.append("{")

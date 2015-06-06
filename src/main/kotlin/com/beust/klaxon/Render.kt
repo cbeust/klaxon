@@ -22,7 +22,11 @@ private fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level
     when (v) {
         is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, level)
         is String -> result.renderString(v)
-        is Map<*, *> -> renderValue(JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value?.toString() }), result, prettyPrint, level)
+        is Map<*, *> -> renderValue(
+                JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value?.toString() }),
+                result,
+                prettyPrint,
+                level)
         is List<*> -> renderValue(JsonArray(v.map { it?.toString() }), result, prettyPrint, level)
         else -> result.append(v.toString())
     }
