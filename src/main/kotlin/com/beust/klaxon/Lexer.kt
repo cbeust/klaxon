@@ -11,7 +11,7 @@ public enum class Type {
     RIGHT_BRACKET,
     COMMA,
     COLON,
-    EOF;
+    EOF
 }
 
 class Token(val tokenType: Type, val value: Any?) {
@@ -66,7 +66,7 @@ public class Lexer(val inputStream : InputStream) {
 
         var tokenType: Type
         var c = nextChar()
-        var currentValue = StringBuilder()
+        val currentValue = StringBuilder()
         var jsonValue: Any? = null
 
         while (! isDone() && isSpace(c)) {
@@ -75,20 +75,33 @@ public class Lexer(val inputStream : InputStream) {
 
         if ('"' == c) {
             tokenType = Type.VALUE
-            if (! isDone()) {
-                c = nextChar()
-                while (index < bytes.size() && c != '"') {
-                    currentValue.append(c)
-                    if (c == '\\' && index < bytes.size()) {
-                        c = nextChar()
-                        currentValue.append(c)
-                    }
-                    c = nextChar()
+            loop@
+            do {
+                if (isDone()) {
+                    throw RuntimeException("Unterminated string")
                 }
-                jsonValue = currentValue.toString()
-            } else {
-                throw RuntimeException("Unterminated string")
-            }
+
+                c = nextChar()
+                when (c) {
+                    '\\' -> {
+                        if (isDone()) {
+                            throw RuntimeException("Unterminated string")
+                        }
+
+                        c = nextChar()
+                        when (c) {
+                            'n' -> currentValue.append("\n")
+                            'r' -> currentValue.append("\r")
+                            '\\' -> currentValue.append("\\")
+                            else -> currentValue.append(c)
+                        }
+                    }
+                    '"' -> break@loop
+                    else -> currentValue.append(c)
+                }
+            } while (true)
+
+            jsonValue = currentValue.toString()
         } else if ('{' == c) {
             tokenType = Type.LEFT_BRACE
         } else if ('}' == c) {

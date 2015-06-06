@@ -199,7 +199,8 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 
 ## Pretty printing
 
-You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it.
+You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get pretty-printed
+version then you can call toJsonString(true)
 
 ## Advanced DSL
 
@@ -258,9 +259,7 @@ do {
 
 ## Limitations
 
-* Because of [Issue 3546](http://youtrack.jetbrains.com/issue/KT-3546), the delegation of `JsonArray` to `List` is currently performed manually, so not all methods available on `List` are available on `JsonArray`.
 * Currently reads the entire JSON content in memory. Streaming will be available soon for large files.
-* No pretty printing
 * Error handling is very primitive
 
 
