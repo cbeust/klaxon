@@ -17,7 +17,14 @@ public fun JsonArray<*>.obj(id: String) : JsonArray<JsonObject?> = mapChildren {
 public fun JsonArray<*>.long(id: String) : JsonArray<Long?> = mapChildren { it.long(id) }
 public fun JsonArray<*>.double(id: String) : JsonArray<Double?> = mapChildren { it.double(id) }
 
-public fun <T> JsonArray<*>.mapChildren(block : (JsonObject) -> T) : JsonArray<T> =
+public fun <T> JsonArray<*>.mapChildrenObjectsOnly(block : (JsonObject) -> T) : JsonArray<T> =
+        JsonArray(flatMapTo(ArrayList(size())) {
+            if (it is JsonObject) listOf(block(it))
+            else if (it is JsonArray<*>) it.mapChildrenObjectsOnly(block)
+            else listOf()
+        })
+
+public fun <T : Any> JsonArray<*>.mapChildren(block : (JsonObject) -> T?) : JsonArray<T?> =
         JsonArray(flatMapTo(ArrayList(size())) {
             if (it is JsonObject) listOf(block(it))
             else if (it is JsonArray<*>) it.mapChildren(block)
@@ -34,7 +41,7 @@ private fun Any?.ensureArray() : JsonArray<Any?> =
 public fun JsonBase.lookup(key : String) : JsonArray<Any?> =
     key.split("[/\\.]".toRegex())
             .filter{ it != "" }
-            .fold<String, JsonBase>(this) { j, part ->
+            .fold(this) { j, part ->
                 when (j) {
                     is JsonArray<*> -> j[part]
                     is JsonObject -> j[part].ensureArray()
