@@ -4,6 +4,7 @@ import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class KlaxonTest {
     BeforeClass
@@ -235,6 +236,26 @@ class KlaxonTest {
         }
 
         assertEquals(1, j.lookup("a").single())
+    }
+
+    Test
+    fun mapChildren() {
+        val j = json {
+            array(1,2,3)
+        }
+
+        val result = j.mapChildrenObjectsOnly { fail("should never reach here") }
+        assertTrue(result.isEmpty())
+    }
+
+    Test
+    fun mapChildrenWithNulls() {
+        val j = json {
+            array(1,2,3)
+        }
+
+        val result = j.mapChildren { fail("should never reach here") }
+        assertEquals(listOf(null, null, null), result)
     }
 }
 
