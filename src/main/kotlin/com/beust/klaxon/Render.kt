@@ -10,13 +10,26 @@ private fun <A: Appendable> A.renderString(s: String): A {
             '\\' -> append(ch).append(ch)
             '\n' -> append("\\n")
             '\r' -> append("\\r")
-            else -> append(ch)
+            '\t' -> append("\\t")
+            '\b' -> append("\\b")
+            '\u000c' -> append("\\f")
+            else -> {
+                if(isPrintableUnicode(ch)){
+                    append("\\u")
+                    append(Integer.toHexString(ch.toInt()).padStart(4, '0'))
+                } else {
+                    append(ch)
+                }
+            }
         }
     }
 
     append("\"")
     return this
 }
+
+private fun isPrintableUnicode(c: Char) : Boolean = ((c >= '\u0000' && c <= '\u001F')
+        || (c >= '\u007F' && c <= '\u009F') || (c >= '\u2000' && c <= '\u20FF'))
 
 fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level: Int) {
     when (v) {

@@ -1,5 +1,7 @@
 package com.beust.klaxon
 
+import java.math.BigInteger
+
 fun convert(value: Any?) : Any? = when (value) {
         is Int -> value
         is Long -> value
@@ -7,6 +9,7 @@ fun convert(value: Any?) : Any? = when (value) {
         is Boolean -> value
         is Float -> value
         is Double -> value
+        is BigInteger -> value
         is JsonObject -> value
         is JsonArray<*> -> value
         null -> null
