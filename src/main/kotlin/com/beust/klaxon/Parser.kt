@@ -40,7 +40,7 @@ class World(var status : Status) {
         return valueStack.getFirst() as JsonObject
     }
 
-    @suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST")
     fun getFirstArray() : JsonArray<Any?> {
         return valueStack.getFirst() as JsonArray<Any?>
     }

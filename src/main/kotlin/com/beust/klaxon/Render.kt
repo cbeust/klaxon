@@ -18,7 +18,7 @@ private fun <A: Appendable> A.renderString(s: String): A {
     return this
 }
 
-private fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level: Int) {
+fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level: Int) {
     when (v) {
         is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, level)
         is String -> result.renderString(v)
@@ -32,7 +32,7 @@ private fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level
     }
 }
 
-private fun Appendable.indent(level: Int) {
+fun Appendable.indent(level: Int) {
     for (i in 1..level) {
         append("  ")
     }

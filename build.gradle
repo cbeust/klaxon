@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlinVersion = '0.12.+'
+    ext.kotlinVersion = '0.13.1513'
 
     repositories {
         mavenCentral()
@@ -14,10 +14,10 @@ buildscript {
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.1"
+    id "com.jfrog.bintray" version "1.2"
 }
 
-version = '0.13-SNAPSHOT'
+version = '0.14'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
