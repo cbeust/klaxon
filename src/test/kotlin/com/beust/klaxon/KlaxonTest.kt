@@ -68,38 +68,46 @@ class KlaxonTest {
             )
         }
 
-        assertEquals("""{
+        val expected = """{
   "a": 1,
   "b": "text"
-}""", j.toJsonString(true))
+}"""
+        val actual = j.toJsonString(true)
+        assertEquals(trim(expected), trim(actual))
     }
 
-    Test
+    @Test
     fun prettyPrintEmptyObject() {
         assertEquals("{}", JsonObject(emptyMap()).toJsonString(true))
     }
 
-    Test
+    @Test
     fun prettyPrintArray() {
         assertEquals("[1, 2, 3]", JsonArray(1, 2, 3).toJsonString(true))
     }
 
-    Test
+    @Test
     fun prettyPrintNestedObjects() {
-        assertEquals("""{
+        val expected = """{
   "a": 1,
   "obj": {
     "b": 2
   }
-}""", json {
+}"""
+
+        val actual = json {
             obj(
                     "a" to 1,
                     "obj" to json {
                         obj("b" to 2)
                     }
             )
-        }.toJsonString(true))
+        }.toJsonString(true)
+
+        assertEquals(trim(actual), trim(expected))
     }
+
+    private fun trim(s: String) = s.replace("\n", "").replace("\r", "")
 
     Test
     fun renderStringEscapes() {
@@ -148,8 +156,14 @@ class KlaxonTest {
                 j.string("nick").filterNotNull())
         assertEquals(listOf("US", "UK", null, "Russia"),
                 j.obj("address").map { it?.string("country") })
-        assertEquals(listOf(89.4, 75.7, -1.0, 72.0), j.double("weight"))
-        assertEquals(listOf(1L, 1L, 1L, 1L), j.long("d"))
+        assertKlaxonEquals(listOf(89.4, 75.7, -1.0, 72.0), j.double("weight"))
+        assertKlaxonEquals(listOf(1L, 1L, 1L, 1L), j.long("d"))
+    }
+
+    private fun <T> assertKlaxonEquals(expected: List<T>, actual: JsonArray<T>) {
+        for (i in 0..expected.size() - 1) {
+            assertEquals(expected.get(i), actual.get(i))
+        }
     }
 
     Test
@@ -255,7 +269,7 @@ class KlaxonTest {
         }
 
         val result = j.mapChildren { fail("should never reach here") }
-        assertEquals(listOf(null, null, null), result)
+        assertKlaxonEquals(listOf(null, null, null), result)
     }
 }
 
