@@ -1,3 +1,3 @@
 {
-  "s": "text field \"s\"\nnext line"
+  "s": "text field \"s\"\nnext line\fform feed\ttab\\rev solidus\/solidus\bbackspace"
 }

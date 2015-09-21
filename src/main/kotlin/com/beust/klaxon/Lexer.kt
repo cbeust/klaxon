@@ -90,9 +90,23 @@ public class Lexer(val inputStream : InputStream) {
 
                         c = nextChar()
                         when (c) {
+                            '\\' -> currentValue.append("\\")
+                            '/' -> currentValue.append("/")
+                            'b' -> currentValue.append("\b")
+                            'f' -> currentValue.append("\u000c")
                             'n' -> currentValue.append("\n")
                             'r' -> currentValue.append("\r")
-                            '\\' -> currentValue.append("\\")
+                            't' -> currentValue.append("\t")
+                            'u' -> {
+                                val unicodeChar = StringBuilder(4)
+                                    .append(nextChar())
+                                    .append(nextChar())
+                                    .append(nextChar())
+                                    .append(nextChar())
+
+                                val intValue = java.lang.Integer.parseInt(unicodeChar.toString(), 16);
+                                currentValue.append(intValue.toChar())
+                            }
                             else -> currentValue.append(c)
                         }
                     }
@@ -125,7 +139,15 @@ public class Lexer(val inputStream : InputStream) {
             }
             val v = currentValue.toString()
             if (NUMERIC.matcher(v).matches()) {
-                jsonValue = java.lang.Integer.parseInt(v)
+                try {
+                    jsonValue = java.lang.Integer.parseInt(v);
+                } catch (e: NumberFormatException){
+                    try {
+                        jsonValue = java.lang.Long.parseLong(v)
+                    } catch(e: NumberFormatException) {
+                        jsonValue = java.math.BigInteger(v)
+                    }
+                }
             } else if (DOUBLE.matcher(v).matches()) {
                 jsonValue = java.lang.Double.parseDouble(v)
             } else if ("true".equals(v.toLowerCase())) {

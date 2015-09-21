@@ -6,17 +6,17 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
+@Test
 class KlaxonTest {
-    BeforeClass
+    @BeforeClass
     fun bc() {
     }
 
     private fun read(name: String): Any? {
-        val cls = javaClass<KlaxonTest>()
+        val cls = KlaxonTest::class.java
         return Parser().parse(cls.getResourceAsStream(name)!!)
     }
 
-    Test
     fun simple() {
         val j = read("/b.json")
         val expected = json {
@@ -25,7 +25,6 @@ class KlaxonTest {
         assertEquals(expected, j)
     }
 
-    Test
     fun basic() {
         val j = read("/a.json")
         val expected = json {
@@ -37,7 +36,6 @@ class KlaxonTest {
         assertEquals(expected, j)
     }
 
-    Test
     fun nullsParse() {
         assertEquals(json {
             array(1, null, obj(
@@ -47,7 +45,6 @@ class KlaxonTest {
         }, read("/nulls.json"))
     }
 
-    Test
     fun nullsDSL() {
         val j = json {
             obj(
@@ -59,7 +56,6 @@ class KlaxonTest {
         assertEquals("""{"1":null,"2":2}""", j.toJsonString())
     }
 
-    Test
     fun prettyPrintObject() {
         val j = json {
             obj(
@@ -76,17 +72,14 @@ class KlaxonTest {
         assertEquals(trim(expected), trim(actual))
     }
 
-    @Test
     fun prettyPrintEmptyObject() {
         assertEquals("{}", JsonObject(emptyMap()).toJsonString(true))
     }
 
-    @Test
     fun prettyPrintArray() {
         assertEquals("[1, 2, 3]", JsonArray(1, 2, 3).toJsonString(true))
     }
 
-    @Test
     fun prettyPrintNestedObjects() {
         val expected = """{
   "a": 1,
@@ -109,19 +102,16 @@ class KlaxonTest {
 
     private fun trim(s: String) = s.replace("\n", "").replace("\r", "")
 
-    Test
     fun renderStringEscapes() {
         assertEquals(""" "test\"it\n" """.trim(), valueToString("test\"it\n"))
     }
 
-    Test
     fun parseStringEscapes() {
         assertEquals(json {
-            obj("s" to "text field \"s\"\nnext line")
+            obj("s" to "text field \"s\"\nnext line\u000cform feed\ttab\\rev solidus/solidus\bbackspace")
         }, read("/escaped.json"))
     }
 
-    Test
     fun arrayLookup() {
         val j = json {
             array(
@@ -129,25 +119,33 @@ class KlaxonTest {
                             "nick" to "SuperMan",
                             "address" to obj("country" to "US"),
                             "weight" to 89.4,
-                            "d" to 1L
+                            "d" to 1L,
+                            "i" to 4,
+                            "b" to java.math.BigInteger("123456789123456789123456786")
                     ),
                     obj(
                             "nick" to "BlackOwl",
                             "address" to obj("country" to "UK"),
                             "weight" to 75.7,
-                            "d" to 1L
+                            "d" to 2L,
+                            "i" to 3,
+                            "b" to java.math.BigInteger("123456789123456789123456787")
                     ),
                     obj(
                             "nick" to "Anonymous",
                             "address" to null,
                             "weight" to -1.0,
-                            "d" to 1L
+                            "d" to 3L,
+                            "i" to 2,
+                            "b" to java.math.BigInteger("123456789123456789123456788")
                     ),
                     obj(
                             "nick" to "Rocket",
                             "address" to obj("country" to "Russia"),
                             "weight" to 72.0,
-                            "d" to 1L
+                            "d" to 4L,
+                            "i" to 1,
+                            "b" to java.math.BigInteger("123456789123456789123456789")
                     )
             )
         }
@@ -156,8 +154,14 @@ class KlaxonTest {
                 j.string("nick").filterNotNull())
         assertEquals(listOf("US", "UK", null, "Russia"),
                 j.obj("address").map { it?.string("country") })
-        assertKlaxonEquals(listOf(89.4, 75.7, -1.0, 72.0), j.double("weight"))
-        assertKlaxonEquals(listOf(1L, 1L, 1L, 1L), j.long("d"))
+        assertKlaxonEquals(JsonArray(89.4, 75.7, -1.0, 72.0), j.double("weight"))
+        assertKlaxonEquals(JsonArray(1L, 2L, 3L, 4L), j.long("d"))
+        assertKlaxonEquals(JsonArray(4, 3, 2, 1), j.int("i"))
+        assertKlaxonEquals(JsonArray(
+                java.math.BigInteger("123456789123456789123456786"),
+                java.math.BigInteger("123456789123456789123456787"),
+                java.math.BigInteger("123456789123456789123456788"),
+                java.math.BigInteger("123456789123456789123456789")), j.bigInt("b"))
     }
 
     private fun <T> assertKlaxonEquals(expected: List<T>, actual: JsonArray<T>) {
@@ -165,8 +169,7 @@ class KlaxonTest {
             assertEquals(expected.get(i), actual.get(i))
         }
     }
-
-    Test
+    
     fun objectLookup() {
         val j = json {
             obj(
@@ -185,7 +188,6 @@ class KlaxonTest {
         assertTrue(j.boolean("true")!!)
     }
 
-    Test
     fun arrayFiltering() {
         val j = json {
             array(1, 2, 3, obj("a" to 1L))
@@ -194,7 +196,6 @@ class KlaxonTest {
         assertEquals(listOf(1L), j.filterIsInstance<JsonObject>().map { it.long("a") })
     }
 
-    Test
     fun lookupObjects() {
         val j = json {
             obj(
@@ -217,7 +218,6 @@ class KlaxonTest {
         assertEquals(JsonArray("Sergey", "Bombshell", null), j.lookup("users.name"))
     }
 
-    Test
     fun lookupArray() {
         val j = json {
             array(
@@ -228,7 +228,6 @@ class KlaxonTest {
         assertEquals(JsonArray(null, 1), j.lookup("a"))
     }
 
-    Test
     fun lookupNestedArrays() {
         val j = json {
             array (
@@ -243,7 +242,6 @@ class KlaxonTest {
         assertEquals(JsonArray(null, 1), j.lookup("a"))
     }
 
-    Test
     fun lookupSingleObject() {
         val j = json {
             obj("a" to 1)
@@ -252,7 +250,6 @@ class KlaxonTest {
         assertEquals(1, j.lookup("a").single())
     }
 
-    Test
     fun mapChildren() {
         val j = json {
             array(1,2,3)
@@ -262,7 +259,6 @@ class KlaxonTest {
         assertTrue(result.isEmpty())
     }
 
-    Test
     fun mapChildrenWithNulls() {
         val j = json {
             array(1,2,3)
@@ -272,4 +268,3 @@ class KlaxonTest {
         assertKlaxonEquals(listOf(null, null, null), result)
     }
 }
-

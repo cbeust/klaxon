@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:0.12'
+    compile 'com.beust:klaxon:0.14'
 }
 ```
 
@@ -18,7 +18,9 @@ dependencies {
 
 Values parsed from a valid JSON file can be of the following type:
 
+* Int
 * Long
+* BigInteger
 * String
 * Double
 * Boolean
@@ -63,7 +65,9 @@ Let's query these values:
 `JsonObject` implements the following methods:
 
 ```
+    fun int(fieldName: String) : Int?
     fun long(fieldName: String) : Long?
+    fun bigInt(fieldName: String) : BigInteger?
     fun string(fieldName: String) : String?
     fun double(fieldName: String) : Double?
     fun boolean(fieldName: String) : Boolean?

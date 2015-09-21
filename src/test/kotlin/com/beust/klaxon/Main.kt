@@ -47,7 +47,7 @@ fun main(args : Array<String>) {
 }
 
 fun parse(name: String) : Any {
-    val cls = javaClass<Parser>()
+    val cls = Parser::class.java
     val inputStream = cls.getResourceAsStream(name)!!
     return Parser().parse(inputStream)!!
 }
