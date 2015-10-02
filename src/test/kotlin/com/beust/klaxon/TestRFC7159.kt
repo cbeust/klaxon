@@ -2,10 +2,7 @@ package com.beust.klaxon;
 
 import org.testng.annotations.Test
 import java.io.ByteArrayInputStream
-import kotlin.reflect
-import kotlin.reflect.KClass
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlin.test.fail
 
 @Test
