@@ -48,7 +48,7 @@ public fun <T : Any> JsonArray<*>.mapChildren(block : (JsonObject) -> T?) : Json
             else listOf(null)
         })
 
-public fun JsonArray<*>.get(key : String) : JsonArray<Any?> = mapChildren { it[key] }
+operator public fun JsonArray<*>.get(key : String) : JsonArray<Any?> = mapChildren { it[key] }
 
 @Suppress("UNCHECKED_CAST")
 private fun Any?.ensureArray() : JsonArray<Any?> =
