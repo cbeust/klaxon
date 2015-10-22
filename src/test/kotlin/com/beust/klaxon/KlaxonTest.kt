@@ -165,7 +165,7 @@ class KlaxonTest {
     }
 
     private fun <T> assertKlaxonEquals(expected: List<T>, actual: JsonArray<T>) {
-        for (i in 0..expected.size() - 1) {
+        for (i in 0..expected.size - 1) {
             assertEquals(expected.get(i), actual.get(i))
         }
     }

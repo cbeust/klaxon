@@ -50,7 +50,7 @@ class World(var status : Status) {
     }
 
     fun hasValues() : Boolean {
-        return valueStack.size() > 1
+        return valueStack.size > 1
     }
 }
 
