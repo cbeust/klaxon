@@ -3,7 +3,7 @@ package com.beust.klaxon
 private fun <A: Appendable> A.renderString(s: String): A {
     append("\"")
 
-    for (idx in 0..s.length() - 1) {
+    for (idx in 0..s.length - 1) {
         val ch = s[idx]
         when (ch) {
             '"' -> append("\\").append(ch)

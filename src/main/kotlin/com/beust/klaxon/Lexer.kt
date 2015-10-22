@@ -43,7 +43,7 @@ public class Lexer(val inputStream : InputStream) {
     }
 
     private fun isDone() : Boolean {
-        return index >= bytes.size()
+        return index >= bytes.size
     }
 
     val BOOLEAN_LETTERS = "falsetrue".toSet()

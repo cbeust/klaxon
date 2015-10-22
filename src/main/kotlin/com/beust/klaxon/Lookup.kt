@@ -35,14 +35,14 @@ public fun JsonArray<*>.bigInt(id: String) : JsonArray<BigInteger?> = mapChildre
 public fun JsonArray<*>.double(id: String) : JsonArray<Double?> = mapChildren { it.double(id) }
 
 public fun <T> JsonArray<*>.mapChildrenObjectsOnly(block : (JsonObject) -> T) : JsonArray<T> =
-        JsonArray(flatMapTo(ArrayList(size())) {
+        JsonArray(flatMapTo(ArrayList(size)) {
             if (it is JsonObject) listOf(block(it))
             else if (it is JsonArray<*>) it.mapChildrenObjectsOnly(block)
             else listOf()
         })
 
 public fun <T : Any> JsonArray<*>.mapChildren(block : (JsonObject) -> T?) : JsonArray<T?> =
-        JsonArray(flatMapTo(ArrayList(size())) {
+        JsonArray(flatMapTo(ArrayList(size)) {
             if (it is JsonObject) listOf(block(it))
             else if (it is JsonArray<*>) it.mapChildren(block)
             else listOf(null)
