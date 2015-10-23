@@ -5,16 +5,16 @@ import java.util.Arrays
 import java.util.LinkedHashMap
 
 public fun valueToString(v: Any?, prettyPrint: Boolean = false) : String =
-    StringBuilder {
+    StringBuilder().apply {
         renderValue(v, this, prettyPrint, 0)
     }.toString()
 
 public interface JsonBase {
     fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int)
-    final fun appendJsonString(result : Appendable, prettyPrint: Boolean = false) =
+    fun appendJsonString(result : Appendable, prettyPrint: Boolean = false) =
             appendJsonStringImpl(result, prettyPrint, 0)
-    final fun toJsonString(prettyPrint: Boolean = false) : String =
-            StringBuilder { appendJsonString(this, prettyPrint) }.toString()
+    fun toJsonString(prettyPrint: Boolean = false) : String =
+            StringBuilder().apply { appendJsonString(this, prettyPrint) }.toString()
 }
 
 public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =

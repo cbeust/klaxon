@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="klaxon" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$" external.system.id="GRADLE" external.system.module.group="" external.system.module.version="0.15" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="klaxon" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$" external.system.id="GRADLE" external.system.module.group="" external.system.module.version="0.17" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes/main" />
     <output-test url="file://$MODULE_DIR$/build/classes/test" />
@@ -19,7 +19,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.testng:testng:6.9.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.beanshell:bsh:2.0b4" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.beust:jcommander:1.48" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:0.14.449" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-runtime:0.14.449" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.0.0-beta-1038" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-runtime:1.0.0-beta-1038" level="project" />
   </component>
 </module>

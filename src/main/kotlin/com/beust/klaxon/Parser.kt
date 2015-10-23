@@ -37,12 +37,12 @@ class World(var status : Status) {
     }
 
     fun getFirstObject() : JsonObject {
-        return valueStack.getFirst() as JsonObject
+        return valueStack.first as JsonObject
     }
 
     @Suppress("UNCHECKED_CAST")
     fun getFirstArray() : JsonArray<Any?> {
-        return valueStack.getFirst() as JsonArray<Any?>
+        return valueStack.first as JsonArray<Any?>
     }
 
     fun peekStatus() : Status {
@@ -50,14 +50,14 @@ class World(var status : Status) {
     }
 
     fun hasValues() : Boolean {
-        return valueStack.size() > 1
+        return valueStack.size > 1
     }
 }
 
 private data class TokenStatus(val status: Status, val tokenType: Type)
 
 class StateMachine {
-    val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
+    private val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
 
     fun put(status: Status, tokenType: Type, processor: (world: World, token: Token) -> World) {
         map.put(TokenStatus(status, tokenType), processor)
