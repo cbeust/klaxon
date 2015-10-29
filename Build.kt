@@ -10,13 +10,13 @@ val project = kotlinProject {
     artifactId = name
     version = "0.19"
     directory = homeDir("kotlin/klaxon")
-}
 
-val packProject = assemble(project) {
-    jar {
-    }
-}
+	assemble {
+	    jar {
+	    }
+	}
 
-val jc = jcenter(project) {
-    publish = true
+	jcenter {
+	    publish = true
+	}
 }
