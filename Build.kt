@@ -9,18 +9,17 @@ val project = kotlinProject {
     group = "com.beust"
     artifactId = name
     version = "0.19"
-    directory = homeDir("kotlin/klaxon")
 
-	dependenciesTest {
-		compile("org.testng:testng:6.9.9")
-	}
+    dependenciesTest {
+        compile("org.testng:testng:6.9.9")
+    }
 
-	assemble {
-	    jar {
-	    }
-	}
+    assemble {
+        jar {
+        }
+    }
 
-	jcenter {
-	    publish = true
-	}
+    jcenter {
+        publish = true
+    }
 }
