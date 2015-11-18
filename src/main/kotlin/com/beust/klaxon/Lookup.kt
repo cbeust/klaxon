@@ -51,18 +51,18 @@ public fun <T : Any> JsonArray<*>.mapChildren(block : (JsonObject) -> T?) : Json
 operator public fun JsonArray<*>.get(key : String) : JsonArray<Any?> = mapChildren { it[key] }
 
 @Suppress("UNCHECKED_CAST")
-private fun Any?.ensureArray() : JsonArray<Any?> =
-        if (this is JsonArray<*>) this as JsonArray<Any?>
-        else JsonArray(this)
+private fun <T> Any?.ensureArray() : JsonArray<T> =
+        if (this is JsonArray<*>) this as JsonArray<T>
+        else JsonArray(this as T)
 
-public fun JsonBase.lookup(key : String) : JsonArray<Any?> =
-    key.split("[/\\.]".toRegex())
-            .filter{ it != "" }
-            .fold(this) { j, part ->
-                when (j) {
-                    is JsonArray<*> -> j[part]
-                    is JsonObject -> j[part].ensureArray()
-                    else -> throw IllegalArgumentException("unsupported type of j = $j")
-                }
-            }.ensureArray()
+public fun <T> JsonBase.lookup(key : String) : JsonArray<T> =
+        key.split("[/\\.]".toRegex())
+                .filter{ it != "" }
+                .fold(this) { j, part ->
+                    when (j) {
+                        is JsonArray<*> -> j[part]
+                        is JsonObject -> j[part].ensureArray<T>()
+                        else -> throw IllegalArgumentException("unsupported type of j = $j")
+                    }
+                }.ensureArray<T>()
 
