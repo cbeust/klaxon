@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:0.14'
+    compile 'com.beust:klaxon:0.20'
 }
 ```
 
@@ -244,7 +244,7 @@ If we have the following JSON
 We can find all emails by
 
 ```kotlin
-parse('my.json').lookup("users.email")
+parse('my.json').lookup<String?>("users.email")
 ```
 
 ## Implementation
