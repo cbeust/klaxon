@@ -214,8 +214,8 @@ class KlaxonTest {
             )
         }
 
-        assertEquals(JsonArray("Sergey", "Bombshell", null), j.lookup("/users/name"))
-        assertEquals(JsonArray("Sergey", "Bombshell", null), j.lookup("users.name"))
+        assertEquals(JsonArray("Sergey", "Bombshell", null), j.lookup<String?>("/users/name"))
+        assertEquals(JsonArray("Sergey", "Bombshell", null), j.lookup<String?>("users.name"))
     }
 
     fun lookupArray() {
@@ -225,7 +225,7 @@ class KlaxonTest {
             )
         }
 
-        assertEquals(JsonArray(null, 1), j.lookup("a"))
+        assertEquals(JsonArray(null, 1), j.lookup<Int?>("a"))
     }
 
     fun lookupNestedArrays() {
@@ -239,7 +239,7 @@ class KlaxonTest {
             )
         }
 
-        assertEquals(JsonArray(null, 1), j.lookup("a"))
+        assertEquals(JsonArray(null, 1), j.lookup<Int?>("a"))
     }
 
     fun lookupSingleObject() {
@@ -247,7 +247,7 @@ class KlaxonTest {
             obj("a" to 1)
         }
 
-        assertEquals(1, j.lookup("a").single())
+        assertEquals(1, j.lookup<Int?>("a").single())
     }
 
     fun mapChildren() {
