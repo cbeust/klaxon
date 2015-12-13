@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    testCompile 'org.testng:testng:6.9.4'
+    testCompile 'org.testng:testng:6.9.9'
 }
 
 task sourceJar(type: Jar) {
