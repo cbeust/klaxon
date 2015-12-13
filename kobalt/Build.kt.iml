@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$" />
+    <content url="file://D:/Java/jdk1.8.0_05" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="kobalt.jar" level="project" />
+  </component>
+</module>
