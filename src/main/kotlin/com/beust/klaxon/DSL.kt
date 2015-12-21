@@ -57,10 +57,10 @@ public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, Muta
 }
 
 public fun <T> JsonArray(vararg items : T) : JsonArray<T> =
-    JsonArray(ArrayList(Arrays.asList(*items)))
+    JsonArray<T>(ArrayList(Arrays.asList(*items)))
 
 public fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
-        JsonArray(list.toArrayList())
+        JsonArray<T>(list.toArrayList())
 
 public data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
 
