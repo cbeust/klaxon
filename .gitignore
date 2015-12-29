@@ -2,5 +2,6 @@ local.properties
 build
 .idea
 .gradle
+.kobalt
 kobaltBuild
 
