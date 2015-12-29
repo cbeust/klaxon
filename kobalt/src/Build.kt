@@ -12,6 +12,7 @@ val project = kotlinProject {
 
     dependenciesTest {
         compile("org.testng:testng:6.9.9")
+        compile("org.jetbrains.kotlin:kotlin-test:1.0.0-beta-4584")
     }
 
     assemble {

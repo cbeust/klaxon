@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlinVersion = '1.0.0-beta-2423'
+    ext.kotlinVersion = '1.0.0-beta-4584'
 
     repositories {
         mavenCentral()
@@ -37,6 +37,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     testCompile 'org.testng:testng:6.9.9'
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
 }
 
 task sourceJar(type: Jar) {
