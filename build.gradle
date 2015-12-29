@@ -1,5 +1,3 @@
-import com.beust.kobalt.plugin.packaging.Jar
-
 buildscript {
     ext.kotlinVersion = '1.0.0-beta-2423'
 
