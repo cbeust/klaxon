@@ -8,7 +8,7 @@ val project = kotlinProject {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
-    version = "0.20"
+    version = "0.21"
 
     dependenciesTest {
         compile("org.testng:testng:6.9.9")
