@@ -1,7 +1,5 @@
-import com.beust.kobalt.plugin.packaging.Jar
-
 buildscript {
-    ext.kotlinVersion = '1.0.0-beta-2423'
+    ext.kotlinVersion = '1.0.0-beta-4584'
 
     repositories {
         mavenCentral()
@@ -19,7 +17,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version = '0.20'
+version = '0.21'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
@@ -39,6 +37,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     testCompile 'org.testng:testng:6.9.9'
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
 }
 
 task sourceJar(type: Jar) {
