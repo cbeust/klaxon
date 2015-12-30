@@ -16,7 +16,7 @@ val project = kotlinProject {
     }
 
     assemble {
-        jar {
+        mavenJars {
         }
     }
 
