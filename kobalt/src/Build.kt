@@ -16,8 +16,7 @@ val project = kotlinProject {
     }
 
     assemble {
-        jar {
-        }
+        mavenJars {}
     }
 
     jcenter {
