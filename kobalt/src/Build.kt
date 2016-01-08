@@ -19,7 +19,7 @@ val project = kotlinProject {
         mavenJars {}
     }
 
-    jcenter {
+    bintray {
         publish = true
     }
 }
