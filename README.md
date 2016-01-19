@@ -1,10 +1,11 @@
+
 # Klaxon: JSON for Kotlin
 
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
 ## Install
 
-```
+```kotlin
 repositories {
     jcenter()
 }
@@ -29,7 +30,7 @@ Values parsed from a valid JSON file can be of the following type:
 
 `JsonObject` behaves like a `Map` while `JsonArray` behaves like a `List`. Once you have parsed a file, you should cast it to the type that you expect. For example, consider this simple file called `object.json`:
 
-```
+```json
 {
     "firstName" : "Cedric",
     "lastName" : "Beust"
@@ -38,7 +39,7 @@ Values parsed from a valid JSON file can be of the following type:
 
 Since this is a JSON object, we parse it as follows:
 
-```
+```kotlin
 fun parse(name: String) : Any {
     val cls = javaClass<Parser>()
     val inputStream = cls.getResourceAsStream(name)!!
@@ -54,7 +55,7 @@ You can also access the JSON content as a file, or any other resource you can ge
 
 Let's query these values:
 
-```
+```kotlin
     val firstName = obj.string("firstName")
     val lastName = obj.string("lastName")
     println("Name: ${firstName} ${lastName}")
@@ -64,7 +65,7 @@ Let's query these values:
 
 `JsonObject` implements the following methods:
 
-```
+```kotlin
     fun int(fieldName: String) : Int?
     fun long(fieldName: String) : Long?
     fun bigInt(fieldName: String) : BigInteger?
@@ -77,7 +78,7 @@ Let's query these values:
 
 `JsonArray` implements the same methods, except that they return `JsonArray`s of the same type. This allows you to easily fetch collections of fields or even sub-objects. For example, consider the following:
 
-```
+```json
 [
     {
         "name" : "John",
@@ -96,7 +97,7 @@ Let's query these values:
 
 We can easily collect all the ages as follows:
 
-```
+```kotlin
 val array = parse("/e.json") as JsonArray<JsonObject>
 
 val ages = array.long("age")
@@ -107,7 +108,7 @@ println("Ages: ${ages}")
 
 Since a `JsonArray` behaves like a `List`, we can apply closures on them, such as `filter`:
 
-```
+```kotlin
 val oldPeople = array.filter {
     it.long("age")!! > 30
 }
@@ -118,7 +119,7 @@ println("Old people: ${oldPeople}")
 
 Let's look at a more complex example:
 
-```
+```json
 [
     {
         "first": "Dale",
@@ -161,7 +162,7 @@ Let's look at a more complex example:
 
 Let's chain a few operations, for example, finding the last names of all the people who studied in Berkeley:
 
-```
+```kotlin
 println("=== Everyone who studied in Berkeley:")
 val berkeley = array.filter {
     it.obj("schoolResults")?.string("location") == "Berkeley"
@@ -177,7 +178,7 @@ println("${berkeley}")
 
 All the grades over 75:
 
-```
+```kotlin
 println("=== All grades bigger than 75")
 val result = array.flatMap {
     it.obj("schoolResults")
@@ -195,7 +196,7 @@ println("Result: ${result}")
 
 Note the use of `flatMap` which transforms an initial result of a list of lists into a single list. If you use `map`, you will get a list of three lists:
 
-```
+```kotlin
 // Using map instead of flatMap
 // Prints:
 // Result: [[JsonObject(map={name=math, grade=90}), JsonObject(map={name=history, grade=85})], [JsonObject(map={name=physics, grade=90})], [JsonObject(    map={name=physics, grade=82})]]
@@ -210,7 +211,7 @@ version then you can call toJsonString(true)
 
 Creating a JSON object with the Klaxon DSL makes it possible to insert arbitrary pieces of Kotlin code anywhere you want. For example, the following creates an object that maps each number from 1 to 3 with its string key:
 
-```
+```kotlin
 val logic = json {
     array(arrayListOf(1,2,3).map {
         obj(it.toString(), it)
@@ -221,7 +222,7 @@ println("Result: ${logic.toJsonString()}")
 
 will output:
 
-```
+```kotlin
 Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
 ```
 
@@ -251,7 +252,7 @@ parse('my.json').lookup<String?>("users.email")
 
 The Parser is implemented as a mutable state machine supported by a simplistic `State` monad, making the main loop very simple:
 
-```
+```kotlin
 val sm = StateMachine()
 val lexer = Lexer(inputStream)
 var world = World(Status.INIT)
