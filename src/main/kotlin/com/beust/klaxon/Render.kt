@@ -31,7 +31,7 @@ private fun <A: Appendable> A.renderString(s: String): A {
 private fun isPrintableUnicode(c: Char) : Boolean = ((c >= '\u0000' && c <= '\u001F')
         || (c >= '\u007F' && c <= '\u009F') || (c >= '\u2000' && c <= '\u20FF'))
 
-fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level: Int) {
+tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level: Int) {
     when (v) {
         is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, level)
         is String -> result.renderString(v)
@@ -41,6 +41,7 @@ fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level: Int) {
                 prettyPrint,
                 level)
         is List<*> -> renderValue(JsonArray(v.map { it?.toString() }), result, prettyPrint, level)
+        is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, level)
         else -> result.append(v.toString())
     }
 }
