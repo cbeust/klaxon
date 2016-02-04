@@ -4,7 +4,7 @@ import com.beust.kobalt.plugin.packaging.assemble
 import com.beust.kobalt.plugin.java.*
 import com.beust.kobalt.plugin.publish.*
 
-val project = kotlinProject {
+val project = project {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
