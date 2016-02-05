@@ -60,7 +60,7 @@ public fun <T> JsonArray(vararg items : T) : JsonArray<T> =
     JsonArray(ArrayList(Arrays.asList(*items)))
 
 public fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
-        JsonArray(list.toArrayList())
+        JsonArray(list.toMutableList())
 
 public data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
 
