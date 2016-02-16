@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:0.23'
+    compile 'com.beust:klaxon:0.24'
 }
 ```
 
@@ -213,7 +213,7 @@ Creating a JSON object with the Klaxon DSL makes it possible to insert arbitrary
 
 ```kotlin
 val logic = json {
-    array(arrayListOf(1,2,3).map {
+    array(listOf(1,2,3).map {
         obj(it.toString(), it)
     })
 }
