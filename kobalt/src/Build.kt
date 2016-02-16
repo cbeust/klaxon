@@ -8,11 +8,11 @@ val project = project {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
-    version = "0.23"
+    version = "0.24"
 
     dependenciesTest {
         compile("org.testng:testng:6.9.9")
-        compile("org.jetbrains.kotlin:kotlin-test:1.0.0-rc-1036")
+        compile("org.jetbrains.kotlin:kotlin-test:1.0.0")
     }
 
     assemble {
