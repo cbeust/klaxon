@@ -36,7 +36,7 @@ tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level
         is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, level)
         is String -> result.renderString(v)
         is Map<*, *> -> renderValue(
-                JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value?.toString() }),
+                JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value }),
                 result,
                 prettyPrint,
                 level)
