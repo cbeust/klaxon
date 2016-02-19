@@ -32,6 +32,6 @@ class JSON() {
 /**
  * Main entry point.
  */
-public fun <T> json(init : JSON.() -> T) : T {
+fun <T> json(init : JSON.() -> T) : T {
     return JSON().init()
 }

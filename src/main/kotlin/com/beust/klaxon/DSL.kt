@@ -1,15 +1,13 @@
 package com.beust.klaxon
 
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.LinkedHashMap
+import java.util.*
 
-public fun valueToString(v: Any?, prettyPrint: Boolean = false) : String =
+fun valueToString(v: Any?, prettyPrint: Boolean = false) : String =
     StringBuilder().apply {
         renderValue(v, this, prettyPrint, 0)
     }.toString()
 
-public interface JsonBase {
+interface JsonBase {
     fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int)
     fun appendJsonString(result : Appendable, prettyPrint: Boolean = false) =
             appendJsonStringImpl(result, prettyPrint, 0)
@@ -17,10 +15,10 @@ public interface JsonBase {
             StringBuilder().apply { appendJsonString(this, prettyPrint) }.toString()
 }
 
-public fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
+fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
         JsonObject(LinkedHashMap(map))
 
-public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?>
+data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?>
         by map {
 
     override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int) {
@@ -56,13 +54,13 @@ public data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, Muta
     }
 }
 
-public fun <T> JsonArray(vararg items : T) : JsonArray<T> =
+fun <T> JsonArray(vararg items : T) : JsonArray<T> =
     JsonArray(ArrayList(Arrays.asList(*items)))
 
-public fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
+fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
         JsonArray(list.toMutableList())
 
-public data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
+data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
 
     override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int) {
         result.append("[")

@@ -3,7 +3,7 @@ package com.beust.klaxon
 import java.util.regex.Pattern
 import java.io.InputStream
 
-public enum class Type {
+enum class Type {
     VALUE,
     LEFT_BRACE,
     RIGHT_BRACE,
@@ -22,7 +22,7 @@ class Token(val tokenType: Type, val value: Any?) {
     }
 }
 
-public class Lexer(val inputStream : InputStream) {
+class Lexer(val inputStream : InputStream) {
     val bytes = inputStream.readBytes()
     val EOF = Token(Type.EOF, null)
     var index = 0

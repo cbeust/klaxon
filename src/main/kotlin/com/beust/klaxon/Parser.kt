@@ -81,7 +81,7 @@ class StateMachine {
 /**
  * Main entry for Klaxon's parser.
  */
-public class Parser {
+class Parser {
     val verbose = false
 
     fun log(s: String) {
@@ -90,12 +90,12 @@ public class Parser {
         }
     }
 
-    public fun parse(fileName: String) : Any? =
+    fun parse(fileName: String) : Any? =
         FileInputStream(File(fileName)).use {
             parse(it)
         }
 
-    public fun parse(inputStream : InputStream) : Any? {
+    fun parse(inputStream : InputStream) : Any? {
 
         val sm = StateMachine()
 
