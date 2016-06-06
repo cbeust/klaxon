@@ -10,7 +10,7 @@ val p = project {
 
     dependenciesTest {
         compile("org.testng:testng:6.9.9",
-                "org.jetbrains.kotlin:kotlin-test:1.0.0")
+                "org.jetbrains.kotlin:kotlin-test:1.0.2")
     }
 
     assemble {
