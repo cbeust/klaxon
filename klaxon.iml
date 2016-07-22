@@ -1,18 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+<module external.linked.project.id="klaxon" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$" external.system.id="KOBALT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/kobaltBuild/classes" />
+    <output-test url="file://$MODULE_DIR$/kobaltBuild/test-classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/kotlin" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/kotlin" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/kobaltBuild" />
     </content>
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
-    <orderEntry type="library" scope="TEST" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="klaxon (Compile)" level="project" />
-    <orderEntry type="library" scope="TEST" name="klaxon (Test)" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: com.google.guava:guava:jar:16.0.1">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/com/google/guava/guava/16.0.1/guava-16.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: org.testng:testng:jar:6.9.9">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/org/testng/testng/6.9.9/testng-6.9.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: org.yaml:snakeyaml:jar:1.15">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/org/yaml/snakeyaml/1.15/snakeyaml-1.15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: com.google.inject:guice:jar:no_aop:4.0">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/com/google/inject/guice/4.0/guice-4.0-no_aop.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: junit:junit:jar:4.10">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/junit/junit/4.10/junit-4.10.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: javax.inject:javax.inject:jar:1">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/javax/inject/javax.inject/1/javax.inject-1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: com.beust:jcommander:jar:1.48">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/com/beust/jcommander/1.48/jcommander-1.48.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: aopalliance:aopalliance:jar:1.0">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: org.apache.ant:ant-launcher:jar:1.7.0">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: org.apache.ant:ant:jar:1.7.0">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/org/apache/ant/ant/1.7.0/ant-1.7.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: org.hamcrest:hamcrest-core:jar:1.1">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Kobalt: org.beanshell:bsh:jar:2.0b4">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.kobalt/repository/org/beanshell/bsh/2.0b4/bsh-2.0b4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="kobalt.jar" level="project" />
   </component>
 </module>
