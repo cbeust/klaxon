@@ -3,7 +3,7 @@ package com.beust.klaxon.test
 import java.util.ArrayList
 import com.beust.klaxon.*
 
-fun main(args : Array<String>) {
+fun main(args: Array<String>) {
 //    val a1 = json {
 //        obj("a", 1.1, "b", "value", "c", array(1))
 //    }
@@ -17,6 +17,12 @@ fun main(args : Array<String>) {
 //    example1()
 //    example2()
 //    example3()
+
+//    val parser: Parser = Parser()
+//    val stringBuilder: StringBuilder = StringBuilder("{\"name\":\"Sakib Sami\", \"age\":23}")
+//    val json: JsonObject = parser.parse(stringBuilder) as JsonObject
+//    println("Name : ${json.string("name")}, Age : ${json.int("age")}")
+
     val anObject = json {
         obj("a" to 1, "b" to "value")
     }
@@ -28,7 +34,7 @@ fun main(args : Array<String>) {
     println("Json array: ${anArray.toJsonString()}")
 
     val aMix = json {
-        obj (
+        obj(
                 "theArray" to anArray,
                 "theObject" to anObject,
                 "anInt" to 4
@@ -46,7 +52,7 @@ fun main(args : Array<String>) {
 
 }
 
-fun parse(name: String) : Any {
+fun parse(name: String): Any {
     val cls = Parser::class.java
     val inputStream = cls.getResourceAsStream(name)!!
     return Parser().parse(inputStream)!!
@@ -97,8 +103,8 @@ fun example1() {
     val result = array.filterIsInstance<JsonObject>().map {
         it.obj("schoolResults")
                 ?.array<JsonObject>("scores")?.filter {
-                    it.long("grade")!! > 75
-                }!!
+            it.long("grade")!! > 75
+        }!!
     }
     println("Result: ${result}")
 }

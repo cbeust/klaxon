@@ -8,7 +8,7 @@
     <version>0.11-SNAPSHOT</version>
 
     <properties>
-        <kotlin.version>0.12.213</kotlin.version>
+        <kotlin.version>1.0.3</kotlin.version>
         <testng.version>6.8.1</testng.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,20 +43,26 @@
             <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
-
-<!--
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
--->
+
+        <!--
+                <dependency>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                    <version>${junit.version}</version>
+                    <scope>test</scope>
+                </dependency>
+        -->
     </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
 
         <plugins>
             <plugin>
