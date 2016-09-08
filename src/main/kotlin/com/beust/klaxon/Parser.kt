@@ -90,6 +90,11 @@ class Parser {
         }
     }
 
+    fun parse(rawValue: StringBuilder): Any? =
+        ByteArrayInputStream(rawValue.toString().toByteArray()).use {
+            parse(it)
+        }
+
     fun parse(fileName: String) : Any? =
         FileInputStream(File(fileName)).use {
             parse(it)
