@@ -1,55 +1,56 @@
 package com.beust.klaxon
 
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.util.LinkedList
 import java.io.File
 import java.io.FileInputStream
 
-class World(var status : Status) {
+class World(var status: Status) {
     private val statusStack = LinkedList<Status>()
     private val valueStack = LinkedList<Any>()
-    var result : Any? = null
+    var result: Any? = null
     var parent = JsonObject()
 
-    fun pushAndSet(status: Status, value: Any) : World {
+    fun pushAndSet(status: Status, value: Any): World {
         pushStatus(status)
         pushValue(value)
         this.status = status
         return this
     }
 
-    fun pushStatus(status: Status) : World {
+    fun pushStatus(status: Status): World {
         statusStack.addFirst(status)
         return this
     }
 
-    fun pushValue(value: Any) : World {
+    fun pushValue(value: Any): World {
         valueStack.addFirst(value)
         return this
     }
 
-    fun popValue() : Any {
+    fun popValue(): Any {
         return valueStack.removeFirst()
     }
 
-    fun popStatus() : Status {
+    fun popStatus(): Status {
         return statusStack.removeFirst()
     }
 
-    fun getFirstObject() : JsonObject {
+    fun getFirstObject(): JsonObject {
         return valueStack.first as JsonObject
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun getFirstArray() : JsonArray<Any?> {
+    fun getFirstArray(): JsonArray<Any?> {
         return valueStack.first as JsonArray<Any?>
     }
 
-    fun peekStatus() : Status {
+    fun peekStatus(): Status {
         return statusStack.get(0)
     }
 
-    fun hasValues() : Boolean {
+    fun hasValues(): Boolean {
         return valueStack.size > 1
     }
 }
@@ -63,7 +64,7 @@ class StateMachine {
         map.put(TokenStatus(status, tokenType), processor)
     }
 
-    fun next(world: World, token: Token) : World {
+    fun next(world: World, token: Token): World {
         val pair = TokenStatus(world.status, token.tokenType)
         val processor = map.get(pair)
         val result = if (processor != null) {
@@ -90,12 +91,17 @@ class Parser {
         }
     }
 
-    fun parse(fileName: String) : Any? =
-        FileInputStream(File(fileName)).use {
-            parse(it)
-        }
+    fun parse(fileName: String): Any? =
+            FileInputStream(File(fileName)).use {
+                parse(it)
+            }
 
-    fun parse(inputStream : InputStream) : Any? {
+    fun parse(rawValue: StringBuilder): Any? {
+        val inputStream: InputStream = ByteArrayInputStream(rawValue.toString().toByteArray())
+        return parse(inputStream)
+    }
+
+    fun parse(inputStream: InputStream): Any? {
 
         val sm = StateMachine()
 
