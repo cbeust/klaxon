@@ -90,6 +90,11 @@ class Parser {
         }
     }
 
+    fun parse(rawValue: StringBuilder): Any? {
+        val inputStream: InputStream = ByteArrayInputStream(rawValue.toString().toByteArray())
+        return parse(inputStream)
+    }
+
     fun parse(fileName: String) : Any? =
         FileInputStream(File(fileName)).use {
             parse(it)
