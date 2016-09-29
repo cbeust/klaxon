@@ -226,7 +226,7 @@ Creating a JSON object with the Klaxon DSL makes it possible to insert arbitrary
 ```kotlin
 val logic = json {
     array(listOf(1,2,3).map {
-        obj(it.toString(), it)
+        obj(it.toString() to it)
     })
 }
 println("Result: ${logic.toJsonString()}")
