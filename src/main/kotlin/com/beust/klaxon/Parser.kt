@@ -1,9 +1,10 @@
 package com.beust.klaxon
 
-import java.io.InputStream
-import java.util.LinkedList
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
+import java.util.*
 
 class World(var status : Status) {
     private val statusStack = LinkedList<Status>()
