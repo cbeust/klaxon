@@ -1,6 +1,7 @@
 local.properties
 build
 .idea
+*.iml
 .gradle
 .kobalt
 kobaltBuild
