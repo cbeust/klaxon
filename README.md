@@ -41,9 +41,10 @@ Since this is a JSON object, we parse it as follows:
 
 ```kotlin
 fun parse(name: String) : Any {
-    val cls = javaClass<Parser>()
-    val inputStream = cls.getResourceAsStream(name)!!
-    return Parser().parse(inputStream)!!
+    val cls = Parser::class.java
+    cls.getResourceAsStream(name)?.let { inputStream ->
+        return Parser().parse(inputStream)
+    }
 }
 
 // ...
@@ -54,13 +55,13 @@ val obj = parse("/object.json") as JsonObject
 Parse from String value :
 ```
 val parser: Parser = Parser()
-val stringBuilder: StringBuilder = StringBuilder("{\"name\":\"Sakib Sami\", \"age\":23}")
+val stringBuilder: StringBuilder = StringBuilder("{\"name\":\"Cedric Beust\", \"age\":23}")
 val json: JsonObject = parser.parse(stringBuilder) as JsonObject
 println("Name : ${json.string("name")}, Age : ${json.int("age")}")
 ```
 Result :
 ```
-Name : Sakib Sami, Age : 23
+Name : Cedric Beust, Age : 23
 ```
 
 You can also access the JSON content as a file, or any other resource you can get an `InputStream` from.
@@ -70,7 +71,7 @@ Let's query these values:
 ```kotlin
     val firstName = obj.string("firstName")
     val lastName = obj.string("lastName")
-    println("Name: ${firstName} ${lastName}")
+    println("Name: $firstName $lastName")
 
     // Prints: Name: Cedric Beust
 ```
@@ -113,7 +114,7 @@ We can easily collect all the ages as follows:
 val array = parse("/e.json") as JsonArray<JsonObject>
 
 val ages = array.long("age")
-println("Ages: ${ages}")
+println("Ages: $ages")
 
 // Prints: Ages: JsonArray(value=[20, 25, 38])
 ```
@@ -124,7 +125,7 @@ Since a `JsonArray` behaves like a `List`, we can apply closures on them, such a
 val oldPeople = array.filter {
     it.long("age")!! > 30
 }
-println("Old people: ${oldPeople}")
+println("Old people: $oldPeople")
 
 // Prints: Old people: [JsonObject(map={age=38, name=Jessica})]
 ```
@@ -181,7 +182,7 @@ val berkeley = array.filter {
 }.map {
     it.string("last")
 }
-println("${berkeley}")
+println("$berkeley")
 
 // Prints:
 // === Everyone who studied in Berkeley:
@@ -198,7 +199,7 @@ val result = array.flatMap {
                 it.long("grade")!! > 75
             }!!
 }
-println("Result: ${result}")
+println("Result: $result")
 
 // Prints:
 // === All grades bigger than 75
