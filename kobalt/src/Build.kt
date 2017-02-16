@@ -8,7 +8,7 @@ val p = project {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
-    version = "0.28"
+    version = "0.29"
 
     dependenciesTest {
         compile("org.testng:testng:6.9.9",
