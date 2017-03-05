@@ -77,6 +77,10 @@ class TestRFC7159 {
         jsonEquals("{ \"a\":\"hp://foo\"}", "{\"a\":\"hp://foo\"}")
     }
 
+    fun unicodeUnescaped() {
+        jsonEquals("{\"a\":\"ú\"}", "{\"a\":\"ú\"}")
+    }
+
     fun objectNullValue() {
         jsonEquals("{ \"a\":null}", "{\"a\":null}")
     }

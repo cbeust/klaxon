@@ -3,6 +3,7 @@ package com.beust.klaxon;
 import org.testng.annotations.Test
 import java.math.BigInteger
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 @Test
 class TestTypes {
@@ -50,6 +51,15 @@ class TestTypes {
     fun typeUnicode(){
         val j = getJsonObject()
         assertEquals("foo\u20ffbar", j.string("unicode_value"))
+    }
+
+    fun typeUnescapedUnicode(){
+        val j = getJsonObject()
+        val actual = j.string("unicode_unescaped_value")
+        assertNotNull(actual)
+        assertEquals(0x00FA, actual!![0].toInt())
+        assertEquals(0x00FA, actual[1].toInt())
+        assertEquals("úú", actual)
     }
 
     fun typeEscape(){
