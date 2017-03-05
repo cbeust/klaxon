@@ -1,7 +1,8 @@
 package com.beust.klaxon
 
-import java.util.regex.Pattern
 import java.io.InputStream
+import java.nio.charset.Charset
+import java.util.regex.Pattern
 
 enum class Type {
     VALUE,
@@ -22,8 +23,7 @@ class Token(val tokenType: Type, val value: Any?) {
     }
 }
 
-class Lexer(val inputStream : InputStream) {
-    val bytes = inputStream.readBytes()
+class Lexer(input: InputStream, charset: Charset = Charsets.UTF_8) {
     val EOF = Token(Type.EOF, null)
     var index = 0
 
@@ -34,16 +34,30 @@ class Lexer(val inputStream : InputStream) {
         return c == ' ' || c == '\r' || c == '\n' || c == '\t'
     }
 
-    private fun nextChar() : Char {
-        return bytes[index++].toChar()
+    private val reader = input.buffered().reader(charset)
+    private var next: Char? = null
+
+    private fun nextChar(): Char {
+        if (isDone()) throw IllegalStateException("Cannot get next char: EOF reached")
+        val c = next!!
+        next = null
+        return c
     }
 
     private fun peekChar() : Char {
-        return bytes[index].toChar()
+        if (isDone()) throw IllegalStateException("Cannot peek next char: EOF reached")
+        return next!!
     }
 
     private fun isDone() : Boolean {
-        return index >= bytes.size
+        if (next != null) {
+            return false
+        }
+        index++
+        val read = reader.read()
+        if (read == -1) return true
+        next = read.toChar()
+        return false
     }
 
     val BOOLEAN_LETTERS = "falsetrue".toSet()
