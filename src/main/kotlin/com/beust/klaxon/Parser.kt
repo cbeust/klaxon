@@ -100,8 +100,6 @@ class Parser {
         }
 
     fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): Any? {
-        (parse("my.json") as JsonObject).lookup<String?>("users.email")
-
         return parse(inputStream.reader(charset))
     }
 
