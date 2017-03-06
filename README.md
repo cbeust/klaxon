@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:0.27'
+    compile 'com.beust:klaxon:0.29'
 }
 ```
 
@@ -53,7 +53,7 @@ val obj = parse("/object.json") as JsonObject
 ```
 
 Parse from String value :
-```
+```kotlin
 val parser: Parser = Parser()
 val stringBuilder: StringBuilder = StringBuilder("{\"name\":\"Cedric Beust\", \"age\":23}")
 val json: JsonObject = parser.parse(stringBuilder) as JsonObject
@@ -218,7 +218,7 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 ## Pretty printing
 
 You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get pretty-printed
-version then you can call toJsonString(true)
+version then you can call `toJsonString(true)`
 
 ## Advanced DSL
 
@@ -235,7 +235,7 @@ println("Result: ${logic.toJsonString()}")
 
 will output:
 
-```kotlin
+```text
 Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
 ```
 
@@ -258,7 +258,7 @@ If we have the following JSON
 We can find all emails by
 
 ```kotlin
-parse('my.json').lookup<String?>("users.email")
+(parse("my.json") as JsonObject).lookup<String?>("users.email")
 ```
 
 ## Implementation
