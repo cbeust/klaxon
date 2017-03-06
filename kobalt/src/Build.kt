@@ -11,7 +11,7 @@ val p = project {
     version = "0.29"
 
     dependenciesTest {
-        compile("org.testng:testng:6.9.9",
+        compile("org.testng:testng:6.11",
                 "org.jetbrains.kotlin:kotlin-test:1.0.3")
     }
 
