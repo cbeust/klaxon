@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import java.io.InputStream
+import java.io.Reader
 import java.nio.charset.Charset
 import java.util.regex.Pattern
 
@@ -23,7 +24,9 @@ class Token(val tokenType: Type, val value: Any?) {
     }
 }
 
-class Lexer(input: InputStream, charset: Charset = Charsets.UTF_8) {
+class Lexer(reader: Reader) {
+    constructor(stream: InputStream, charset: Charset = Charsets.UTF_8) : this(stream.reader(charset))
+
     val EOF = Token(Type.EOF, null)
     var index = 0
 
@@ -34,7 +37,7 @@ class Lexer(input: InputStream, charset: Charset = Charsets.UTF_8) {
         return c == ' ' || c == '\r' || c == '\n' || c == '\t'
     }
 
-    private val reader = input.buffered().reader(charset)
+    private val reader = reader.buffered()
     private var next: Char? = null
 
     private fun nextChar(): Char {
