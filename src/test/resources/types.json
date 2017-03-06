@@ -7,6 +7,7 @@
     "double_exp_value": 3.141E-10,
     "string_value": "foo-bar",
     "unicode_value": "foo\u20ffbar",
+    "unicode_unescaped_value": "ú\u00fa",
     "escape_value": "[\"|\\|\/|\b|\f|\n|\r|\t]",
     "object_value": {},
     "array_value": [],
