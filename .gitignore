@@ -5,4 +5,5 @@ build
 .gradle
 .kobalt
 kobaltBuild
+lib/kotlin-*
 
