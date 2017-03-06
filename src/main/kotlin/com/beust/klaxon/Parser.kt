@@ -1,9 +1,7 @@
 package com.beust.klaxon
 
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
+import java.io.*
+import java.nio.charset.Charset
 import java.util.*
 
 class World(var status : Status) {
@@ -92,7 +90,7 @@ class Parser {
     }
 
     fun parse(rawValue: StringBuilder): Any? =
-        ByteArrayInputStream(rawValue.toString().toByteArray()).use {
+        StringReader(rawValue.toString()).use {
             parse(it)
         }
 
@@ -101,7 +99,13 @@ class Parser {
             parse(it)
         }
 
-    fun parse(inputStream : InputStream) : Any? {
+    fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): Any? {
+        (parse("my.json") as JsonObject).lookup<String?>("users.email")
+
+        return parse(inputStream.reader(charset))
+    }
+
+    fun parse(reader: Reader): Any? {
 
         val sm = StateMachine()
 
@@ -202,7 +206,7 @@ class Parser {
         })
         // else error
 
-        val lexer = Lexer(inputStream)
+        val lexer = Lexer(reader)
 
         var world = World(Status.INIT)
         do {
