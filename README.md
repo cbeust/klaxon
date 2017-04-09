@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile [group: 'com.beust', name: 'klaxon', version: '0.30']
+    compile 'com.beust:klaxon:0.30'
 }
 ```
 
