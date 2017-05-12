@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import java.lang.IllegalArgumentException
 import java.math.BigInteger
 
 fun convert(value: Any?) : Any? = when (value) {
