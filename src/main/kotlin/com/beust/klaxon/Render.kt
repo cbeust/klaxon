@@ -40,7 +40,7 @@ tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level
                 result,
                 prettyPrint,
                 level)
-        is List<*> -> renderValue(JsonArray(v.map { it?.toString() }), result, prettyPrint, level)
+        is List<*> -> renderValue(JsonArray(v), result, prettyPrint, level)
         is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, level)
         else -> result.append(v.toString())
     }
