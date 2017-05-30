@@ -267,4 +267,20 @@ class KlaxonTest {
         val result = j.mapChildren { fail("should never reach here") }
         assertKlaxonEquals(listOf(null, null, null), result)
     }
+
+    fun renderMap() {
+        val map = mapOf(
+            "a" to 1,
+            "b" to "x",
+            "c" to null
+        )
+
+        assertEquals(valueToString(map), "{\"a\":1,\"b\":\"x\",\"c\":null}")
+    }
+
+    fun renderList() {
+        val list = listOf(null, 1, true, false, "a")
+
+        assertEquals(valueToString(list), "[null,1,true,false,\"a\"]")
+    }
 }
