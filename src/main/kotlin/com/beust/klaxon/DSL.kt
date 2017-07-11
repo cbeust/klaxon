@@ -2,17 +2,17 @@ package com.beust.klaxon
 
 import java.util.*
 
-fun valueToString(v: Any?, prettyPrint: Boolean = false) : String =
+fun valueToString(v: Any?, prettyPrint: Boolean = false, canonical : Boolean = false) : String =
     StringBuilder().apply {
-        renderValue(v, this, prettyPrint, 0)
+        renderValue(v, this, prettyPrint, canonical, 0)
     }.toString()
 
 interface JsonBase {
-    fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int)
-    fun appendJsonString(result : Appendable, prettyPrint: Boolean = false) =
-            appendJsonStringImpl(result, prettyPrint, 0)
-    fun toJsonString(prettyPrint: Boolean = false) : String =
-            StringBuilder().apply { appendJsonString(this, prettyPrint) }.toString()
+    fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int)
+    fun appendJsonString(result : Appendable, prettyPrint: Boolean = false, canonical: Boolean = false) =
+            appendJsonStringImpl(result, prettyPrint, canonical, 0)
+    fun toJsonString(prettyPrint: Boolean = false, canonical: Boolean = false) : String =
+            StringBuilder().apply { appendJsonString(this, prettyPrint, canonical) }.toString()
 }
 
 fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
@@ -21,31 +21,31 @@ fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
 data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?>
         by map {
 
-    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int) {
+    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
         result.append("{")
 
         var comma = false
-        for ((k, v) in map.toSortedMap()) {
+        for ((k, v) in (if(canonical) map.toSortedMap() else map)) {
             if (comma) {
                 result.append(",")
             } else {
                 comma = true
             }
 
-            if (prettyPrint) {
+            if (prettyPrint && !canonical) {
                 result.appendln()
                 result.indent(level + 1)
             }
 
             result.append("\"").append(k).append("\":")
-            if (prettyPrint) {
+            if (prettyPrint && !canonical) {
                 result.append(" ")
             }
 
-            renderValue(v, result, prettyPrint, level + 1)
+            renderValue(v, result, prettyPrint, canonical, level + 1)
         }
 
-        if (prettyPrint && map.isNotEmpty()) {
+        if (prettyPrint && !canonical && map.isNotEmpty()) {
             result.appendln()
             result.indent(level)
         }
@@ -62,21 +62,21 @@ fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
 
 data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
 
-    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, level: Int) {
+    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical : Boolean, level: Int) {
         result.append("[")
 
         var comma = false
         value.forEach {
             if (comma) {
                 result.append(",")
-                if (prettyPrint) {
+                if (prettyPrint && !canonical) {
                     result.append(" ")
                 }
             } else {
                 comma = true
             }
 
-            renderValue(it, result, prettyPrint, level)
+            renderValue(it, result, prettyPrint, canonical, level)
         }
         result.append("]")
     }
