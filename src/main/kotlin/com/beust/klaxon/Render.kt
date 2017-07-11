@@ -1,5 +1,7 @@
 package com.beust.klaxon
 
+import java.text.DecimalFormat
+
 private fun <A: Appendable> A.renderString(s: String): A {
     append("\"")
 
@@ -31,17 +33,21 @@ private fun <A: Appendable> A.renderString(s: String): A {
 private fun isPrintableUnicode(c: Char) : Boolean = ((c >= '\u0000' && c <= '\u001F')
         || (c >= '\u007F' && c <= '\u009F') || (c >= '\u2000' && c <= '\u20FF'))
 
-tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, level: Int) {
+private val decimalFormat = DecimalFormat("0.0####E0##;-0.0####E0##")
+
+tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
     when (v) {
-        is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, level)
+        is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, canonical, level)
         is String -> result.renderString(v)
         is Map<*, *> -> renderValue(
                 JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value }),
                 result,
                 prettyPrint,
+                canonical,
                 level)
-        is List<*> -> renderValue(JsonArray(v), result, prettyPrint, level)
-        is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, level)
+        is List<*> -> renderValue(JsonArray(v), result, prettyPrint, canonical, level)
+        is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, canonical, level)
+        is Double, is Float -> result.append(if(canonical) decimalFormat.format(v) else v.toString())
         else -> result.append(v.toString())
     }
 }
