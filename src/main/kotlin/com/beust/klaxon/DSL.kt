@@ -25,7 +25,7 @@ data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<
         result.append("{")
 
         var comma = false
-        for ((k, v) in map) {
+        for ((k, v) in map.toSortedMap()) {
             if (comma) {
                 result.append(",")
             } else {
