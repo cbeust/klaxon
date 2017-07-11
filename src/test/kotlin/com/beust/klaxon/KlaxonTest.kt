@@ -100,6 +100,23 @@ class KlaxonTest {
         assertEquals(trim(actual), trim(expected))
     }
 
+	fun canonicalJsonObject() {
+		val j = json {
+			obj(
+				"c" to 1,
+				"a" to 2,
+				"b" to obj(
+					"e" to 1,
+					"d" to 2
+				)
+			)
+		}.toJsonString(false)
+		
+		val expected = """{"a":2,"b":{"d":2,"e":1},"c":1}"""
+		
+		assertEquals(j, expected)
+	}
+    
     private fun trim(s: String) = s.replace("\n", "").replace("\r", "")
 
     fun renderStringEscapes() {
