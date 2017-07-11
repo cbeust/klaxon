@@ -2,6 +2,7 @@ package com.beust.klaxon
 
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
+import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -102,20 +103,31 @@ class KlaxonTest {
 
 	fun canonicalJsonObject() {
 		val j = json {
-			obj(
-				"c" to 1,
-				"a" to 2,
-				"b" to obj(
-					"e" to 1,
-					"d" to 2
-				)
-			)
-		}.toJsonString(false)
+            obj(
+                    "c" to 1,
+                    "a" to 2,
+                    "b" to obj(
+                            "e" to 1,
+                            "d" to 2
+                    )
+            )
+		}.toJsonString(canonical = true)
 		
 		val expected = """{"a":2,"b":{"d":2,"e":1},"c":1}"""
 		
 		assertEquals(j, expected)
 	}
+    
+    fun canonicalJsonNumber() {
+        val j = json {
+            obj(
+                    "d" to 123456789.123456789,
+                    "f" to 123456789.123456789f
+            )
+        }.toJsonString(canonical = true)
+        
+        assert(Pattern.matches("\\{(\"[a-z]+\":\\d\\.\\d+E\\d+(,|}\$))+", j))
+    }
     
     private fun trim(s: String) = s.replace("\n", "").replace("\r", "")
 
