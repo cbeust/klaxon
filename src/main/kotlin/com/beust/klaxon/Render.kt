@@ -16,7 +16,7 @@ private fun <A: Appendable> A.renderString(s: String): A {
             '\b' -> append("\\b")
             '\u000c' -> append("\\f")
             else -> {
-                if(isPrintableUnicode(ch)){
+                if(isNotPrintableUnicode(ch)) {
                     append("\\u")
                     append(Integer.toHexString(ch.toInt()).padStart(4, '0'))
                 } else {
@@ -30,8 +30,10 @@ private fun <A: Appendable> A.renderString(s: String): A {
     return this
 }
 
-private fun isPrintableUnicode(c: Char) : Boolean = ((c >= '\u0000' && c <= '\u001F')
-        || (c >= '\u007F' && c <= '\u009F') || (c >= '\u2000' && c <= '\u20FF'))
+private fun isNotPrintableUnicode(c: Char): Boolean =
+    c in '\u0000'..'\u001F' ||
+    c in '\u007F'..'\u009F' ||
+    c in '\u2000'..'\u20FF'
 
 private val decimalFormat = DecimalFormat("0.0####E0##;-0.0####E0##")
 
