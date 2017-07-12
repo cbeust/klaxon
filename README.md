@@ -40,9 +40,9 @@ Values parsed from a valid JSON file can be of the following type:
 Since this is a JSON object, we parse it as follows:
 
 ```kotlin
-fun parse(name: String) : Any {
+fun parse(name: String) : Any? {
     val cls = Parser::class.java
-    cls.getResourceAsStream(name)?.let { inputStream ->
+    return cls.getResourceAsStream(name)?.let { inputStream ->
         return Parser().parse(inputStream)
     }
 }
@@ -195,7 +195,7 @@ All the grades over 75:
 println("=== All grades bigger than 75")
 val result = array.flatMap {
     it.obj("schoolResults")
-            ?.array(JsonObject(), "scores")?.filter {
+            ?.array<JsonObject>("scores")?.filter {
                 it.long("grade")!! > 75
             }!!
 }
