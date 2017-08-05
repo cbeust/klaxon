@@ -171,7 +171,7 @@ class Lexer(reader: Reader) {
             } else if (v == "null") {
                 jsonValue = null
             } else {
-                throw RuntimeException("Unexpected character at position ${index}"
+                throw RuntimeException("Unexpected character at position ${index-1}"
                     + ": '${c} (${c.toInt()})'")
             }
 
