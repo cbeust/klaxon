@@ -28,7 +28,7 @@ class Lexer(reader: Reader) {
     constructor(stream: InputStream, charset: Charset = Charsets.UTF_8) : this(stream.reader(charset))
 
     val EOF = Token(Type.EOF, null)
-    var index = 0
+    var index = 1
 
     val NUMERIC = Pattern.compile("[-]?[0-9]+")
     val DOUBLE = Pattern.compile(NUMERIC.toString() + "((\\.[0-9]+)?([eE][-+]?[0-9]+)?)")
@@ -38,12 +38,18 @@ class Lexer(reader: Reader) {
     }
 
     private val reader = reader.buffered()
-    private var next: Char? = null
+    private var next: Char?
+
+    init {
+        val c = reader.read()
+        next = if (c == -1) null else c.toChar()
+    }
 
     private fun nextChar(): Char {
         if (isDone()) throw IllegalStateException("Cannot get next char: EOF reached")
         val c = next!!
-        next = null
+        next = reader.read().let { if (it == -1) null else it.toChar() }
+        index++
         return c
     }
 
@@ -52,16 +58,7 @@ class Lexer(reader: Reader) {
         return next!!
     }
 
-    private fun isDone() : Boolean {
-        if (next != null) {
-            return false
-        }
-        index++
-        val read = reader.read()
-        if (read == -1) return true
-        next = read.toChar()
-        return false
-    }
+    private fun isDone() : Boolean = next == null
 
     val BOOLEAN_LETTERS = "falsetrue".toSet()
     private fun isBooleanLetter(c: Char) : Boolean {
@@ -174,7 +171,7 @@ class Lexer(reader: Reader) {
             } else if (v == "null") {
                 jsonValue = null
             } else {
-                throw RuntimeException("Unexpected character at position ${index}"
+                throw RuntimeException("Unexpected character at position ${index-1}"
                     + ": '${c} (${c.toInt()})'")
             }
 
