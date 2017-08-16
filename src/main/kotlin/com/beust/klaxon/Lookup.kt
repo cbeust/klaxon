@@ -27,7 +27,7 @@ fun JsonObject.string(fieldName: String) : String? = get(fieldName) as String?
 fun JsonObject.double(fieldName: String) : Double? = get(fieldName) as Double?
 fun JsonObject.boolean(fieldName: String) : Boolean? = get(fieldName) as Boolean?
 
-fun JsonObject.date(fieldName: String, formatter: (String?) -> Date?) : Date? {
+fun JsonObject.date(fieldName: String, formatter: (String) -> Date?) : Date? {
     val value: String = get(fieldName) as? String ?: return null
     return formatter(value)
 }
