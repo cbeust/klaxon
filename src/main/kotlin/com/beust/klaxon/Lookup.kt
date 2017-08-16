@@ -2,6 +2,7 @@ package com.beust.klaxon
 
 import java.math.BigInteger
 import java.util.ArrayList
+import java.util.Date
 
 
 @Suppress("UNCHECKED_CAST")
@@ -25,6 +26,11 @@ fun JsonObject.bigInt(fieldName: String) : BigInteger? = get(fieldName) as BigIn
 fun JsonObject.string(fieldName: String) : String? = get(fieldName) as String?
 fun JsonObject.double(fieldName: String) : Double? = get(fieldName) as Double?
 fun JsonObject.boolean(fieldName: String) : Boolean? = get(fieldName) as Boolean?
+
+fun JsonObject.date(fieldName: String, formatter: (String?) -> Date?) : Date? {
+    val value: String = get(fieldName) as? String ?: return null
+    return formatter(value)
+}
 
 
 fun JsonArray<*>.string(id: String) : JsonArray<String?> = mapChildren { it.string(id) }
