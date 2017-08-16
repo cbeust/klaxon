@@ -26,11 +26,8 @@ fun JsonObject.bigInt(fieldName: String) : BigInteger? = get(fieldName) as BigIn
 fun JsonObject.string(fieldName: String) : String? = get(fieldName) as String?
 fun JsonObject.double(fieldName: String) : Double? = get(fieldName) as Double?
 fun JsonObject.boolean(fieldName: String) : Boolean? = get(fieldName) as Boolean?
-
-fun JsonObject.date(fieldName: String, formatter: (String) -> Date?) : Date? {
-    val value: String = get(fieldName) as? String ?: return null
-    return formatter(value)
-}
+fun JsonObject.date(fieldName: String, formatter: (String) -> Date?) : Date? =
+        (get(fieldName) as? String?)?.let { formatter(it) }
 
 
 fun JsonArray<*>.string(id: String) : JsonArray<String?> = mapChildren { it.string(id) }
@@ -39,6 +36,8 @@ fun JsonArray<*>.long(id: String) : JsonArray<Long?> = mapChildren { it.long(id)
 fun JsonArray<*>.int(id: String) : JsonArray<Int?> = mapChildren { it.int(id) }
 fun JsonArray<*>.bigInt(id: String) : JsonArray<BigInteger?> = mapChildren { it.bigInt(id) }
 fun JsonArray<*>.double(id: String) : JsonArray<Double?> = mapChildren { it.double(id) }
+fun JsonArray<*>.date(id: String, formatter: (String) -> Date?) : JsonArray<Date?> =
+        mapChildren { it.date(id, formatter) }
 
 fun <T> JsonArray<*>.mapChildrenObjectsOnly(block : (JsonObject) -> T) : JsonArray<T> =
         JsonArray(flatMapTo(ArrayList<T>(size)) {
