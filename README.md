@@ -76,6 +76,33 @@ Let's query these values:
     // Prints: Name: Cedric Beust
 ```
 
+To transform a string to Date, you can use the function `.date()`, check this example:
+
+```json
+{
+  "date" : "1994-11-05T13:15:30Z"
+}
+```
+
+Parse from String value to Date:
+```kotlin
+val parser: Parser = Parser()
+val json: JsonObject = parse("/date.json") as JsonObject
+val date: Date? = json.date("date", { Date.from(Instant.parse(it)) })
+
+val calendar = Calendar.getInstance()
+calendar.time = date
+val year = calendar.get(Calendar.YEAR)
+val month = calendar.get(Calendar.MONTH)
+val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+println("Day : $day, Month : $month, Year : $year")
+```
+Result :
+```
+Day : 05, Month : 11, Year: 1994
+```
+
 `JsonObject` implements the following methods:
 
 ```kotlin
@@ -86,6 +113,7 @@ Let's query these values:
     fun double(fieldName: String) : Double?
     fun boolean(fieldName: String) : Boolean?
     fun obj(fieldName: String) : JsonObject?
+    fun date(fieldName: String) : Date?
     fun <T> array(thisType: T, fieldName: String) : JsonArray<T>?
 ```
 
