@@ -113,7 +113,7 @@ Day : 05, Month : 11, Year: 1994
     fun double(fieldName: String) : Double?
     fun boolean(fieldName: String) : Boolean?
     fun obj(fieldName: String) : JsonObject?
-    fun date(fieldName: String) : Date?
+    fun date(fieldName: String, formatter: (String) -> Date?) : Date?
     fun <T> array(thisType: T, fieldName: String) : JsonArray<T>?
 ```
 
