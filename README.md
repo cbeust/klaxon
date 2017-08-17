@@ -1,4 +1,4 @@
-<img src="doc/klaxon.jpg" alt="Klaxon logo" height="101" width="220" />
+<img src="doc/klaxon.png" alt="Klaxon logo" height="101" width="220" />
 
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
