@@ -1,7 +1,5 @@
 <img src="doc/klaxon.jpg" alt="Klaxon logo" height="101" width="220" />
 
-# Klaxon: JSON for Kotlin
-
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
 ## Install
