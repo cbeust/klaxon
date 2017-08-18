@@ -1,5 +1,4 @@
-
-# Klaxon: JSON for Kotlin
+<img src="doc/klaxon.png" alt="Klaxon logo" height="101" width="220" />
 
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
@@ -241,7 +240,7 @@ Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
 
 ## Flattening and path lookup
 
-If we have the following JSON 
+If we have the following JSON
 ```json
 {
 	"users" : [
