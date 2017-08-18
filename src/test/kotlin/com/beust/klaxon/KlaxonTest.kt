@@ -37,6 +37,24 @@ class KlaxonTest {
         assertEquals(expected, j)
     }
 
+    fun emptyString() {
+        val j = Parser().parse("")
+        val expected = JsonObject()
+        assertEquals(j, expected)
+    }
+
+    fun emptyStringBuilder() {
+        val j = Parser().parse(StringBuilder(""))
+        val expected = JsonObject()
+        assertEquals(j, expected)
+    }
+
+    fun emptyArray() {
+        val j = Parser().parse(StringBuilder("[]"))
+        val expected = JsonArray<JsonObject>()
+        assertEquals(j, expected)
+    }
+
     fun nullsParse() {
         assertEquals(json {
             array(1, null, obj(

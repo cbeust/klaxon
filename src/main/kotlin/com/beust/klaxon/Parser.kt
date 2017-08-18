@@ -89,21 +89,32 @@ class Parser {
         }
     }
 
-    fun parse(rawValue: StringBuilder): Any? =
-        StringReader(rawValue.toString()).use {
-            parse(it)
-        }
+    fun parse(rawValue: String): Any? =
+            StringReader(rawValue).use {
+                parse(it)
+            }
 
-    fun parse(fileName: String) : Any? =
-        FileInputStream(File(fileName)).use {
-            parse(it)
-        }
+    fun parse(rawValue: StringBuilder): Any? = parse(rawValue.toString())
+
+    fun parse(file: File) : Any? =
+            FileInputStream(file).use {
+                parse(it)
+            }
 
     fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): Any? {
         return parse(inputStream.reader(charset))
     }
 
     fun parse(reader: Reader): Any? {
+
+        val lexer = Lexer(reader)
+
+        if (lexer.isDone()) {
+            return when {
+                lexer.isArray -> JsonArray<JsonObject>()
+                else -> JsonObject()
+            }
+        }
 
         val sm = StateMachine()
 
@@ -203,8 +214,6 @@ class Parser {
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
         // else error
-
-        val lexer = Lexer(reader)
 
         var world = World(Status.INIT)
         do {
