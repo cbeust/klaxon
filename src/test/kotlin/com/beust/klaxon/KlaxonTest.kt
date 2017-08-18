@@ -2,6 +2,7 @@ package com.beust.klaxon
 
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
+import java.io.File
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -52,6 +53,12 @@ class KlaxonTest {
     fun emptyArray() {
         val j = Parser().parse(StringBuilder("[]"))
         val expected = JsonArray<JsonObject>()
+        assertEquals(j, expected)
+    }
+
+    fun emptyInputStream() {
+        val j = read("/empty.json")
+        val expected = JsonObject()
         assertEquals(j, expected)
     }
 
