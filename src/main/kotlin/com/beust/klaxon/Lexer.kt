@@ -2,7 +2,6 @@ package com.beust.klaxon
 
 import java.io.InputStream
 import java.io.Reader
-import java.io.StringWriter
 import java.nio.charset.Charset
 import java.util.regex.Pattern
 
