@@ -56,7 +56,7 @@ class World(var status : Status) {
 class JsonParseException(val reason: String): IOException() {
 
     override val message: String?
-        get() = "${super.message} Reason: $reason"
+        get() = "${super.message}\nReason: $reason"
 
 }
 
