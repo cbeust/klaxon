@@ -39,18 +39,35 @@ class KlaxonTest {
     }
 
     fun emptyString() {
-        val j = Parser().parse("")
+        val j = Parser().parse("", strictMode = false)
         assertNull(j)
     }
 
     fun emptyStringBuilder() {
-        val j = Parser().parse(StringBuilder(""))
+        val j = Parser().parse(StringBuilder(""), strictMode = false)
         assertNull(j)
     }
 
     fun emptyInputStream() {
-        val j = read("/empty.json")
+        val cls = KlaxonTest::class.java
+        val j = Parser().parse(cls.getResourceAsStream("/empty.json")!!, strictMode = false)
         assertNull(j)
+    }
+
+    @Test(expectedExceptions = arrayOf(JsonParseException::class))
+    fun emptyStringStrict() {
+        Parser().parse("")
+    }
+
+    @Test(expectedExceptions = arrayOf(JsonParseException::class))
+    fun emptyStringBuilderStrict() {
+        Parser().parse(StringBuilder(""))
+    }
+
+    @Test(expectedExceptions = arrayOf(JsonParseException::class))
+    fun emptyInputStreamStrict() {
+        val cls = KlaxonTest::class.java
+        Parser().parse(cls.getResourceAsStream("/empty.json")!!)
     }
 
     fun nullsParse() {
