@@ -29,7 +29,6 @@ class Lexer(reader: Reader) {
 
     val EOF = Token(Type.EOF, null)
     var index = 1
-    var isArray = false
 
     val NUMERIC = Pattern.compile("[-]?[0-9]+")
     val DOUBLE = Pattern.compile(NUMERIC.toString() + "((\\.[0-9]+)?([eE][-+]?[0-9]+)?)")
@@ -44,7 +43,6 @@ class Lexer(reader: Reader) {
     init {
         val c = reader.read()
         next = if (c == -1) null else c.toChar()
-        isArray = next == '['
     }
 
     private fun nextChar(): Char {

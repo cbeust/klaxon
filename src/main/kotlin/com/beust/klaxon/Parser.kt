@@ -110,10 +110,7 @@ class Parser {
         val lexer = Lexer(reader)
 
         if (lexer.isDone()) {
-            return when {
-                lexer.isArray -> JsonArray<JsonObject>()
-                else -> JsonObject()
-            }
+            return null
         }
 
         val sm = StateMachine()

@@ -2,7 +2,6 @@ package com.beust.klaxon
 
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
-import java.io.File
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -40,31 +39,18 @@ class KlaxonTest {
     }
 
     fun emptyString() {
-        val j = Parser().parse("") as JsonObject
-        val expected = JsonObject()
-        assertEquals(j, expected)
-        assertNull(j["any"])
+        val j = Parser().parse("")
+        assertNull(j)
     }
 
     fun emptyStringBuilder() {
-        val j = Parser().parse(StringBuilder("")) as JsonObject
-        val expected = JsonObject()
-        assertEquals(j, expected)
-        assertNull(j["any"])
-    }
-
-    fun emptyArray() {
-        val j = Parser().parse(StringBuilder("[]")) as JsonArray<*>
-        val expected = JsonArray<JsonObject>()
-        assertEquals(j, expected)
-        assertEquals(j.size, 0)
+        val j = Parser().parse(StringBuilder(""))
+        assertNull(j)
     }
 
     fun emptyInputStream() {
-        val j = read("/empty.json") as JsonObject
-        val expected = JsonObject()
-        assertEquals(j, expected)
-        assertNull(j["any"])
+        val j = read("/empty.json")
+        assertNull(j)
     }
 
     fun nullsParse() {
