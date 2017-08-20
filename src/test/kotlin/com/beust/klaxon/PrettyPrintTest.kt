@@ -2,6 +2,9 @@ package com.beust.klaxon
 
 import org.testng.Assert
 import org.testng.annotations.Test
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.util.*
 
 class PrettyPrintTest {
     @Test
@@ -14,4 +17,22 @@ class PrettyPrintTest {
         Assert.assertTrue(string.contains(" 22"), "22 should be displayed as an Int, not a String: $string")
 
     }
+
+    @Test
+    fun shouldDisplayDate() {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        val expectedDate = Date.from(Instant.now())
+        val expectedString = simpleDateFormat.format(expectedDate)
+        val json = json { JsonObject(mapOf(
+                "date" to expectedDate
+        )) }
+//        val modifier = Modifier({ simpleDateFormat.format(it) })
+//        val string = json.toJsonString(true, modifier = modifier)
+        val string = json.toJsonString(true)
+        println("string $string\nexpected string $expectedString")
+        Assert.assertTrue(
+                string.contains(expectedString),
+                "Date needs to be formatted, resulting in a String like: $expectedString")
+    }
+
 }

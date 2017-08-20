@@ -1,6 +1,11 @@
 package com.beust.klaxon
 
 import java.text.DecimalFormat
+import java.util.*
+
+interface Modifier {
+    fun parseDate(date: Date): String
+}
 
 private fun <A: Appendable> A.renderString(s: String): A {
     append("\"")
@@ -37,10 +42,15 @@ private fun isNotPrintableUnicode(c: Char): Boolean =
 
 private val decimalFormat = DecimalFormat("0.0####E0##;-0.0####E0##")
 
-tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
+tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int, modifier: Modifier? = null) {
     when (v) {
         is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, canonical, level)
         is String -> result.renderString(v)
+        is Date -> {
+            modifier?.parseDate(v)?.let {
+                result.renderString(it)
+            }
+        }
         is Map<*, *> -> renderValue(
                 JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value }),
                 result,
