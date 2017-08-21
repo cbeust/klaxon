@@ -110,6 +110,9 @@ class Parser {
                 parse(it, strictMode)
             }
 
+    fun parse(inputStream: InputStream, charset: Charset) =
+            parse(inputStream, true, charset)
+
     fun parse(
             inputStream: InputStream,
             strictMode: Boolean = true,
