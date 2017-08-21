@@ -1,5 +1,4 @@
-
-# Klaxon: JSON for Kotlin
+<img src="doc/klaxon.png" alt="Klaxon logo" height="101" width="220" />
 
 Klaxon is a lightweight library to parse JSON in Kotlin.
 
@@ -246,7 +245,7 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 ## Pretty printing
 
 You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get pretty-printed
-version then you can call `toJsonString(true)`
+version then you can call `toJsonString(true)` or `toJsonString(true, modifier)`
 
 ## Advanced DSL
 
