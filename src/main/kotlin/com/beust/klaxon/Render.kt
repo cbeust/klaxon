@@ -3,8 +3,6 @@ package com.beust.klaxon
 import java.text.DecimalFormat
 import java.util.*
 
-class Modifier(val parseDate: (Date) -> String)
-
 private fun <A: Appendable> A.renderString(s: String): A {
     append("\"")
 
@@ -45,7 +43,7 @@ tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canon
         is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, canonical, level, modifier)
         is String -> result.renderString(v)
         is Date -> {
-            modifier?.parseDate?.invoke(v)?.let {
+            modifier?.renderDateToString?.invoke(v)?.let {
                 result.renderString(it)
             }
         }
