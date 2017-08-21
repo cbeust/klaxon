@@ -24,6 +24,7 @@ Values parsed from a valid JSON file can be of the following type:
 * String
 * Double
 * Boolean
+* Date
 * JsonObject
 * JsonArray
 
