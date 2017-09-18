@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import java.text.DecimalFormat
+import java.util.*
 
 private fun <A: Appendable> A.renderString(s: String): A {
     append("\"")
@@ -37,18 +38,24 @@ private fun isNotPrintableUnicode(c: Char): Boolean =
 
 private val decimalFormat = DecimalFormat("0.0####E0##;-0.0####E0##")
 
-tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
+tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int, modifier: Modifier?) {
     when (v) {
-        is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, canonical, level)
+        is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, canonical, level, modifier)
         is String -> result.renderString(v)
+        is Date -> {
+            modifier?.renderDateToString?.invoke(v)?.let {
+                result.renderString(it)
+            }
+        }
         is Map<*, *> -> renderValue(
                 JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value }),
                 result,
                 prettyPrint,
                 canonical,
-                level)
-        is List<*> -> renderValue(JsonArray(v), result, prettyPrint, canonical, level)
-        is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, canonical, level)
+                level,
+                modifier)
+        is List<*> -> renderValue(JsonArray(v), result, prettyPrint, canonical, level, modifier)
+        is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, canonical, level, modifier)
         is Double, is Float -> result.append(if(canonical) decimalFormat.format(v) else v.toString())
         else -> result.append(v.toString())
     }

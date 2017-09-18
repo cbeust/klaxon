@@ -4,15 +4,18 @@ import java.util.*
 
 fun valueToString(v: Any?, prettyPrint: Boolean = false, canonical : Boolean = false) : String =
     StringBuilder().apply {
-        renderValue(v, this, prettyPrint, canonical, 0)
+        renderValue(v, this, prettyPrint, canonical, 0, null)
     }.toString()
 
 interface JsonBase {
-    fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int)
-    fun appendJsonString(result : Appendable, prettyPrint: Boolean = false, canonical: Boolean = false) =
-            appendJsonStringImpl(result, prettyPrint, canonical, 0)
+    fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int, modifier: Modifier?)
+    fun appendJsonString(result : Appendable, prettyPrint: Boolean = false, canonical: Boolean = false, modifier: Modifier?) =
+            appendJsonStringImpl(result, prettyPrint, canonical, 0, modifier)
     fun toJsonString(prettyPrint: Boolean = false, canonical: Boolean = false) : String =
-            StringBuilder().apply { appendJsonString(this, prettyPrint, canonical) }.toString()
+            StringBuilder().apply { appendJsonString(this, prettyPrint, canonical, null) }.toString()
+    //To cbeust: I am not able to set a default value for the variable modifier, Kobalt compilation results a error, any idea?
+    fun toJsonString(prettyPrint: Boolean = false, canonical: Boolean = false, modifier: Modifier?) : String =
+            StringBuilder().apply { appendJsonString(this, prettyPrint, canonical, modifier) }.toString()
 }
 
 fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
@@ -21,7 +24,7 @@ fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
 data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?>
         by map {
 
-    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
+    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int, modifier: Modifier?) {
         result.append("{")
 
         var comma = false
@@ -42,7 +45,7 @@ data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<
                 result.append(" ")
             }
 
-            renderValue(v, result, prettyPrint, canonical, level + 1)
+            renderValue(v, result, prettyPrint, canonical, level + 1, modifier)
         }
 
         if (prettyPrint && !canonical && map.isNotEmpty()) {
@@ -62,7 +65,7 @@ fun <T> JsonArray(list : List<T> = emptyList()) : JsonArray<T> =
 
 data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> by value {
 
-    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical : Boolean, level: Int) {
+    override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical : Boolean, level: Int, modifier: Modifier?) {
         result.append("[")
 
         var comma = false
@@ -76,7 +79,7 @@ data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> b
                 comma = true
             }
 
-            renderValue(it, result, prettyPrint, canonical, level)
+            renderValue(it, result, prettyPrint, canonical, level, modifier)
         }
         result.append("]")
     }

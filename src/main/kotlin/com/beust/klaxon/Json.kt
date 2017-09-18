@@ -2,6 +2,7 @@ package com.beust.klaxon
 
 import java.lang.IllegalArgumentException
 import java.math.BigInteger
+import java.util.Date
 
 fun convert(value: Any?) : Any? = when (value) {
         is Int -> value
@@ -13,6 +14,7 @@ fun convert(value: Any?) : Any? = when (value) {
         is BigInteger -> value
         is JsonObject -> value
         is JsonArray<*> -> value
+        is Date -> value
         null -> null
         else -> throw IllegalArgumentException("Unrecognized type: " + value)
     }
