@@ -58,7 +58,7 @@ class Lexer(reader: Reader) {
         return next!!
     }
 
-    private fun isDone() : Boolean = next == null
+    fun isDone() : Boolean = next == null
 
     val BOOLEAN_LETTERS = "falsetrue".toSet()
     private fun isBooleanLetter(c: Char) : Boolean {

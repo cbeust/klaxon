@@ -53,6 +53,13 @@ class World(var status : Status) {
     }
 }
 
+class JsonParseException(val reason: String): IOException() {
+
+    override val message: String?
+        get() = "${super.message}\nReason: $reason"
+
+}
+
 private data class TokenStatus(val status: Status, val tokenType: Type)
 
 class StateMachine {
@@ -81,6 +88,7 @@ class StateMachine {
  * Main entry for Klaxon's parser.
  */
 class Parser {
+
     val verbose = false
 
     fun log(s: String) {
@@ -89,21 +97,39 @@ class Parser {
         }
     }
 
-    fun parse(rawValue: StringBuilder): Any? =
-        StringReader(rawValue.toString()).use {
-            parse(it)
-        }
+    fun parse(rawValue: String, strictMode: Boolean = true): Any? =
+            StringReader(rawValue).use {
+                parse(it, strictMode)
+            }
 
-    fun parse(fileName: String) : Any? =
-        FileInputStream(File(fileName)).use {
-            parse(it)
-        }
+    fun parse(rawValue: StringBuilder, strictMode: Boolean = true): Any? =
+            parse(rawValue.toString(), strictMode)
 
-    fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): Any? {
-        return parse(inputStream.reader(charset))
+    fun parse(file: File, strictMode: Boolean = true) : Any? =
+            FileInputStream(file).use {
+                parse(it, strictMode)
+            }
+
+    fun parse(inputStream: InputStream, charset: Charset) =
+            parse(inputStream, true, charset)
+
+    fun parse(
+            inputStream: InputStream,
+            strictMode: Boolean = true,
+            charset: Charset = Charsets.UTF_8): Any? {
+        return parse(inputStream.reader(charset), strictMode)
     }
 
-    fun parse(reader: Reader): Any? {
+    fun parse(reader: Reader, strictMode: Boolean): Any? {
+
+        val lexer = Lexer(reader)
+
+        if (lexer.isDone()) {
+            if (strictMode) {
+                throw JsonParseException("JSON input is empty")
+            }
+            return null
+        }
 
         val sm = StateMachine()
 
@@ -203,8 +229,6 @@ class Parser {
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
         // else error
-
-        val lexer = Lexer(reader)
 
         var world = World(Status.INIT)
         do {

@@ -4,6 +4,7 @@ import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -35,6 +36,38 @@ class KlaxonTest {
             )
         }
         assertEquals(expected, j)
+    }
+
+    fun emptyString() {
+        val j = Parser().parse("", strictMode = false)
+        assertNull(j)
+    }
+
+    fun emptyStringBuilder() {
+        val j = Parser().parse(StringBuilder(""), strictMode = false)
+        assertNull(j)
+    }
+
+    fun emptyInputStream() {
+        val cls = KlaxonTest::class.java
+        val j = Parser().parse(cls.getResourceAsStream("/empty.json")!!, strictMode = false)
+        assertNull(j)
+    }
+
+    @Test(expectedExceptions = arrayOf(JsonParseException::class))
+    fun emptyStringStrict() {
+        Parser().parse("")
+    }
+
+    @Test(expectedExceptions = arrayOf(JsonParseException::class))
+    fun emptyStringBuilderStrict() {
+        Parser().parse(StringBuilder(""))
+    }
+
+    @Test(expectedExceptions = arrayOf(JsonParseException::class))
+    fun emptyInputStreamStrict() {
+        val cls = KlaxonTest::class.java
+        Parser().parse(cls.getResourceAsStream("/empty.json")!!)
     }
 
     fun nullsParse() {
