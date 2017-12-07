@@ -17,12 +17,12 @@ class World(var status : Status) {
         return this
     }
 
-    fun pushStatus(status: Status) : World {
+    private fun pushStatus(status: Status) : World {
         statusStack.addFirst(status)
         return this
     }
 
-    fun pushValue(value: Any) : World {
+    private fun pushValue(value: Any) : World {
         valueStack.addFirst(value)
         return this
     }
@@ -45,7 +45,7 @@ class World(var status : Status) {
     }
 
     fun peekStatus() : Status {
-        return statusStack.get(0)
+        return statusStack[0]
     }
 
     fun hasValues() : Boolean {
@@ -68,7 +68,7 @@ class StateMachine {
         val result = if (processor != null) {
             processor(world, token)
         } else {
-            val message = "No state found: ${world.status} ${token}"
+            val message = "No state found: ${world.status} $token"
             throw RuntimeException(message)
         }
 
@@ -81,9 +81,9 @@ class StateMachine {
  * Main entry for Klaxon's parser.
  */
 class Parser {
-    val verbose = false
+    private val verbose = false
 
-    fun log(s: String) {
+    private fun log(s: String) {
         if (verbose) {
             println("[Parser2] ${s}")
         }
@@ -110,28 +110,28 @@ class Parser {
         sm.put(Status.INIT, Type.VALUE, { world: World, token: Token ->
             world.pushAndSet(Status.IN_FINISHED_VALUE, token.value!!)
         })
-        sm.put(Status.INIT, Type.LEFT_BRACE, { world: World, token: Token ->
+        sm.put(Status.INIT, Type.LEFT_BRACE, { world: World, _: Token ->
             world.pushAndSet(Status.IN_OBJECT, JsonObject())
         })
-        sm.put(Status.INIT, Type.LEFT_BRACKET, { world: World, token: Token ->
+        sm.put(Status.INIT, Type.LEFT_BRACKET, { world: World, _: Token ->
             world.pushAndSet(Status.IN_ARRAY, JsonArray<Any>())
         })
         // else error
 
-        sm.put(Status.IN_FINISHED_VALUE, Type.EOF, { world: World, token: Token ->
+        sm.put(Status.IN_FINISHED_VALUE, Type.EOF, { world: World, _: Token ->
             world.result = world.popValue()
             world
         })
         // else error
 
 
-        sm.put(Status.IN_OBJECT, Type.COMMA, { world: World, token: Token ->
+        sm.put(Status.IN_OBJECT, Type.COMMA, { world: World, _: Token ->
             world
         })
         sm.put(Status.IN_OBJECT, Type.VALUE, { world: World, token: Token ->
             world.pushAndSet(Status.PASSED_PAIR_KEY, token.value!!)
         })
-        sm.put(Status.IN_OBJECT, Type.RIGHT_BRACE, { world: World, token: Token ->
+        sm.put(Status.IN_OBJECT, Type.RIGHT_BRACE, { world: World, _: Token ->
             if (world.hasValues()) {
                 world.popStatus()
                 world.popValue()
@@ -143,7 +143,7 @@ class Parser {
         })
 
 
-        sm.put(Status.PASSED_PAIR_KEY, Type.COLON, { world: World, token: Token ->
+        sm.put(Status.PASSED_PAIR_KEY, Type.COLON, { world: World, _: Token ->
             world
         })
         sm.put(Status.PASSED_PAIR_KEY, Type.VALUE, { world: World, token: Token ->
@@ -154,7 +154,7 @@ class Parser {
             world.status = world.peekStatus()
             world
         })
-        sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACKET, { world: World, token: Token ->
+        sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACKET, { world: World, _: Token ->
             world.popStatus()
             val key = world.popValue() as String
             world.parent = world.getFirstObject()
@@ -162,7 +162,7 @@ class Parser {
             world.parent.put(key, newArray)
             world.pushAndSet(Status.IN_ARRAY, newArray)
         })
-        sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { world: World, token: Token ->
+        sm.put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { world: World, _: Token ->
             world.popStatus()
             val key = world.popValue() as String
             world.parent = world.getFirstObject()
@@ -172,7 +172,7 @@ class Parser {
         })
         // else error
 
-        sm.put(Status.IN_ARRAY, Type.COMMA, { world: World, token: Token ->
+        sm.put(Status.IN_ARRAY, Type.COMMA, { world: World, _: Token ->
             world
         })
         sm.put(Status.IN_ARRAY, Type.VALUE, { world: World, token: Token ->
@@ -180,7 +180,7 @@ class Parser {
             value.add(token.value)
             world
         })
-        sm.put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { world: World, token: Token ->
+        sm.put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { world: World, _: Token ->
             if (world.hasValues()) {
                 world.popStatus()
                 world.popValue()
@@ -190,13 +190,13 @@ class Parser {
             }
             world
         })
-        sm.put(Status.IN_ARRAY, Type.LEFT_BRACE, { world: World, token: Token ->
+        sm.put(Status.IN_ARRAY, Type.LEFT_BRACE, { world: World, _: Token ->
             val value = world.getFirstArray()
             val newObject = JsonObject()
             value.add(newObject)
             world.pushAndSet(Status.IN_OBJECT, newObject)
         })
-        sm.put(Status.IN_ARRAY, Type.LEFT_BRACKET, { world: World, token: Token ->
+        sm.put(Status.IN_ARRAY, Type.LEFT_BRACKET, { world: World, _: Token ->
             val value = world.getFirstArray()
             val newArray = JsonArray<Any>()
             value.add(newArray)
@@ -209,7 +209,7 @@ class Parser {
         var world = World(Status.INIT)
         do {
             val token = lexer.nextToken()
-            log("Token: ${token}")
+            log("Token: $token")
             world = sm.next(world, token)
         } while (token.tokenType != Type.EOF)
 
