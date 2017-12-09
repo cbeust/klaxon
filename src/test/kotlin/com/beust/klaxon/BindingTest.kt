@@ -15,7 +15,7 @@ class BindingTest {
             var isFalse: Boolean? = null,
             var array: List<Int> = emptyList())
     fun allTypes() {
-        val result = JsonAdapter().fromJson<AllTypes>("""
+        val result = Klaxon().fromJson<AllTypes>("""
         {
             "int": 42,
             "string": "foo",
@@ -38,7 +38,7 @@ class BindingTest {
     )
 
     fun compoundObject() {
-        val result = JsonAdapter().fromJson<Deck1>("""
+        val result = Klaxon().fromJson<Deck1>("""
         {
           "cardCount": 2,
           "card":
@@ -65,7 +65,7 @@ class BindingTest {
     )
 
     fun compoundObjectWithArray() {
-        val result = JsonAdapter().fromJson<Deck2>("""
+        val result = Klaxon().fromJson<Deck2>("""
         {
           "cardCount": 2,
           "cards": [
@@ -90,7 +90,7 @@ class BindingTest {
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun badFieldMapping() {
-        JsonAdapter().fromJson<Mapping>("""
+        Klaxon().fromJson<Mapping>("""
         {
           "name": "foo"
         }
@@ -98,7 +98,7 @@ class BindingTest {
     }
 
     fun goodFieldMapping() {
-        val result = JsonAdapter().fromJson<Mapping>("""
+        val result = Klaxon().fromJson<Mapping>("""
         {
           "theName": "foo"
         }
@@ -116,8 +116,8 @@ class BindingTest {
     )
 
     fun typeAdapters() {
-        val result = JsonAdapter().apply {
-            typeAdapter(KlaxonDate::class, object: KlaxonAdapter<LocalDateTime?> {
+        val result = Klaxon()
+            .typeAdapter(KlaxonDate::class, object: KlaxonAdapter<LocalDateTime?> {
                 override fun fromJson(value: JsonValue)
                         = LocalDateTime.parse(value.string,
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
@@ -129,7 +129,7 @@ class BindingTest {
                 }
             })
 
-            typeAdapter(KlaxonDayOfTheWeek::class, object: KlaxonAdapter<String> {
+            .typeAdapter(KlaxonDayOfTheWeek::class, object: KlaxonAdapter<String> {
                 override fun fromJson(value: JsonValue) : String {
                     return when(value.int) {
                         0 -> "Sunday"
@@ -148,15 +148,14 @@ class BindingTest {
                     }
                 }
             })
-        }.fromJson<WithDate>("""
-            {
-              "theDate": "2017-05-10 16:30"
-              "dayOfTheWeek": 2
-            }
-        """)
+            .fromJson<WithDate>("""
+                {
+                  "theDate": "2017-05-10 16:30"
+                  "dayOfTheWeek": 2
+                }
+            """)
         Assert.assertEquals(result?.dayOfTheWeek, "Tuesday")
         Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
-        println("Date: " + result?.date)
     }
 }
 

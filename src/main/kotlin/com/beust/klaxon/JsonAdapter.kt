@@ -30,6 +30,7 @@ class JsonAdapter {
         }
     }
 
+    private fun log(s: String) = s //println(s)
     private fun warn(s: String) = "  WARNING: $s"
 
     fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>): Any {
@@ -49,7 +50,7 @@ class JsonAdapter {
 
         val result = cls.newInstance().apply {
             cls.declaredFields.forEach { field ->
-                println("Looking at field: $field")
+                log("Looking at field: $field")
                 val jsonAnnotation = field.getAnnotation(Json::class.java)
                 val fieldName =
                     if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
@@ -72,10 +73,10 @@ class JsonAdapter {
                     if (! foundAdapter) {
                         if (isPrimitive(field.type)) {
                             if (field.type.isAssignableFrom(jValue.javaClass)) {
-                                println("  Found value: $jValue")
+                                log("  Found value: $jValue")
                                 setField(this, field, jValue)
                             } else {
-                                println(warn("  Found value with incompatible type: "
+                                log(warn("  Found value with incompatible type: "
                                         + " value $jValue, expected " + field.type
                                         + " found KlaxonJson : " + jValue.javaClass))
                             }
