@@ -16,7 +16,7 @@ class JsonAdapter {
     }
 
     inline fun <reified T>fromJson(json: String) : T? {
-        val map = Parser().parse(StringReader(json))
+        val map = Parser.parse(StringReader(json))
         if (map is JsonObject) {
             val cls = T::class.java
             return fromJsonObject(map, cls) as T?

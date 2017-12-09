@@ -25,7 +25,7 @@ class TestLexerInputSize {
             }
         }
         try {
-            Parser().parse(SequenceInputStream(first, second)) as JsonObject
+            Parser.parse(SequenceInputStream(first, second)) as JsonObject
         } catch (e: RuntimeException) {
             assertEquals("Unexpected character at position 258: '# (35)'", e.message)
         }

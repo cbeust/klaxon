@@ -10,7 +10,7 @@ class TestTypes {
 
     private fun getJsonObject(): JsonObject {
         val cls = TestTypes::class.java
-        return Parser().parse(cls.getResourceAsStream("/types.json")!!) as JsonObject
+        return Parser.parse(cls.getResourceAsStream("/types.json")!!) as JsonObject
     }
 
     fun typeInt() {
@@ -84,7 +84,7 @@ class TestTypes {
 
     fun testEscapeRender(){
         val cls = TestTypes::class.java
-        val j = Parser().parse(cls.getResourceAsStream("/escaped.json")!!) as JsonObject
+        val j = Parser.parse(cls.getResourceAsStream("/escaped.json")!!) as JsonObject
         assertEquals("""{"s":"text field \"s\"\nnext line\fform feed\ttab\\rev solidus/solidus\bbackspace"}""", j.toJsonString())
     }
 }
