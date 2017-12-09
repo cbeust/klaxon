@@ -3,9 +3,10 @@ package com.beust.klaxon
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 import java.io.StringReader
 import java.lang.reflect.Field
+import kotlin.reflect.KClass
 
 class JsonAdapter {
-    val typeMap = hashMapOf<String, KlaxonAdapter<*, *>>()
+    val typeMap = hashMapOf<KClass<out Annotation>, KlaxonAdapter<*>>()
 
     private fun isPrimitive(type: Class<*>) : Boolean {
         return type.isPrimitive || type in setOf(
@@ -44,11 +45,12 @@ class JsonAdapter {
                     throw KlaxonException("Don't know how to map \"$fieldName\" to field \"${field.name}\"")
                 } else {
                     val typeAdapter = field.annotations.mapNotNull {
-                        typeMap[it.annotationClass.qualifiedName]
+                        typeMap[it.annotationClass]
                     }.firstOrNull()
 
                     if (typeAdapter != null) {
-//                        setField(this, field, typeAdapter.fromJson(jValue))
+                        val adapted = typeAdapter.fromJson(JsonValue(jValue))
+                        if (adapted != null) setField(this, field, adapted)
                     } else if (isPrimitive(field.type)) {
                         if (field.type.isAssignableFrom(jValue.javaClass)) {
                             println("  Found value: $jValue")

@@ -2,7 +2,10 @@ package com.beust.klaxon
 
 import org.testng.Assert
 import org.testng.annotations.Test
-import java.util.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+
 
 @Test
 class BindingTest {
@@ -106,31 +109,32 @@ class BindingTest {
     data class WithDate(
         @field:Json(name = "theDate")
         @field:KlaxonDate
-        var date: java.util.Date? = null,
+        var date: LocalDateTime? = null,
 
         @field:KlaxonDayOfTheWeek
         var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
-    fun date() {
-        val adapter = object: KlaxonAdapter<String, Date> {
-            override fun fromJson(json: String): Date {
-                return Date(2001, 8, 21)
-            }
-
-            override fun toJson(o: Date): String {
-                return """ {
-                    | "date" : ${o.toString()} }
-                    | """.trimMargin()
-            }
-        }
-
+    fun typeAdapters() {
         val result = JsonAdapter().apply {
-            typeMap[KlaxonDate::class.java.name] = adapter
-            typeMap[KlaxonDayOfTheWeek::class.java.name] = object: KlaxonAdapter<Int, String> {
-                override fun fromJson(json: Int) : String {
-                    return when(json) {
+            typeMap[KlaxonDate::class] = object: KlaxonAdapter<LocalDateTime?> {
+                override fun fromJson(value: JsonValue)
+                        = LocalDateTime.parse(value.string,
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+
+                override fun toJson(o: LocalDateTime?): String {
+                    return """ {
+                    | "date" : ${o?.toString()} }
+                    | """.trimMargin()
+                }
+            }
+
+            typeMap[KlaxonDayOfTheWeek::class] = object: KlaxonAdapter<String> {
+                override fun fromJson(json: JsonValue) : String {
+                    return when(json.int) {
                         0 -> "Sunday"
+                        1 -> "Monday"
+                        2 -> "Tuesday"
                         else -> "Some other day"
                     }
                 }
@@ -138,17 +142,21 @@ class BindingTest {
                 override fun toJson(day: String) : String {
                     return when(day) {
                         "Sunday" -> "0"
-                        else -> "1"
+                        "Monday" -> "1"
+                        "Tuesday" -> "2"
+                        else -> "-1"
                     }
                 }
-
             }
         }.fromJson<WithDate>("""
             {
-              "theDate": "2/15/2001"
+              "theDate": "2017-05-10 16:30"
               "dayOfTheWeek": 2
             }
         """)
+        Assert.assertEquals(result?.dayOfTheWeek, "Tuesday")
+        Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
+        println("Date: " + result?.date)
     }
 }
 
