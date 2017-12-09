@@ -117,7 +117,7 @@ class BindingTest {
 
     fun typeAdapters() {
         val result = JsonAdapter().apply {
-            typeMap[KlaxonDate::class] = object: KlaxonAdapter<LocalDateTime?> {
+            typeAdapter(KlaxonDate::class, object: KlaxonAdapter<LocalDateTime?> {
                 override fun fromJson(value: JsonValue)
                         = LocalDateTime.parse(value.string,
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
@@ -127,11 +127,11 @@ class BindingTest {
                     | "date" : ${o?.toString()} }
                     | """.trimMargin()
                 }
-            }
+            })
 
-            typeMap[KlaxonDayOfTheWeek::class] = object: KlaxonAdapter<String> {
-                override fun fromJson(json: JsonValue) : String {
-                    return when(json.int) {
+            typeAdapter(KlaxonDayOfTheWeek::class, object: KlaxonAdapter<String> {
+                override fun fromJson(value: JsonValue) : String {
+                    return when(value.int) {
                         0 -> "Sunday"
                         1 -> "Monday"
                         2 -> "Tuesday"
@@ -139,15 +139,15 @@ class BindingTest {
                     }
                 }
 
-                override fun toJson(day: String) : String {
-                    return when(day) {
+                override fun toJson(o: String) : String {
+                    return when(o) {
                         "Sunday" -> "0"
                         "Monday" -> "1"
                         "Tuesday" -> "2"
                         else -> "-1"
                     }
                 }
-            }
+            })
         }.fromJson<WithDate>("""
             {
               "theDate": "2017-05-10 16:30"
