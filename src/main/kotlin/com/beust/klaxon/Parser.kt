@@ -80,33 +80,11 @@ class StateMachine {
 /**
  * Main entry for Klaxon's parser.
  */
-class Parser {
+object Parser {
     private val verbose = false
+    private val sm = StateMachine()
 
-    private fun log(s: String) {
-        if (verbose) {
-            println("[Parser2] ${s}")
-        }
-    }
-
-    fun parse(rawValue: StringBuilder): Any? =
-        StringReader(rawValue.toString()).use {
-            parse(it)
-        }
-
-    fun parse(fileName: String) : Any? =
-        FileInputStream(File(fileName)).use {
-            parse(it)
-        }
-
-    fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): Any? {
-        return parse(inputStream.reader(charset))
-    }
-
-    fun parse(reader: Reader): Any? {
-
-        val sm = StateMachine()
-
+    init {
         sm.put(Status.INIT, Type.VALUE, { world: World, token: Token ->
             world.pushAndSet(Status.IN_FINISHED_VALUE, token.value!!)
         })
@@ -204,6 +182,29 @@ class Parser {
         })
         // else error
 
+    }
+
+    private fun log(s: String) {
+        if (verbose) {
+            println("[Parser2] ${s}")
+        }
+    }
+
+    fun parse(rawValue: StringBuilder): Any? =
+        StringReader(rawValue.toString()).use {
+            parse(it)
+        }
+
+    fun parse(fileName: String) : Any? =
+        FileInputStream(File(fileName)).use {
+            parse(it)
+        }
+
+    fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): Any? {
+        return parse(inputStream.reader(charset))
+    }
+
+    fun parse(reader: Reader): Any? {
         val lexer = Lexer(reader)
 
         var world = World(Status.INIT)

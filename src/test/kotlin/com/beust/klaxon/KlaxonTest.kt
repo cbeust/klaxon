@@ -15,7 +15,7 @@ class KlaxonTest {
 
     private fun read(name: String): Any? {
         val cls = KlaxonTest::class.java
-        return Parser().parse(cls.getResourceAsStream(name)!!)
+        return Parser.parse(cls.getResourceAsStream(name)!!)
     }
 
     fun simple() {
