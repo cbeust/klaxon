@@ -15,7 +15,7 @@ class BindingTest {
             var isFalse: Boolean? = null,
             var array: List<Int> = emptyList())
     fun allTypes() {
-        val result = Klaxon().fromJson<AllTypes>("""
+        val result = Klaxon().parse<AllTypes>("""
         {
             "int": 42,
             "string": "foo",
@@ -38,7 +38,7 @@ class BindingTest {
     )
 
     fun compoundObject() {
-        val result = Klaxon().fromJson<Deck1>("""
+        val result = Klaxon().parse<Deck1>("""
         {
           "cardCount": 2,
           "card":
@@ -65,7 +65,7 @@ class BindingTest {
     )
 
     fun compoundObjectWithArray() {
-        val result = Klaxon().fromJson<Deck2>("""
+        val result = Klaxon().parse<Deck2>("""
         {
           "cardCount": 2,
           "cards": [
@@ -90,7 +90,7 @@ class BindingTest {
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun badFieldMapping() {
-        Klaxon().fromJson<Mapping>("""
+        Klaxon().parse<Mapping>("""
         {
           "name": "foo"
         }
@@ -98,7 +98,7 @@ class BindingTest {
     }
 
     fun goodFieldMapping() {
-        val result = Klaxon().fromJson<Mapping>("""
+        val result = Klaxon().parse<Mapping>("""
         {
           "theName": "foo"
         }
@@ -148,7 +148,7 @@ class BindingTest {
                     }
                 }
             })
-            .fromJson<WithDate>("""
+            .parse<WithDate>("""
                 {
                   "theDate": "2017-05-10 16:30"
                   "dayOfTheWeek": 2

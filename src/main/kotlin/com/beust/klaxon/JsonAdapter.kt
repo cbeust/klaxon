@@ -1,7 +1,6 @@
 package com.beust.klaxon
 
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
-import java.io.StringReader
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
 
@@ -18,16 +17,6 @@ class JsonAdapter {
                 Double::class.java, Character::class.java, java.lang.Boolean::class.java)
 
         private fun isPrimitive(type: Class<*>) = type.isPrimitive || type in PRIMITIVES
-    }
-
-    inline fun <reified T>fromJson(json: String) : T? {
-        val map = Parser().parse(StringReader(json))
-        if (map is JsonObject) {
-            val cls = T::class.java
-            return fromJsonObject(map, cls) as T?
-        } else {
-            return null
-        }
     }
 
     private fun log(s: String) = s //println(s)
