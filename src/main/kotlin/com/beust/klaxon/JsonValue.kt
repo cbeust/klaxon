@@ -1,5 +1,8 @@
 package com.beust.klaxon
 
+/**
+ * Variant class that encapsulates one JSON value.
+ */
 class JsonValue(value: Any?) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
@@ -22,9 +25,4 @@ class JsonValue(value: Any?) {
         }
     }
 
-}
-
-interface KlaxonAdapter<T> {
-    fun fromJson(value: JsonValue) : T
-    fun toJson(o: T) : String
 }

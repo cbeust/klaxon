@@ -2,6 +2,7 @@ package com.beust.klaxon
 
 import org.testng.Assert
 import org.testng.annotations.Test
+import java.lang.reflect.Field
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -83,6 +84,19 @@ class BindingTest {
         }
     }
 
+    class BadMapping @JvmOverloads constructor(
+            var badName: String? = null
+    )
+
+    @Test(expectedExceptions = arrayOf(KlaxonException::class))
+    fun badFieldMapping2() {
+        Klaxon().parse<BadMapping>("""
+        {
+          "goodName": "foo"
+        }
+        """)
+    }
+
     class Mapping @JvmOverloads constructor(
             @field:Json(name = "theName")
             var name: String? = null
@@ -107,18 +121,18 @@ class BindingTest {
     }
 
     data class WithDate(
-        @field:Json(name = "theDate")
-        @field:KlaxonDate
-        var date: LocalDateTime? = null,
+            @field:Json(name = "theDate")
+            @field:KlaxonDate
+            var date: LocalDateTime? = null,
 
-        @field:KlaxonDayOfTheWeek
-        var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
+            @field:KlaxonDayOfTheWeek
+            var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
-    fun typeAdapters() {
+    fun fieldAdapters() {
         val result = Klaxon()
-            .typeAdapter(KlaxonDate::class, object: KlaxonAdapter<LocalDateTime?> {
-                override fun fromJson(value: JsonValue)
+            .fieldConverter(KlaxonDate::class, object: TypeConverter<LocalDateTime?> {
+                override fun fromJson(field: Field, value: JsonValue)
                         = LocalDateTime.parse(value.string,
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
 
@@ -129,8 +143,8 @@ class BindingTest {
                 }
             })
 
-            .typeAdapter(KlaxonDayOfTheWeek::class, object: KlaxonAdapter<String> {
-                override fun fromJson(value: JsonValue) : String {
+            .fieldConverter(KlaxonDayOfTheWeek::class, object: TypeConverter<String> {
+                override fun fromJson(field: Field, value: JsonValue) : String {
                     return when(value.int) {
                         0 -> "Sunday"
                         1 -> "Monday"
@@ -157,6 +171,48 @@ class BindingTest {
         Assert.assertEquals(result?.dayOfTheWeek, "Tuesday")
         Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
     }
+
+    val CARD_ADAPTER = object: TypeConverter<Card?> {
+        override fun fromJson(field: Field, value: JsonValue): Card? {
+            fun parseCard(str: String) : Card? {
+                val s0 = str[0]
+                val cardValue =
+                    if (s0 == '1' && str[1] == '0') 10
+                    else if (s0 == 'K') 13
+                    else (s0 - '0')
+                val suit = when(str[1]) {
+                    'H' -> "Hearts"
+                    'S' -> "Spades"
+                    else -> ""
+                }
+                return if (suit != "") Card(cardValue, suit) else null
+            }
+            val str = value.string
+            return if (str != null) parseCard(str) else null
+        }
+
+        override fun toJson(o: Card?): String {
+            return "some JSON"
+        }
+    }
+
+    private fun privateTypeConverter(withAdapter: Boolean) {
+        val klaxon = Klaxon()
+        if (withAdapter) klaxon.typeConverter(CARD_ADAPTER)
+        val result = klaxon.parse<Deck1>("""
+            {
+                "cardCount": 1,
+                "card" : "KS"
+            }
+        """)
+        Assert.assertEquals(result?.cardCount, 1)
+        Assert.assertEquals(result?.card, Card(13, "Spades"))
+    }
+
+    fun withTypeConverter() = privateTypeConverter(withAdapter = true)
+
+    @Test(expectedExceptions = arrayOf(KlaxonException::class))
+    fun withoutTypeConverter() = privateTypeConverter(withAdapter = false)
 }
 
 annotation class KlaxonDate
