@@ -7,7 +7,8 @@ class JsonConverter : JsonObjectConverter {
     private val fieldTypeMap = hashMapOf<KClass<out Annotation>, TypeConverter<*>>()
 
     private val typeConverters = arrayListOf<TypeConverter<*>>(
-        IntAdapter(), StringAdapter(), LongAdapter(), BooleanAdapter(), ArrayAdapter(this), ObjectAdapter(this)
+        IntConverter(), StringConverter(), LongConverter(), BooleanConverter(),
+            ArrayConverter(this), ObjectConverter(this)
     )
 
     fun fieldTypeConverter(annotation: KClass<out Annotation>, adapter: TypeConverter<*>) {

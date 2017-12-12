@@ -3,7 +3,31 @@ package com.beust.klaxon
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 import java.lang.reflect.Field
 
-class ObjectAdapter(private val jsonObjectConverter: JsonObjectConverter) : TypeConverter<Any?> {
+class IntConverter : TypeConverter<Int> {
+    override fun fromJson(field: Field, value: JsonValue)
+            = if (field.type == java.lang.Integer::class.java) value.int else null
+    override fun toJson(obj: Int) = obj.toString()
+}
+
+class LongConverter : TypeConverter<Int> {
+    override fun fromJson(field: Field, value: JsonValue)
+            = if (field.type == java.lang.Long::class.java) value.int else null
+    override fun toJson(obj: Int) = obj.toString()
+}
+
+class StringConverter : TypeConverter<String> {
+    override fun fromJson(field: Field, value: JsonValue)
+            = if (field.type == java.lang.String::class.java) value.string else null
+    override fun toJson(obj: String) = obj
+}
+
+class BooleanConverter : TypeConverter<Boolean> {
+    override fun fromJson(field: Field, value: JsonValue)
+            = if (field.type == java.lang.Boolean::class.java) value.boolean else null
+    override fun toJson(obj: Boolean) = obj.toString()
+}
+
+class ObjectConverter(private val jsonObjectConverter: JsonObjectConverter) : TypeConverter<Any?> {
     override fun fromJson(field: Field, value: JsonValue): Any? {
         val fieldType = field.type
         val obj = value.obj
@@ -11,12 +35,12 @@ class ObjectAdapter(private val jsonObjectConverter: JsonObjectConverter) : Type
             else null
     }
 
-    override fun toJson(o: Any?): String {
+    override fun toJson(obj: Any?): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
-class ArrayAdapter(private val jsonObjectConverter: JsonObjectConverter) : TypeConverter<List<Any?>> {
+class ArrayConverter(private val jsonObjectConverter: JsonObjectConverter) : TypeConverter<List<Any?>> {
     override fun fromJson(field: Field, value: JsonValue): List<Any?>? {
         val fieldType = field.type
         val result = arrayListOf<Any?>()
@@ -37,32 +61,8 @@ class ArrayAdapter(private val jsonObjectConverter: JsonObjectConverter) : TypeC
         return if (! result.isEmpty()) result else null
     }
 
-    override fun toJson(o: List<Any?>): String {
+    override fun toJson(obj: List<Any?>): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-}
-
-class IntAdapter : TypeConverter<Int> {
-    override fun fromJson(field: Field, value: JsonValue)
-            = if (field.type == java.lang.Integer::class.java) value.int else null
-    override fun toJson(o: Int) = o.toString() ?: "Illegal Int value"
-}
-
-class LongAdapter : TypeConverter<Int> {
-    override fun fromJson(field: Field, value: JsonValue)
-            = if (field.type == java.lang.Long::class.java) value.int else null
-    override fun toJson(o: Int) = o.toString() ?: "Illegal Int value"
-}
-
-class StringAdapter : TypeConverter<String> {
-    override fun fromJson(field: Field, value: JsonValue)
-            = if (field.type == java.lang.String::class.java) value.string else null
-    override fun toJson(o: String) = o.toString() ?: "Illegal String value"
-}
-
-class BooleanAdapter : TypeConverter<Boolean> {
-    override fun fromJson(field: Field, value: JsonValue)
-            = if (field.type == java.lang.Boolean::class.java) value.boolean else null
-    override fun toJson(o: Boolean) = o.toString() ?: "Illegal Boolean value"
 }
