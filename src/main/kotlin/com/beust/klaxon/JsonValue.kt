@@ -1,9 +1,11 @@
 package com.beust.klaxon
 
+import kotlin.reflect.full.declaredMemberProperties
+
 /**
  * Variant class that encapsulates one JSON value.
  */
-class JsonValue(value: Any?) {
+class JsonValue(value: Any?, val jsonConverter: JsonConverter) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
@@ -12,17 +14,67 @@ class JsonValue(value: Any?) {
     var char: Char? = null
     var boolean: Boolean? = null
 
+    var type: Class<*>
+
     init {
         when(value) {
-            is JsonObject -> obj = value
-            is JsonArray<*> -> array = value
-            is String -> string = value
-            is Int -> int = value
-            is Float -> float = value
-            is Char -> char = value
-            is Boolean -> boolean = value
-            else -> throw KlaxonException("Don't know how to interpret value $value")
+            is JsonObject -> {
+                obj = value
+                type = value.javaClass
+            }
+            is JsonArray<*> -> {
+                array = value
+                type = List::class.java
+            }
+            is String -> {
+                string = value
+                type = String::class.java
+            }
+            is Int -> {
+                int = value
+                type = Int::class.java
+            }
+            is Float -> {
+                float = value
+                type = Float::class.java
+            }
+            is Char -> {
+                char = value
+                type = Char::class.java
+            }
+            is Boolean -> {
+                boolean = value
+                type = Boolean::class.java
+            }
+            else -> {
+                obj = convertToJsonObject(value!!)
+                type = value.javaClass
+            }
         }
     }
 
+    private fun convertToJsonObject(obj: Any): JsonObject {
+        val result = JsonObject()
+        obj::class.declaredMemberProperties.forEach { property ->
+            println("Found property: " + property)
+            val p = property.getter.call(obj)
+            val converter = jsonConverter.findBestConverter(p)
+            result[property.name] = converter?.fromJson(null, JsonValue(p, jsonConverter))
+            println("  Converted: $converter")
+        }
+        return result
+    }
+
+    val inside: Any
+        get() {
+            val result = if (obj != null) obj
+            else if (array != null) array
+            else if (string != null) string
+            else if (int != null) int
+            else if (float != null) float
+            else if (char != null) char
+            else if (boolean != null) boolean
+            else throw KlaxonException("Should never happen")
+            return result!!
+        }
 }

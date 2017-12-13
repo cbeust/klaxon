@@ -24,6 +24,25 @@ class JsonConverter : JsonObjectConverter {
     private fun log(s: String) = s //println(s)
     private fun warn(s: String) = "  WARNING: $s"
 
+    fun <T> findBestConverter(obj: T) : TypeConverter<T>? {
+        val jsonValue = JsonValue(obj, this)
+        // Collect all the type converters
+        val result = typeConverters.firstOrNull {
+            val jv = it.fromJson(null, jsonValue)
+            jv != null
+        } as TypeConverter<T>
+        return result
+    }
+
+    override fun toJsonString(p: Any?): String {
+        val converter = findBestConverter(p)
+        if (converter != null) {
+            return converter.toJson(p)
+        } else {
+            throw KlaxonException("Don't know how to convert $p")
+        }
+    }
+
     override fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>): Any {
         fun setField(obj: Any, field: Field, value: Any) {
             field.isAccessible = true
@@ -67,7 +86,7 @@ class JsonConverter : JsonObjectConverter {
                     throw KlaxonException("Don't know how to map class field \"$fieldName\" " +
                             "to any JSON field: $jsonFields")
                 } else {
-                    val convertedValue = tryToConvert(field, JsonValue(jValue))
+                    val convertedValue = tryToConvert(field, JsonValue(jValue, this@JsonConverter))
                     if (convertedValue != null) {
                         setField(this, field, convertedValue)
                     } else {
@@ -84,4 +103,5 @@ class JsonConverter : JsonObjectConverter {
 
 interface JsonObjectConverter {
     fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>): Any
+    fun toJsonString(p: Any?): String
 }

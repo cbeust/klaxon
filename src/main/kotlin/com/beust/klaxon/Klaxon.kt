@@ -70,4 +70,13 @@ class Klaxon {
 
     inline fun <reified T> maybeParse(map: Any?) : T? =
             if (map is JsonObject) parseFromJsonObject(map) else null
+
+    fun <T> toJsonString(obj: T): String? {
+        val converter = jsonConverter.findBestConverter(obj)
+        if (converter != null) {
+            return converter.toJson(obj)
+        } else {
+            return null
+        }
+    }
 }

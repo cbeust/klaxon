@@ -132,7 +132,7 @@ class BindingTest {
     fun fieldAdapters() {
         val result = Klaxon()
             .fieldConverter(KlaxonDate::class, object: TypeConverter<LocalDateTime?> {
-                override fun fromJson(field: Field, value: JsonValue)
+                override fun fromJson(field: Field?, value: JsonValue)
                         = LocalDateTime.parse(value.string,
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
 
@@ -144,7 +144,7 @@ class BindingTest {
             })
 
             .fieldConverter(KlaxonDayOfTheWeek::class, object: TypeConverter<String> {
-                override fun fromJson(field: Field, value: JsonValue) : String {
+                override fun fromJson(field: Field?, value: JsonValue) : String {
                     return when(value.int) {
                         0 -> "Sunday"
                         1 -> "Monday"
@@ -173,7 +173,7 @@ class BindingTest {
     }
 
     val CARD_ADAPTER = object: TypeConverter<Card?> {
-        override fun fromJson(field: Field, value: JsonValue): Card? {
+        override fun fromJson(field: Field?, value: JsonValue): Card? {
             fun parseCard(str: String) : Card? {
                 val s0 = str[0]
                 val cardValue =
@@ -191,7 +191,7 @@ class BindingTest {
             return if (str != null) parseCard(str) else null
         }
 
-        override fun toJson(o: Card?): String {
+        override fun toJson(obj: Card?): String {
             return "some JSON"
         }
     }
@@ -213,6 +213,27 @@ class BindingTest {
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun withoutTypeConverter() = privateTypeConverter(withAdapter = false)
+
+    fun toJson() {
+        val klaxon = Klaxon().typeConverter(CARD_ADAPTER)
+
+        val deck = klaxon.parse<Deck1>("""
+            {
+                "cardCount": 1,
+                "card" : "KS"
+            }
+        """)
+
+        val s2 = klaxon.toJsonString(deck)
+        if (s2 != null) {
+            Assert.assertTrue(s2.contains("\"suit\""))
+            Assert.assertTrue(s2.contains("\"Spades\""))
+            Assert.assertTrue(s2.contains("\"value\""))
+            Assert.assertTrue(s2.contains("13"))
+            Assert.assertTrue(s2.contains("\"cardCount\""))
+            Assert.assertTrue(s2.contains("1"))
+        }
+    }
 }
 
 annotation class KlaxonDate

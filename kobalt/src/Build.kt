@@ -2,14 +2,17 @@
 import com.beust.kobalt.plugin.java.javaCompiler
 import com.beust.kobalt.plugin.packaging.assemble
 import com.beust.kobalt.plugin.publish.bintray
-import com.beust.kobalt.*
-import com.beust.kobalt.api.*
+import com.beust.kobalt.project
 
 val p = project {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
     version = "0.32"
+
+    dependencies {
+        compile("org.jetbrains.kotlin:kotlin-reflect:1.1.4-3")
+    }
 
     dependenciesTest {
         compile("org.testng:testng:6.11",
