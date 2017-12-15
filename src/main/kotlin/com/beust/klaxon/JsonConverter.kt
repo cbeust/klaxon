@@ -4,18 +4,18 @@ import java.lang.reflect.Field
 import kotlin.reflect.KClass
 
 class JsonConverter : JsonObjectConverter {
-    private val fieldTypeMap = hashMapOf<KClass<out Annotation>, TypeConverter<*>>()
+    private val fieldTypeMap = hashMapOf<KClass<out Annotation>, Converter2<*>>()
 
-    private val typeConverters = arrayListOf<TypeConverter<*>>(
-        IntConverter(), StringConverter(), LongConverter(), BooleanConverter(),
+    private val typeConverters = arrayListOf<Converter2<*>>(
+        IntConverter(), StringConverter(), BooleanConverter(),
             ArrayConverter(this), ObjectConverter(this)
     )
 
-    fun fieldTypeConverter(annotation: KClass<out Annotation>, adapter: TypeConverter<*>) {
+    fun fieldTypeConverter(annotation: KClass<out Annotation>, adapter: Converter2<*>) {
         fieldTypeMap[annotation] = adapter
     }
 
-    fun typeConverter(adapter: TypeConverter<*>) {
+    fun typeConverter(adapter: Converter2<*>) {
         // Note: always insert at the front of the list so that user defined
         // converters can override the default ones.
         typeConverters.add(0, adapter)
@@ -24,20 +24,20 @@ class JsonConverter : JsonObjectConverter {
     private fun log(s: String) = s //println(s)
     private fun warn(s: String) = "  WARNING: $s"
 
-    fun <T> findBestConverter(obj: T) : TypeConverter<T>? {
+    fun <T> findBestConverter(obj: T) : Converter2<T>? {
         val jsonValue = JsonValue(obj, this)
         // Collect all the type converters
         val result = typeConverters.firstOrNull {
             val jv = it.fromJson(null, jsonValue)
             jv != null
-        } as TypeConverter<T>
+        } as Converter2<T>
         return result
     }
 
     override fun toJsonString(p: Any?): String {
         val converter = findBestConverter(p)
         if (converter != null) {
-            return converter.toJson(p)
+            return converter.toJson(p!!)
         } else {
             throw KlaxonException("Don't know how to convert $p")
         }
@@ -54,7 +54,7 @@ class JsonConverter : JsonObjectConverter {
          * the value. @return null otherwise.
          */
         fun tryToConvert(field: Field, value: JsonValue) : Any? {
-            val converters = arrayListOf<TypeConverter<*>>()
+            val converters = arrayListOf<Converter2<*>>()
             // Collect all the field type converters
             converters.addAll(
                 field.annotations.mapNotNull {
@@ -62,7 +62,7 @@ class JsonConverter : JsonObjectConverter {
                 })
 
             // Collect all the type converters
-            typeConverters.firstOrNull { it.fromJson(field, value) != null }?.let {
+            typeConverters.firstOrNull { it.canConvert(field, value.inside) }?.let {
                 converters.add(it)
             }
 
@@ -72,6 +72,10 @@ class JsonConverter : JsonObjectConverter {
             }.firstOrNull()
         }
 
+        println("Trying to instantiate $cls")
+        if (cls.toString().contains("JsonObject")) {
+            println("")
+        }
         val result = cls.newInstance().apply {
             cls.declaredFields.forEach { field ->
                 log("Looking at field: $field")
@@ -90,6 +94,7 @@ class JsonConverter : JsonObjectConverter {
                     if (convertedValue != null) {
                         setField(this, field, convertedValue)
                     } else {
+                        val convertedValue = tryToConvert(field, JsonValue(jValue, this@JsonConverter))
                         throw KlaxonException("Don't know how to convert \"$jValue\" into ${field.type} for "
                                 + "field named \"${field.name}\"")
                     }

@@ -131,19 +131,29 @@ class BindingTest {
 
     fun fieldAdapters() {
         val result = Klaxon()
-            .fieldConverter(KlaxonDate::class, object: TypeConverter<LocalDateTime?> {
+            .fieldConverter(KlaxonDate::class, object: Converter2<LocalDateTime> {
+                override fun canConvert(field: Field?, value: Any): Boolean {
+                    return field?.type == LocalDateTime::class
+                            || value::class == LocalDateTime::class
+                }
+
                 override fun fromJson(field: Field?, value: JsonValue)
                         = LocalDateTime.parse(value.string,
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
 
-                override fun toJson(o: LocalDateTime?): String {
+                override fun toJson(o: Any): String {
                     return """ {
                     | "date" : ${o?.toString()} }
                     | """.trimMargin()
                 }
             })
 
-            .fieldConverter(KlaxonDayOfTheWeek::class, object: TypeConverter<String> {
+            .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter2<String> {
+                override fun canConvert(field: Field?, value: Any): Boolean {
+                    return field?.type == String::class
+                            || value::class == String::class
+                }
+
                 override fun fromJson(field: Field?, value: JsonValue) : String {
                     return when(value.int) {
                         0 -> "Sunday"
@@ -153,7 +163,7 @@ class BindingTest {
                     }
                 }
 
-                override fun toJson(o: String) : String {
+                override fun toJson(o: Any) : String {
                     return when(o) {
                         "Sunday" -> "0"
                         "Monday" -> "1"
@@ -172,7 +182,12 @@ class BindingTest {
         Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
     }
 
-    val CARD_ADAPTER = object: TypeConverter<Card?> {
+    val CARD_ADAPTER = object: Converter2<Card?> {
+        override fun canConvert(field: Field?, value: Any): Boolean {
+            return field?.type == Card::class
+                    || value::class == Card::class
+        }
+
         override fun fromJson(field: Field?, value: JsonValue): Card? {
             fun parseCard(str: String) : Card? {
                 val s0 = str[0]
@@ -191,12 +206,12 @@ class BindingTest {
             return if (str != null) parseCard(str) else null
         }
 
-        override fun toJson(obj: Card?): String {
+        override fun toJson(obj: Any): String {
             return "some JSON"
         }
     }
 
-    private fun privateTypeConverter(withAdapter: Boolean) {
+    private fun privateConverter2(withAdapter: Boolean) {
         val klaxon = Klaxon()
         if (withAdapter) klaxon.typeConverter(CARD_ADAPTER)
         val result = klaxon.parse<Deck1>("""
@@ -209,12 +224,12 @@ class BindingTest {
         Assert.assertEquals(result?.card, Card(13, "Spades"))
     }
 
-    fun withTypeConverter() = privateTypeConverter(withAdapter = true)
+    fun withConverter2() = privateConverter2(withAdapter = true)
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
-    fun withoutTypeConverter() = privateTypeConverter(withAdapter = false)
+    fun withoutConverter2() = privateConverter2(withAdapter = false)
 
-    fun toJson() {
+    fun objectsToJson() {
         val klaxon = Klaxon().typeConverter(CARD_ADAPTER)
 
         val deck = klaxon.parse<Deck1>("""
@@ -224,7 +239,7 @@ class BindingTest {
             }
         """)
 
-        val s2 = klaxon.toJsonString(deck)
+        val s2 = klaxon.toJsonString(deck!!)
         if (s2 != null) {
             Assert.assertTrue(s2.contains("\"suit\""))
             Assert.assertTrue(s2.contains("\"Spades\""))
@@ -234,6 +249,34 @@ class BindingTest {
             Assert.assertTrue(s2.contains("1"))
         }
     }
+
+    data class ArrayHolder(var listOfInts: List<Int> = emptyList(),
+            var listOfStrings : List<String> = emptyList(),
+            var listOfBooleans: List<Boolean> = emptyList(),
+            var string: String = "foo", var isTrue: Boolean = true, var isFalse: Boolean = false)
+
+    fun arrayToJson() {
+        val klaxon = Klaxon()
+        val klaxon2 = Klaxon2()
+
+//        val deck = klaxon.parse<ArrayHolder>("""
+//            {
+//                "listOfInts": [1, 3, 5]
+//            }
+//        """)
+
+        val h = ArrayHolder(listOf(1,3,5),
+                listOf("d", "e", "f"),
+                listOf(true, false, true))
+        val s2 = klaxon.toJsonString(h)
+        Assert.assertTrue(s2.contains("\"listOfInts\" : [1, 3, 5]"))
+        Assert.assertTrue(s2.contains("\"listOfStrings\" : [\"d\", \"e\", \"f\"]"))
+        Assert.assertTrue(s2.contains("\"listOfBooleans\" : [true, false, true]"))
+        Assert.assertTrue(s2.contains("\"string\" : \"foo\""))
+        Assert.assertTrue(s2.contains("\"isTrue\" : true"))
+        Assert.assertTrue(s2.contains("\"isFalse\" : false"))
+    }
+
 }
 
 annotation class KlaxonDate

@@ -46,7 +46,7 @@ class Klaxon {
     /**
      * Add a TypeConverter.
      */
-    fun typeConverter(adapter: TypeConverter<*>): Klaxon {
+    fun typeConverter(adapter: Converter2<*>): Klaxon {
         jsonConverter.typeConverter(adapter)
         return this
     }
@@ -54,7 +54,7 @@ class Klaxon {
     /**
      * Add a field TypeConverter.
      */
-    fun fieldConverter(annotation: KClass<out Annotation>, adapter: TypeConverter<*>): Klaxon {
+    fun fieldConverter(annotation: KClass<out Annotation>, adapter: Converter2<*>): Klaxon {
         jsonConverter.fieldTypeConverter(annotation, adapter)
         return this
     }
@@ -71,12 +71,12 @@ class Klaxon {
     inline fun <reified T> maybeParse(map: Any?) : T? =
             if (map is JsonObject) parseFromJsonObject(map) else null
 
-    fun <T> toJsonString(obj: T): String? {
+    fun toJsonString(obj: Any): String {
         val converter = jsonConverter.findBestConverter(obj)
         if (converter != null) {
             return converter.toJson(obj)
         } else {
-            return null
+            return "<couldn't find a converter>"
         }
     }
 }
