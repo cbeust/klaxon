@@ -1,9 +1,11 @@
 package com.beust.klaxon
 
+import kotlin.reflect.KProperty
+
 /**
  * Variant class that encapsulates one JSON value.
  */
-class JsonValue(value: Any?, val jsonConverter: JsonConverter) {
+class JsonValue(value: Any?, val jsonConverter: Klaxon3, val field: KProperty<*>?) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
@@ -81,24 +83,41 @@ class JsonValue(value: Any?, val jsonConverter: JsonConverter) {
             val property = entry.key
             val p = entry.value
             println("Found property: " + property)
-            val converter = jsonConverter.findBestConverter(p)
-            val jv = JsonValue(p, jsonConverter)
-            result[property.name] = converter?.fromJson(null, jv)
-            println("  Converted: $converter")
+            val pair = jsonConverter.findFromConverter(p!!)
+            if (pair != null) {
+                println("BEST CONVERTER FOR $p: ${pair.first}")
+                val jv = pair.second
+                result[property.name] = jv
+            } else {
+                throw KlaxonException("Couldn't find a converter for $p")
+            }
         }
         return result
     }
 
     val inside: Any
         get() {
-            val result = if (obj != null) obj
-            else if (array != null) array
-            else if (string != null) string
-            else if (int != null) int
-            else if (float != null) float
-            else if (char != null) char
-            else if (boolean != null) boolean
-            else throw KlaxonException("Should never happen")
+            val result =
+                if (obj != null) obj
+                    else if (array != null) array
+                    else if (string != null) string
+                    else if (int != null) int
+                    else if (float != null) float
+                    else if (char != null) char
+                    else if (boolean != null) boolean
+                    else throw KlaxonException("Should never happen")
             return result!!
         }
+
+    override fun toString() : String {
+        return if (obj != null) "{object: $obj}"
+            else if (array != null) "{array: $array}"
+            else if (string != null) "{string: $string}"
+            else if (int != null) "{int: $int}"
+            else if (float != null) "{float: $float}"
+            else if (char != null) "{char: $char}"
+            else if (boolean != null) "{boolean: $boolean}"
+            else throw KlaxonException("Should never happen")
+
+    }
 }

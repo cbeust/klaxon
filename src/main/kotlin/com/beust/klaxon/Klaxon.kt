@@ -41,12 +41,12 @@ class Klaxon {
      * Parse a JsonObject into an object.
      */
     inline fun <reified T> parseFromJsonObject(map: JsonObject) : T?
-        = jsonConverter.fromJsonObject(map, T::class.java) as T?
+        = jsonConverter.fromJsonObject(map, T::class.java, T::class) as T?
 
     /**
      * Add a TypeConverter.
      */
-    fun typeConverter(adapter: Converter2<*>): Klaxon {
+    fun typeConverter(adapter: Converter2): Klaxon {
         jsonConverter.typeConverter(adapter)
         return this
     }
@@ -54,7 +54,7 @@ class Klaxon {
     /**
      * Add a field TypeConverter.
      */
-    fun fieldConverter(annotation: KClass<out Annotation>, adapter: Converter2<*>): Klaxon {
+    fun fieldConverter(annotation: KClass<out Annotation>, adapter: Converter2): Klaxon {
         jsonConverter.fieldTypeConverter(annotation, adapter)
         return this
     }

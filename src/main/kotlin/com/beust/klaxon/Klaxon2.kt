@@ -1,39 +1,26 @@
 package com.beust.klaxon
 
-import java.lang.reflect.Field
+import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KProperty
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.javaType
+import kotlin.reflect.jvm.jvmErasure
 
-interface Converter2<T> {
-    fun canConvert(field: Field?, value: Any) : Boolean
-    fun fromJson(field: Field?, jValue: JsonValue) : T?
+interface Converter2 {
+//    fun canConvert(field: KProperty<*>?, value: Any) : Boolean
+    fun fromJson(field: KProperty<*>?, jValue: JsonValue) : Any?
     fun toJson(value: Any) : String
 }
 
-class _IntConverter: Converter2<Int> {
-    override fun canConvert(field: Field?, value: Any): Boolean {
-        return field?.type == Int::class.java || value::class == Int::class.java
-            || field?.type == Integer::class.java || value::class == Integer::class
-    }
+class _IntConverter: Converter2 {
+//    override fun canConvert(field: KProperty<*>?, value: Any): Boolean {
+//        return field?.returnType == Int::class.java || value::class == Int::class.java
+//            || field?.returnType == Integer::class.java || value::class == Integer::class
+//    }
 
-    override fun fromJson(field: Field?, value: JsonValue)
-            = if (matchType(field, value, java.lang.Integer::class.java)) value.int else null
-
-    override fun toJson(value: Any): String {
-        return value.toString()
-    }
-
-}
-
-class _BooleanConverter: Converter2<Boolean> {
-    override fun canConvert(field: Field?, value: Any): Boolean {
-        return field?.type == Boolean::class.java || value::class == Boolean::class.java
-           || field?.type == Boolean::class || value::class == Boolean::class
-    }
-
-    override fun fromJson(field: Field?, value: JsonValue)
-            = if (matchType(field, value, java.lang.Boolean::class.java)) value.boolean else null
+    override fun fromJson(field: KProperty<*>?, value: JsonValue)
+            = if (value.inside is Int || value.inside is Integer) value.int else null
 
     override fun toJson(value: Any): String {
         return value.toString()
@@ -41,13 +28,28 @@ class _BooleanConverter: Converter2<Boolean> {
 
 }
 
-class _StringConverter: Converter2<String> {
-    override fun canConvert(field: Field?, value: Any): Boolean {
-        return field?.type == String::class.java || value::class.java == String::class.java
+class _BooleanConverter: Converter2 {
+//    override fun canConvert(field: KProperty<*>?, value: Any): Boolean {
+//        return field?.returnType == Boolean::class.java || value::class == Boolean::class.java
+//           || field?.returnType == Boolean::class || value::class == Boolean::class
+//    }
+
+    override fun fromJson(field: KProperty<*>?, value: JsonValue)
+            = if (value.inside is java.lang.Boolean|| value.inside is Boolean) value.boolean else null
+
+    override fun toJson(value: Any): String {
+        return value.toString()
     }
 
-    override fun fromJson(field: Field?, jValue: JsonValue): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+}
+
+class _StringConverter: Converter2 {
+//    override fun canConvert(field: KProperty<*>?, value: Any): Boolean {
+//        return field?.returnType == String::class.java || value::class.java == String::class.java
+//    }
+
+    override fun fromJson(field: KProperty<*>?, value: JsonValue): String? {
+        return if (value.inside is String || value.inside is java.lang.String) value.string else null
     }
 
     override fun toJson(value: Any): String {
@@ -56,13 +58,42 @@ class _StringConverter: Converter2<String> {
 
 }
 
-class _ArrayConverter(val parent: Klaxon2): Converter2<Array<*>> {
-    override fun canConvert(field: Field?, value: Any): Boolean {
-        return value is Collection<*>
-    }
+class _ArrayConverter(val parent: JsonConverter): Converter2 {
+//    override fun canConvert(field: KProperty<*>?, value: Any): Boolean {
+//        return value is Collection<*>
+//    }
 
-    override fun fromJson(field: Field?, jValue: JsonValue): Array<*> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun fromJson(prop: KProperty<*>?, value: JsonValue): List<Any?>? {
+        if (! (value.inside is Collection<*>)) return null
+
+        val propType =
+            if (prop != null) {
+                if (! (prop.getter.returnType.javaType is ParameterizedType)) {
+                    println("PROBLEM")
+                }
+                (prop.getter.returnType.javaType as ParameterizedType).rawType
+            } else {
+                value.inside.javaClass
+            }
+//        val propType = (prop?.getter?.returnType?.javaType as ParameterizedType)?.rawType
+//                ?: value.inside.javaClass
+        val result = arrayListOf<Any?>()
+        if (propType == java.util.List::class.java && prop != null) {
+            val elementType = prop.returnType.arguments[0].type
+            val jValue = value.array
+            if (jValue != null) {
+                jValue.forEach {
+                    if (it is JsonObject) {
+                        val cls = elementType!!.javaType as Class<*>
+                        val inflated = parent.fromJsonObject(it, cls, elementType.jvmErasure)
+                        result.add(inflated)
+                    } else {
+                        result.add(it)
+                    }
+                }
+            }
+        }
+        return if (! result.isEmpty()) result else null
     }
 
     override fun toJson(value: Any): String {
@@ -80,13 +111,20 @@ class _ArrayConverter(val parent: Klaxon2): Converter2<Array<*>> {
     }
 }
 
-class _ObjectConverter(val parent: Klaxon2): Converter2<Array<*>> {
-    override fun canConvert(field: Field?, value: Any): Boolean {
-        return true
-    }
+class _ObjectConverter(val parent: JsonConverter): Converter2 {
+//    override fun canConvert(field: KProperty<*>?, value: Any): Boolean {
+//        return true
+//    }
 
-    override fun fromJson(field: Field?, jValue: JsonValue): Array<*> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun fromJson(field: KProperty<*>?, value: JsonValue): Any? {
+        if (field == null) return null
+        else {
+            val fieldType = field?.returnType!!::class.java ?: value.type::class.java
+            val obj = value.obj
+            return null
+//            return if (obj != null) parent.fromJsonObject(obj, fieldType, null)
+//            else null
+        }
     }
 
     override fun toJson(value: Any): String {
@@ -122,24 +160,25 @@ class Klaxon2 {
         }
     }
 
-    val converters = arrayOf(
-            _BooleanConverter(),
-            _IntConverter(),
-            _StringConverter(),
-            _ArrayConverter(this),
-            _ObjectConverter(this)
-    )
-
-    fun toJson(value: Any) : String {
-        val c = converters.firstOrNull() { it.canConvert(null, "foo") }
-        val converter = converters.firstOrNull() { it.canConvert(null, value) }
-        val result =
-            if (converter != null) {
-                val json = converter.toJson(value)
-                json
-            } else {
-                throw KlaxonException("Couldn't find a converter for $value")
-            }
-        return result
-    }
+//    val converters = arrayOf(
+//            _BooleanConverter(),
+//            _IntConverter(),
+//            _StringConverter()
+//            ,
+//            _ArrayConverter(this),
+//            _ObjectConverter(this)
+//    )
+//
+//    fun toJson(value: Any) : String {
+//        val c = converters.firstOrNull() { it.canConvert(null, "foo") }
+//        val converter = converters.firstOrNull() { it.canConvert(null, value) }
+//        val result =
+//            if (converter != null) {
+//                val json = converter.toJson(value)
+//                json
+//            } else {
+//                throw KlaxonException("Couldn't find a converter for $value")
+//            }
+//        return result
+//    }
 }

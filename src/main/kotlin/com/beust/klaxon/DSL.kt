@@ -20,6 +20,7 @@ fun JsonObject(map : Map<String, Any?> = emptyMap()) : JsonObject =
 
 data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<String, Any?>
         by map {
+//    constructor() : this(mutableMapOf<String, Any?>()) {}
 
     override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
         result.append("{")
