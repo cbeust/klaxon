@@ -158,14 +158,16 @@ class Klaxon : ConverterFinder {
                     }.firstOrNull()
                     if (converter != null) {
                         val js = converter.fromJson(JsonValue(value, this))
-                        if (js != null) Pair(converter, js) else null
+                        if (js != null)
+                            Pair(converter, js)
+                            else throw KlaxonException("Field converter was not able to convert $value")
                     } else {
                         null
                     }
                 } else {
                     null
                 }
-                return result
+            return result
         }
 
         /**

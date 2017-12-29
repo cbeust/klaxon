@@ -12,6 +12,26 @@ annotation class KlaxonDayOfTheWeek
 
 @Test
 class BindingAdapterTest {
+    class WrongFieldAdapter @JvmOverloads constructor (
+        @KlaxonDate
+        var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
+    )
+
+    @Test(expectedExceptionsMessageRegExp = "convert")
+    fun wrongFieldAdapter() {
+        try {
+            val result = createKlaxon()
+                    .parse<WrongFieldAdapter>("""
+                {
+                  "dayOfTheWeek": 2
+                }
+            """)
+            Assert.fail("Should have been unable to convert")
+        } catch(ex: Exception) {
+            Assert.assertTrue(ex.message?.contains("not able to convert") ?: false)
+        }
+    }
+
     class WithDate @JvmOverloads constructor(
         @Json(name = "theDate")
         @KlaxonDate
@@ -21,14 +41,17 @@ class BindingAdapterTest {
         var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
-    fun fieldAdapters() {
-        val result = Klaxon()
+    private fun createKlaxon()
+        = Klaxon()
             .fieldConverter(KlaxonDate::class, object: Converter {
-                override fun fromJson(jv: JsonValue)
-                    = LocalDateTime.parse(jv.string, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                override fun fromJson(jv: JsonValue) = if (jv.string != null) {
+                        LocalDateTime.parse(jv.string, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                    } else {
+                        null
+                    }
 
                 override fun toJson(o: Any)
-                    = """ { "date" : $o } """.trimMargin()
+                        = """ { "date" : $o } """.trimMargin()
             })
 
             .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter {
@@ -50,6 +73,9 @@ class BindingAdapterTest {
                     }
                 }
             })
+
+    fun fieldAdapters() {
+        val result = createKlaxon()
             .parse<WithDate>("""
             {
               "theDate": "2017-05-10 16:30"
@@ -108,4 +134,5 @@ class BindingAdapterTest {
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun withoutConverter2() = privateConverter2(withAdapter = false)
+
 }
