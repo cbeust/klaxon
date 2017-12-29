@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.internal.ConverterFinder
 import com.beust.klaxon.internal.firstNotNullResult
 import java.io.*
 import java.nio.charset.Charset
@@ -10,7 +11,7 @@ import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaMethod
 
-class Klaxon {
+class Klaxon : ConverterFinder {
     private val DEFAULT_CONVERTER = object : Converter {
         override fun fromJson(jv: JsonValue): Any? {
             val value = jv.inside
@@ -80,7 +81,7 @@ class Klaxon {
         }
     }
 
-    fun findFromConverter(o: Any, prop: KProperty<*>?): Pair<Converter, Any>? {
+    override fun findFromConverter(o: Any, prop: KProperty<*>?): Pair<Converter, Any>? {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
             val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
             return result

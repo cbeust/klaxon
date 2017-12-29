@@ -1,12 +1,13 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.internal.ConverterFinder
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Variant class that encapsulates one JSON value.
  */
-class JsonValue(value: Any?, private val klaxon: Klaxon) {
+class JsonValue(value: Any?, private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
@@ -83,7 +84,7 @@ class JsonValue(value: Any?, private val klaxon: Klaxon) {
         propertiesAndValues(obj).entries.forEach { entry ->
             val property = entry.key
             val p = entry.value
-            val pair = klaxon.findFromConverter(p!!, property)
+            val pair = converterFinder.findFromConverter(p!!, property)
             if (pair != null) {
                 val jv = pair.second
                 result[property.name] = jv
