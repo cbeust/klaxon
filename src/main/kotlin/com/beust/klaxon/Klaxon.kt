@@ -37,9 +37,8 @@ class Klaxon {
                 else -> {
                     val valueList = arrayListOf<String>()
                     value::class.declaredMemberProperties.forEach { prop ->
-                        val value = prop.getter.call(value)
-                        if (value != null) {
-                            val jsonValue = toJsonString(value)
+                        prop.getter.call(value)?.let { getValue ->
+                            val jsonValue = toJsonString(getValue)
                             valueList.add("\"${prop.name}\" : $jsonValue")
                         }
                     }
@@ -87,21 +86,15 @@ class Klaxon {
             return result
         }
 
-        fun annotationForProp(prop: KProperty<*>, kc: Class<*>, annotation: KClass<out Annotation>)
-                = kc.getDeclaredField(prop.name).getDeclaredAnnotation(annotation.java)
-
         fun findFieldConverter() : Pair<Converter, Any>? {
             val result =
                 if (prop != null) {
                     val cls = prop.getter.javaMethod!!.declaringClass
-                    val allAnnotations = annotationsForProp(prop, cls)
-                    val converter =
-                            annotationsForProp(prop, cls).mapNotNull {
-                                val annotation = annotationForProp(prop, cls, it.annotationClass)
-                                fieldTypeMap[it.annotationClass]
-                            }.firstOrNull()
+                    val converter = annotationsForProp(prop, cls).mapNotNull {
+                        fieldTypeMap[it.annotationClass]
+                    }.firstOrNull()
                     if (converter != null) {
-                        val js = converter.fromJson(JsonValue(o, this, null))
+                        val js = converter.fromJson(JsonValue(o, this))
                         if (js != null) Pair(converter, js) else null
                     } else {
                         null
@@ -115,7 +108,7 @@ class Klaxon {
         val fieldConverter = findFieldConverter()
         val result = fieldConverter ?:
             converters.firstNotNullResult {
-                val js = it.fromJson(JsonValue(o, this, null))
+                val js = it.fromJson(JsonValue(o, this))
                 if (js != null) Pair(it, js) else null
             }
 
@@ -132,12 +125,14 @@ class Klaxon {
 
     val parser = Parser()
 
+    @Suppress("unused")
     /**
      * Parse a Reader into a JsonObject.
      */
     fun parseJsonObject(reader: Reader)
             = parser.parse(reader) as JsonObject
 
+    @Suppress("unused")
     /**
      * Parse a Reader into a JsonArray.
      */
@@ -195,8 +190,6 @@ class Klaxon {
                         else prop.name
                 val jValue = jsonObject[fieldName]
 
-                println("Prop: $prop")
-
                 if (jValue == null) {
                     val jsonFields = jsonObject.keys.joinToString(",")
                     throw KlaxonException("Don't know how to map class field \"$fieldName\" " +
@@ -206,7 +199,6 @@ class Klaxon {
                     if (convertedValue != null) {
                         setField(this, prop, convertedValue)
                     } else {
-                        val convertedValue = kFromJson(jValue, prop)
                         throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
                                 + "field named \"${prop.name}\"")
                     }

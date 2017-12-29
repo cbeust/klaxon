@@ -6,7 +6,7 @@ import kotlin.reflect.full.declaredMemberProperties
 /**
  * Variant class that encapsulates one JSON value.
  */
-class JsonValue(value: Any?, val jsonConverter: Klaxon, val field: KProperty<*>?) {
+class JsonValue(value: Any?, private val klaxon: Klaxon) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
@@ -83,10 +83,8 @@ class JsonValue(value: Any?, val jsonConverter: Klaxon, val field: KProperty<*>?
         propertiesAndValues(obj).entries.forEach { entry ->
             val property = entry.key
             val p = entry.value
-            println("Found property: " + property)
-            val pair = jsonConverter.findFromConverter(p!!, property)
+            val pair = klaxon.findFromConverter(p!!, property)
             if (pair != null) {
-                println("BEST CONVERTER FOR $p: ${pair.first}")
                 val jv = pair.second
                 result[property.name] = jv
             } else {
@@ -96,6 +94,7 @@ class JsonValue(value: Any?, val jsonConverter: Klaxon, val field: KProperty<*>?
         return result
     }
 
+    @Suppress("IMPLICIT_CAST_TO_ANY")
     val inside: Any
         get() {
             val result =

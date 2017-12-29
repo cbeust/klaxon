@@ -1,7 +1,7 @@
 package com.beust.klaxon
 
 interface Converter {
-    fun toJson(o: Any): String?
+    fun toJson(value: Any): String?
     fun fromJson(jv: JsonValue) : Any?
 }
 
