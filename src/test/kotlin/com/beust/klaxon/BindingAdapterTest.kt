@@ -2,26 +2,22 @@ package com.beust.klaxon
 
 import org.testng.Assert
 import org.testng.annotations.Test
-import java.lang.annotation.ElementType
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-import java.lang.annotation.Target
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(AnnotationTarget.FIELD)
 annotation class KlaxonDate
+@Target(AnnotationTarget.FIELD)
 annotation class KlaxonDayOfTheWeek
 
 @Test
 class BindingAdapterTest {
     class WithDate @JvmOverloads constructor(
             @Json(name = "theDate")
-            @field:KlaxonDate
+            @KlaxonDate
             var date: LocalDateTime? = null,
 
-            @field:KlaxonDayOfTheWeek
+            @KlaxonDayOfTheWeek
             var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
