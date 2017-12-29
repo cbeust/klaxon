@@ -97,13 +97,21 @@ class Klaxon : ConverterFinder {
         }
     }
 
+    /**
+     * Type converters that convert a JsonObject into an object.
+     */
     private val converters = arrayListOf<Converter>(DEFAULT_CONVERTER)
+
     fun converter(converter: Converter): Klaxon {
         converters.add(0, converter)
         return this
     }
 
+    /**
+     * Field type converters that convert fields with a marker annotation.
+     */
     private val fieldTypeMap = hashMapOf<KClass<out Annotation>, Converter>()
+
     fun fieldConverter(annotation: KClass<out Annotation>, converter: Converter): Klaxon {
         fieldTypeMap[annotation] = converter
         return this
@@ -127,12 +135,20 @@ class Klaxon : ConverterFinder {
         }
     }
 
-    override fun findFromConverter(o: Any, prop: KProperty<*>?): Pair<Converter, Any>? {
+    /**
+     * @return a converter that will turn `value` into a `JsonObject`. If a non-null property is
+     * passed, inspect that property for annotations that would override the type converter
+     * we need to use to convert it.
+     */
+    override fun findFromConverter(value: Any, prop: KProperty<*>?): Pair<Converter, Any>? {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
             val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
             return result
         }
 
+        /**
+         * @return a Converter if a field annotation can be found on the property, `null` otherwise.
+         */
         fun findFieldConverter() : Pair<Converter, Any>? {
             val result =
                 if (prop != null) {
@@ -141,7 +157,7 @@ class Klaxon : ConverterFinder {
                         fieldTypeMap[it.annotationClass]
                     }.firstOrNull()
                     if (converter != null) {
-                        val js = converter.fromJson(JsonValue(o, this))
+                        val js = converter.fromJson(JsonValue(value, this))
                         if (js != null) Pair(converter, js) else null
                     } else {
                         null
@@ -152,14 +168,20 @@ class Klaxon : ConverterFinder {
                 return result
         }
 
-        val fieldConverter = findFieldConverter()
-        val result = fieldConverter ?:
+        /**
+         * @return a Converter if one can be found for the value.
+         */
+        fun findTypeConverter() =
             converters.firstNotNullResult {
-                val js = it.fromJson(JsonValue(o, this))
+                val js = it.fromJson(JsonValue(value, this))
                 if (js != null) Pair(it, js) else null
             }
 
-        return result
+        //
+        // First try to find a field converter. If none is found, try to find
+        // a regular type converter.
+        //
+        return findFieldConverter() ?: findTypeConverter()
     }
 
     private fun findToConverter(o: Any): Pair<Converter, String>? {
@@ -185,10 +207,15 @@ class Klaxon : ConverterFinder {
 
         val result = cls.newInstance().apply {
             kc?.declaredMemberProperties?.forEach { prop ->
+                //
+                // Check if the name of the field was overridden with a @Json annotation
+                //
                 val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
                 val fieldName =
                         if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
                         else prop.name
+
+                // Retrieve the value of that property and convert it from JSON
                 val jValue = jsonObject[fieldName]
 
                 if (jValue == null) {
@@ -209,27 +236,4 @@ class Klaxon : ConverterFinder {
         }
         return result
     }
-
-    /**
-     * Gather a list of all candidate type converters and take the first one that will convert
-     * the value. @return null otherwise.
-     */
-//    fun tryToConvert(prop: KProperty1<out Any, Any?>, value: JsonValue): Any? {
-//        val candidates = converters.map { it.fromJson(value) }
-//        return null
-//    }
 }
-
-//fun main(args: Array<String>) {
-//
-//    run {
-//
-//    }
-//    run {
-//        val deck = Deck2(cardCount = 2, cards = listOf(Card(8, "Hearts"), Card(3, "Spades")))
-//        val js = Klaxon()
-//                .converter(CARD_CONVERTER)
-//                .toJsonString(deck)
-//        println(js)
-//    }
-//}
