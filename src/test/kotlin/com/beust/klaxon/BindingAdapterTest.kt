@@ -26,8 +26,8 @@ class BindingAdapterTest {
     )
 
     fun fieldAdapters() {
-        val result = Klaxon3()
-                .fieldConverter(KlaxonDate::class, object: Converter3 {
+        val result = Klaxon()
+                .fieldConverter(KlaxonDate::class, object: Converter {
                     override fun fromJson(jv: JsonValue)
                             = LocalDateTime.parse(jv.string,
                             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
@@ -39,7 +39,7 @@ class BindingAdapterTest {
                     }
                 })
 
-                .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter3 {
+                .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter {
 //                override fun canConvert(field: KProperty<*>?, value: Any): Boolean {
 //                    return field?.returnType == String::class
 //                            || value::class == String::class
@@ -73,7 +73,7 @@ class BindingAdapterTest {
         Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
     }
 
-    val CARD_ADAPTER = object: Converter3 {
+    val CARD_ADAPTER = object: Converter {
 
         override fun fromJson(value: JsonValue): Card? {
             fun parseCard(str: String) : Card? {
@@ -105,7 +105,7 @@ class BindingAdapterTest {
     }
 
     private fun privateConverter2(withAdapter: Boolean) {
-        val klaxon = Klaxon3()
+        val klaxon = Klaxon()
         if (withAdapter) klaxon.converter(CARD_ADAPTER)
         val result = klaxon.parse<Deck1>("""
             {

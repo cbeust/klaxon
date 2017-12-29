@@ -10,13 +10,8 @@ import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaMethod
 
-interface Converter3 {
-    fun toJson(o: Any): String?
-    fun fromJson(jv: JsonValue) : Any?
-}
-
-class Klaxon3 {
-    private val DEFAULT_CONVERTER = object : Converter3 {
+class Klaxon {
+    private val DEFAULT_CONVERTER = object : Converter {
         override fun fromJson(jv: JsonValue): Any? {
             val value = jv.inside
             val result =
@@ -56,14 +51,14 @@ class Klaxon3 {
         }
     }
 
-    private val converters = arrayListOf<Converter3>(DEFAULT_CONVERTER)
-    fun converter(converter: Converter3): Klaxon3 {
+    private val converters = arrayListOf<Converter>(DEFAULT_CONVERTER)
+    fun converter(converter: Converter): Klaxon {
         converters.add(0, converter)
         return this
     }
 
-    private val fieldTypeMap = hashMapOf<KClass<out Annotation>, Converter3>()
-    fun fieldConverter(annotation: KClass<out Annotation>, converter: Converter3): Klaxon3 {
+    private val fieldTypeMap = hashMapOf<KClass<out Annotation>, Converter>()
+    fun fieldConverter(annotation: KClass<out Annotation>, converter: Converter): Klaxon {
         fieldTypeMap[annotation] = converter
         return this
     }
@@ -86,7 +81,7 @@ class Klaxon3 {
         }
     }
 
-    fun findFromConverter(o: Any, prop: KProperty<*>?): Pair<Converter3, Any>? {
+    fun findFromConverter(o: Any, prop: KProperty<*>?): Pair<Converter, Any>? {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
             val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
             return result
@@ -95,7 +90,7 @@ class Klaxon3 {
         fun annotationForProp(prop: KProperty<*>, kc: Class<*>, annotation: KClass<out Annotation>)
                 = kc.getDeclaredField(prop.name).getDeclaredAnnotation(annotation.java)
 
-        fun findFieldConverter() : Pair<Converter3, Any>? {
+        fun findFieldConverter() : Pair<Converter, Any>? {
             val result =
                 if (prop != null) {
                     val cls = prop.getter.javaMethod!!.declaringClass
@@ -127,7 +122,7 @@ class Klaxon3 {
         return result
     }
 
-    private fun findToConverter(o: Any): Pair<Converter3, String>? {
+    private fun findToConverter(o: Any): Pair<Converter, String>? {
         val result = converters.mapNotNull {
             val js = it.toJson(o)
             if (js != null) Pair(it, js) else null
@@ -239,7 +234,7 @@ class Klaxon3 {
 //    }
 //    run {
 //        val deck = Deck2(cardCount = 2, cards = listOf(Card(8, "Hearts"), Card(3, "Spades")))
-//        val js = Klaxon3()
+//        val js = Klaxon()
 //                .converter(CARD_CONVERTER)
 //                .toJsonString(deck)
 //        println(js)

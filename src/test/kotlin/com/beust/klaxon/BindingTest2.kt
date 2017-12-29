@@ -25,7 +25,7 @@ class BindingTest2 {
             var string: String = "foo", var isTrue: Boolean = true, var isFalse: Boolean = false)
 
     fun arrayToJson() {
-        val klaxon = Klaxon3()
+        val klaxon = Klaxon()
         val h = ArrayHolder(listOf(1, 3, 5),
                 listOf("d", "e", "f"),
                 listOf(true, false, true))
@@ -38,7 +38,7 @@ class BindingTest2 {
         Assert.assertTrue(s2.contains("\"isFalse\" : false"))
     }
 
-    val CARD_CONVERTER = object: Converter3 {
+    val CARD_CONVERTER = object: Converter {
         override fun fromJson(jv: JsonValue): Any? {
             val jo = jv.obj
             if (jo != null) {
@@ -63,7 +63,7 @@ class BindingTest2 {
     }
 
     fun objectsToJson() {
-        val klaxon = Klaxon3().converter(CARD_CONVERTER)
+        val klaxon = Klaxon().converter(CARD_CONVERTER)
 
 //        val deck = klaxon.parse<BindingTest.Deck1>("""
 //            {
@@ -93,7 +93,7 @@ class BindingTest2 {
             var isFalse: Boolean? = null,
             var array: List<Int> = emptyList())
     fun allTypes() {
-        val result = Klaxon3().parse<AllTypes>("""
+        val result = Klaxon().parse<AllTypes>("""
         {
             "int": 42,
             "string": "foo",
@@ -106,7 +106,7 @@ class BindingTest2 {
     }
 
     fun compoundObject() {
-        val result = Klaxon3()
+        val result = Klaxon()
                 .converter(CARD_CONVERTER)
                 .parse<Deck1>("""
         {
@@ -135,7 +135,7 @@ class BindingTest2 {
     )
 
     fun compoundObjectWithArray() {
-        val result = Klaxon3()
+        val result = Klaxon()
                 .converter(CARD_CONVERTER)
                 .parse<Deck2>("""
         {
@@ -162,7 +162,7 @@ class BindingTest2 {
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun badFieldMapping() {
-        Klaxon3().parse<Mapping>("""
+        Klaxon().parse<Mapping>("""
         {
           "name": "foo"
         }
@@ -170,7 +170,7 @@ class BindingTest2 {
     }
 
     fun goodFieldMapping() {
-        val result = Klaxon3().parse<Mapping>("""
+        val result = Klaxon().parse<Mapping>("""
         {
           "theName": "foo"
         }
