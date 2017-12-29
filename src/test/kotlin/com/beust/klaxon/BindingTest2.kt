@@ -40,13 +40,9 @@ class BindingTest2 {
 
     val CARD_CONVERTER = object: Converter {
         override fun fromJson(jv: JsonValue): Any? {
-            val jo = jv.obj
-            if (jo != null) {
-                val suit = jo.string("suit")
-                val value = jo.int("value")
-                return if (suit != null && value != null) Card(value, suit) else null
-            }
-            return null
+            val suit = jv.obj?.string("suit")
+            val value = jv.obj?.int("value")
+            return if (suit != null && value != null) Card(value, suit) else null
         }
 
         override fun toJson(o: Any): String? {
@@ -75,12 +71,9 @@ class BindingTest2 {
         val deck1 = Deck1(cardCount = 1, card = Card(13, "Clubs"))
 
         val s2 = klaxon.toJsonString(deck1)
-        Assert.assertTrue(s2.contains("\"CLUBS\""))
-        Assert.assertTrue(s2.contains("\"suit\""))
-        Assert.assertTrue(s2.contains("\"value\""))
-        Assert.assertTrue(s2.contains("13"))
-        Assert.assertTrue(s2.contains("\"cardCount\""))
-        Assert.assertTrue(s2.contains("1"))
+        listOf("\"CLUBS\"", "\"suit\"", "\"value\"", "13", "\"cardCount\"", "1").forEach {
+            Assert.assertTrue(s2.contains(it))
+        }
     }
 
     //
