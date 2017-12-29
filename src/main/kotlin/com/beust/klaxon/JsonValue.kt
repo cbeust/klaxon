@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Variant class that encapsulates one JSON value.
@@ -79,7 +80,7 @@ class JsonValue(value: Any?, val jsonConverter: Klaxon3, val field: KProperty<*>
 
     private fun convertToJsonObject(obj: Any): JsonObject {
         val result = JsonObject()
-        val kv = Klaxon2.propertiesAndValues(obj).entries.forEach { entry ->
+        propertiesAndValues(obj).entries.forEach { entry ->
             val property = entry.key
             val p = entry.value
             println("Found property: " + property)
@@ -120,4 +121,19 @@ class JsonValue(value: Any?, val jsonConverter: Klaxon3, val field: KProperty<*>
             else throw KlaxonException("Should never happen")
 
     }
+
+    companion object {
+        fun propertiesAndValues(obj: Any): Map<KProperty<*>, Any?> {
+            val result = hashMapOf<KProperty<*>, Any?>()
+            obj::class.declaredMemberProperties
+//                    .filter { it.visibility != KVisibility.PRIVATE && it.isAccessible }
+//            obj.javaClass.declaredFields
+                    .forEach { property ->
+                        val p = property.call(obj)
+                        result.put(property, p)
+                    }
+            return result
+        }
+    }
+
 }
