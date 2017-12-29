@@ -5,6 +5,7 @@ build
 .gradle
 .kobalt
 kobaltBuild
+kobalt/out
 lib/kotlin-*
 target/*
 

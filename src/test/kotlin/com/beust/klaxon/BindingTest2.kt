@@ -19,9 +19,14 @@ class BindingTest2 {
     // Tests objects -> JSON string
     //
 
+    data class ArrayHolder(var listOfInts: List<Int> = emptyList(),
+            var listOfStrings : List<String> = emptyList(),
+            var listOfBooleans: List<Boolean> = emptyList(),
+            var string: String = "foo", var isTrue: Boolean = true, var isFalse: Boolean = false)
+
     fun arrayToJson() {
         val klaxon = Klaxon3()
-        val h = BindingTest.ArrayHolder(listOf(1, 3, 5),
+        val h = ArrayHolder(listOf(1, 3, 5),
                 listOf("d", "e", "f"),
                 listOf(true, false, true))
         val s2 = klaxon.toJsonString(h)
@@ -150,9 +155,14 @@ class BindingTest2 {
         }
     }
 
+    class Mapping @JvmOverloads constructor(
+            @field:Json(name = "theName")
+            var name: String? = null
+    )
+
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun badFieldMapping() {
-        Klaxon3().parse<BindingTest.Mapping>("""
+        Klaxon3().parse<Mapping>("""
         {
           "name": "foo"
         }
@@ -160,7 +170,7 @@ class BindingTest2 {
     }
 
     fun goodFieldMapping() {
-        val result = Klaxon3().parse<BindingTest.Mapping>("""
+        val result = Klaxon3().parse<Mapping>("""
         {
           "theName": "foo"
         }

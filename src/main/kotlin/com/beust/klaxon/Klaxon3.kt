@@ -6,7 +6,9 @@ import java.nio.charset.Charset
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.javaMethod
 
 interface Converter3 {
     fun toJson(o: Any): String?
@@ -55,14 +57,19 @@ class Klaxon3 {
     }
 
     private val converters = arrayListOf<Converter3>(DEFAULT_CONVERTER)
-
     fun converter(converter: Converter3): Klaxon3 {
         converters.add(0, converter)
         return this
     }
 
-    fun kFromJson(o: Any): Any? {
-        val converter = findFromConverter(o)
+    private val fieldTypeMap = hashMapOf<KClass<out Annotation>, Converter3>()
+    fun fieldConverter(annotation: KClass<out Annotation>, converter: Converter3): Klaxon3 {
+        fieldTypeMap[annotation] = converter
+        return this
+    }
+
+    fun kFromJson(o: Any, prop: KProperty1<out Any, Any?>? = null): Any? {
+        val converter = findFromConverter(o, prop)
         if (converter != null) {
             return converter.second
         } else {
@@ -71,19 +78,52 @@ class Klaxon3 {
     }
 
     fun toJsonString(o: Any): String {
-        val converter = findToConverter(o)
-        if (converter != null) {
-            return converter.second
+        val converted = findToConverter(o)
+        if (converted != null) {
+            return converted.second
         } else {
             throw KlaxonException("Couldn't find a converter for $o")
         }
     }
 
-    fun findFromConverter(o: Any): Pair<Converter3, Any>? {
-        val result = converters.firstNotNullResult {
-            val js = it.fromJson(JsonValue(o, this, null))
-            if (js != null) Pair(it, js) else null
+    fun findFromConverter(o: Any, prop: KProperty<*>?): Pair<Converter3, Any>? {
+        fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
+            val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
+            return result
         }
+
+        fun annotationForProp(prop: KProperty<*>, kc: Class<*>, annotation: KClass<out Annotation>)
+                = kc.getDeclaredField(prop.name).getDeclaredAnnotation(annotation.java)
+
+        fun findFieldConverter() : Pair<Converter3, Any>? {
+            val result =
+                if (prop != null) {
+                    val cls = prop.getter.javaMethod!!.declaringClass
+                    val allAnnotations = annotationsForProp(prop, cls)
+                    val converter =
+                            annotationsForProp(prop, cls).mapNotNull {
+                                val annotation = annotationForProp(prop, cls, it.annotationClass)
+                                fieldTypeMap[it.annotationClass]
+                            }.firstOrNull()
+                    if (converter != null) {
+                        val js = converter.fromJson(JsonValue(o, this, null))
+                        if (js != null) Pair(converter, js) else null
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
+                return result
+        }
+
+        val fieldConverter = findFieldConverter()
+        val result = fieldConverter ?:
+            converters.firstNotNullResult {
+                val js = it.fromJson(JsonValue(o, this, null))
+                if (js != null) Pair(it, js) else null
+            }
+
         return result
     }
 
@@ -142,7 +182,11 @@ class Klaxon3 {
     fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>?): Any {
         fun setField(obj: Any, prop: KProperty<*>, value: Any) {
             if (prop is KMutableProperty<*>) {
-                prop.setter.call(obj, value)
+                try {
+                    prop.setter.call(obj, value)
+                } catch(ex: IllegalArgumentException) {
+                    throw KlaxonException("Can't set value $value on property $prop")
+                }
             } else {
                 throw KlaxonException("Property $prop is not mutable")
             }
@@ -163,11 +207,11 @@ class Klaxon3 {
                     throw KlaxonException("Don't know how to map class field \"$fieldName\" " +
                             "to any JSON field: $jsonFields")
                 } else {
-                    val convertedValue = kFromJson(jValue)
+                    val convertedValue = kFromJson(jValue, prop)
                     if (convertedValue != null) {
                         setField(this, prop, convertedValue)
                     } else {
-                        val convertedValue = kFromJson(jValue)
+                        val convertedValue = kFromJson(jValue, prop)
                         throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
                                 + "field named \"${prop.name}\"")
                     }

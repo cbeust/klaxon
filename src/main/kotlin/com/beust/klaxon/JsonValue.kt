@@ -83,7 +83,7 @@ class JsonValue(value: Any?, val jsonConverter: Klaxon3, val field: KProperty<*>
             val property = entry.key
             val p = entry.value
             println("Found property: " + property)
-            val pair = jsonConverter.findFromConverter(p!!)
+            val pair = jsonConverter.findFromConverter(p!!, property)
             if (pair != null) {
                 println("BEST CONVERTER FOR $p: ${pair.first}")
                 val jv = pair.second
