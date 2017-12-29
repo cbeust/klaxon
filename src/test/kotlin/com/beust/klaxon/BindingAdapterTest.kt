@@ -13,58 +13,49 @@ annotation class KlaxonDayOfTheWeek
 @Test
 class BindingAdapterTest {
     class WithDate @JvmOverloads constructor(
-            @Json(name = "theDate")
-            @KlaxonDate
-            var date: LocalDateTime? = null,
+        @Json(name = "theDate")
+        @KlaxonDate
+        var date: LocalDateTime? = null,
 
-            @KlaxonDayOfTheWeek
-            var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
+        @KlaxonDayOfTheWeek
+        var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
     fun fieldAdapters() {
         val result = Klaxon()
-                .fieldConverter(KlaxonDate::class, object: Converter {
-                    override fun fromJson(jv: JsonValue)
-                            = LocalDateTime.parse(jv.string,
-                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+            .fieldConverter(KlaxonDate::class, object: Converter {
+                override fun fromJson(jv: JsonValue)
+                    = LocalDateTime.parse(jv.string, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
 
-                    override fun toJson(o: Any): String {
-                        return """ {
-                    | "date" : ${o?.toString()} }
-                    | """.trimMargin()
+                override fun toJson(o: Any)
+                    = """ { "date" : $o } """.trimMargin()
+            })
+
+            .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter {
+                override fun fromJson(jv: JsonValue) : String {
+                    return when(jv.int) {
+                        0 -> "Sunday"
+                        1 -> "Monday"
+                        2 -> "Tuesday"
+                        else -> "Some other day"
                     }
-                })
-
-                .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter {
-//                override fun canConvert(field: KProperty<*>?, value: Any): Boolean {
-//                    return field?.returnType == String::class
-//                            || value::class == String::class
-//                }
-
-                    override fun fromJson(jv: JsonValue) : String {
-                        return when(jv.int) {
-                            0 -> "Sunday"
-                            1 -> "Monday"
-                            2 -> "Tuesday"
-                            else -> "Some other day"
-                        }
-                    }
-
-                    override fun toJson(o: Any) : String {
-                        return when(o) {
-                            "Sunday" -> "0"
-                            "Monday" -> "1"
-                            "Tuesday" -> "2"
-                            else -> "-1"
-                        }
-                    }
-                })
-                .parse<WithDate>("""
-                {
-                  "theDate": "2017-05-10 16:30"
-                  "dayOfTheWeek": 2
                 }
-            """)
+
+                override fun toJson(o: Any) : String {
+                    return when(o) {
+                        "Sunday" -> "0"
+                        "Monday" -> "1"
+                        "Tuesday" -> "2"
+                        else -> "-1"
+                    }
+                }
+            })
+            .parse<WithDate>("""
+            {
+              "theDate": "2017-05-10 16:30"
+              "dayOfTheWeek": 2
+            }
+        """)
         Assert.assertEquals(result?.dayOfTheWeek, "Tuesday")
         Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
     }
