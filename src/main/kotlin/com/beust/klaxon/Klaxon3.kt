@@ -1,6 +1,6 @@
 package com.beust.klaxon
 
-import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
+import com.beust.klaxon.internal.firstNotNullResult
 import java.io.*
 import java.nio.charset.Charset
 import kotlin.reflect.KClass
