@@ -38,14 +38,14 @@ class BindingTest2 {
         Assert.assertTrue(s2.contains("\"isFalse\" : false"))
     }
 
-    val CARD_CONVERTER = object: Converter {
-        override fun fromJson(jv: JsonValue): Any? {
-            val suit = jv.obj?.string("suit")
-            val value = jv.obj?.int("value")
-            return if (suit != null && value != null) Card(value, suit) else null
+    val CARD_CONVERTER = object: Converter<Card> {
+        override fun fromJson(jv: JsonValue): Card {
+            val suit = jv.objString("suit")
+            val value = jv.objInt("value")
+            return Card(value, suit)
         }
 
-        override fun toJson(o: Any): String? {
+        override fun toJson(o: Card): String? {
             val result = if (o is Card) {
                 """
                     "value" : ${o.value},

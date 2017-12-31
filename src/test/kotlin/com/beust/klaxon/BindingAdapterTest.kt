@@ -17,7 +17,7 @@ class BindingAdapterTest {
         var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
-    @Test(expectedExceptionsMessageRegExp = "convert")
+    @Test
     fun wrongFieldAdapter() {
         try {
             val result = createKlaxon()
@@ -28,7 +28,7 @@ class BindingAdapterTest {
             """)
             Assert.fail("Should have been unable to convert")
         } catch(ex: Exception) {
-            Assert.assertTrue(ex.message?.contains("not able to convert") ?: false)
+            Assert.assertTrue(ex.message?.contains("ouldn't parse date") ?: false)
         }
     }
 
@@ -43,18 +43,19 @@ class BindingAdapterTest {
 
     private fun createKlaxon()
         = Klaxon()
-            .fieldConverter(KlaxonDate::class, object: Converter {
-                override fun fromJson(jv: JsonValue) = if (jv.string != null) {
+            .fieldConverter(KlaxonDate::class, object: Converter<LocalDateTime> {
+                override fun fromJson(jv: JsonValue) =
+                    if (jv.string != null) {
                         LocalDateTime.parse(jv.string, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                     } else {
-                        null
+                        throw KlaxonException("Couldn't parse date: ${jv.string}")
                     }
 
-                override fun toJson(o: Any)
+                override fun toJson(o: LocalDateTime)
                         = """ { "date" : $o } """.trimMargin()
             })
 
-            .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter {
+            .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter<String> {
                 override fun fromJson(jv: JsonValue) : String {
                     return when(jv.int) {
                         0 -> "Sunday"
@@ -64,7 +65,7 @@ class BindingAdapterTest {
                     }
                 }
 
-                override fun toJson(o: Any) : String {
+                override fun toJson(o: String) : String {
                     return when(o) {
                         "Sunday" -> "0"
                         "Monday" -> "1"
@@ -86,9 +87,8 @@ class BindingAdapterTest {
         Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
     }
 
-    val CARD_ADAPTER = object: Converter {
-
-        override fun fromJson(value: JsonValue): Card? {
+    val CARD_ADAPTER = object: Converter<Card> {
+        override fun fromJson(value: JsonValue): Card {
             fun parseCard(str: String) : Card? {
                 val s0 = str[0]
                 val cardValue =
@@ -109,10 +109,10 @@ class BindingAdapterTest {
                     } else {
                         null
                     }
-            return result
+            return result ?: throw KlaxonException("Couldn't parse card")
         }
 
-        override fun toJson(obj: Any): String {
+        override fun toJson(obj: Card): String {
             return "some JSON"
         }
     }

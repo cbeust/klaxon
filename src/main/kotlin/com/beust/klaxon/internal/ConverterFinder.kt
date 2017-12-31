@@ -4,5 +4,5 @@ import com.beust.klaxon.Converter
 import kotlin.reflect.KProperty
 
 interface ConverterFinder {
-    fun findFromConverter(value: Any, prop: KProperty<*>?): Pair<Converter, Any>?
+    fun findConverter(value: Any, prop: KProperty<*>? = null): Converter<*>
 }

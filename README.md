@@ -276,7 +276,8 @@ do {
 
 ## Limitations
 
-* Currently reads the entire JSON content in memory. Streaming will be available soon for large files.
+* Currently reads the entire JSON content in memory, streaming is not available yet
 * Error handling is very primitive
+
 
 

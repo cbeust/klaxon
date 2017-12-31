@@ -7,7 +7,7 @@ import kotlin.reflect.full.declaredMemberProperties
 /**
  * Variant class that encapsulates one JSON value.
  */
-class JsonValue(value: Any?, private val converterFinder: ConverterFinder) {
+class JsonValue(value: Any?, val property: KProperty<*>, private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
@@ -19,10 +19,16 @@ class JsonValue(value: Any?, private val converterFinder: ConverterFinder) {
 
     var type: Class<*>
 
+    private fun error(type: String, name: String) : Nothing {
+        throw KlaxonException("Couldn't find $type on object named $name")
+    }
+
+    fun objInt(name: String) : Int  = obj?.int(name) ?: error("Int", name)
+    fun objString(name: String) : String = obj?.string(name) ?: error("String", name)
+
     init {
         when(value) {
             is JsonValue -> {
-                println("PROBLEM")
                 type = String::class.java
             }
             is JsonObject -> {
@@ -84,13 +90,7 @@ class JsonValue(value: Any?, private val converterFinder: ConverterFinder) {
         propertiesAndValues(obj).entries.forEach { entry ->
             val property = entry.key
             val p = entry.value
-            val pair = converterFinder.findFromConverter(p!!, property)
-            if (pair != null) {
-                val jv = pair.second
-                result[property.name] = jv
-            } else {
-                throw KlaxonException("Couldn't find a converter for $p")
-            }
+            result[property.name] = converterFinder.findConverter(p!!, property)
         }
         return result
     }
