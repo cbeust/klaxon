@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import org.testng.Assert
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 import java.util.regex.Pattern
@@ -16,6 +17,14 @@ class KlaxonTest {
     private fun read(name: String): Any? {
         val cls = KlaxonTest::class.java
         return Parser().parse(cls.getResourceAsStream(name)!!)
+    }
+
+    fun generated() {
+        val j = read("/generated.json") as JsonArray<JsonObject>
+        val expected = json {
+            array(1, "abc", 2.34, false)
+        }
+        Assert.assertEquals((j[0]["name"] as JsonObject)["last"], "Olson")
     }
 
     fun simple() {
