@@ -52,7 +52,7 @@ class BindingAdapterTest {
                     }
 
                 override fun toJson(o: LocalDateTime)
-                        = """ { "date" : $o } """.trimMargin()
+                        = """ { "date" : $o } """
             })
 
             .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter<String> {
