@@ -19,7 +19,8 @@ dependencies {
 Klaxon has different API's depending on your needs:
 
 - A high level API that lets you bind JSON documents directly to your objects, and vice versa.
-- A low level API that lets you manipulate JSON objects and use queries on them
+- A low level API that lets you manipulate JSON objects and use queries on them.
+- [_Coming soon_] A streaming API so you can act on JSON document as it's being read.
 
 ## High level API (object binding)
 
