@@ -55,7 +55,7 @@ class KlaxonTest {
         }, read("/nulls.json"))
     }
 
-    fun nullsDSL() {
+    fun nullsDsl() {
         val j = json {
             obj(
                     "1" to null,
