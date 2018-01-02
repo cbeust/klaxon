@@ -29,14 +29,14 @@ class BindingTest {
         val h = ArrayHolder(listOf(1, 3, 5),
                 listOf("d", "e", "f"),
                 listOf(true, false, true))
-        val s2 = klaxon.toJsonString(h)
+        val s = klaxon.toJsonString(h)
         listOf("\"listOfInts\" : [1, 3, 5]",
                 "\"listOfStrings\" : [\"d\", \"e\", \"f\"]",
                 "\"listOfBooleans\" : [true, false, true]",
                 "\"string\" : \"foo\"",
                 "\"isTrue\" : true",
                 "\"isFalse\" : false").forEach {
-            Assert.assertTrue(s2.contains(it))
+            assertContains(s, it)
         }
     }
 
@@ -50,11 +50,12 @@ class BindingTest {
     }
 
     fun objectsToJson() {
-        val klaxon = Klaxon().converter(CARD_CONVERTER)
         val deck1 = Deck1(cardCount = 1, card = Card(13, "Clubs"))
-        val s2 = klaxon.toJsonString(deck1)
+        val s = Klaxon()
+                .converter(CARD_CONVERTER)
+                .toJsonString(deck1)
         listOf("\"CLUBS\"", "\"suit\"", "\"value\"", "13", "\"cardCount\"", "1").forEach {
-            Assert.assertTrue(s2.contains(it))
+            assertContains(s, it)
         }
     }
 
@@ -151,5 +152,9 @@ class BindingTest {
         }
         """)
         Assert.assertEquals(result?.name, "foo")
+    }
+
+    companion object {
+        private fun assertContains(s1: String, s2: String) = Assert.assertTrue(s1.contains(s2))
     }
 }
