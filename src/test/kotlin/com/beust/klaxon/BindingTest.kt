@@ -13,7 +13,7 @@ data class Deck1(
 )
 
 @Test
-class BindingTest2 {
+class BindingTest {
 
     //
     // Tests objects -> JSON string
@@ -30,46 +30,28 @@ class BindingTest2 {
                 listOf("d", "e", "f"),
                 listOf(true, false, true))
         val s2 = klaxon.toJsonString(h)
-        Assert.assertTrue(s2.contains("\"listOfInts\" : [1, 3, 5]"))
-        Assert.assertTrue(s2.contains("\"listOfStrings\" : [\"d\", \"e\", \"f\"]"))
-        Assert.assertTrue(s2.contains("\"listOfBooleans\" : [true, false, true]"))
-        Assert.assertTrue(s2.contains("\"string\" : \"foo\""))
-        Assert.assertTrue(s2.contains("\"isTrue\" : true"))
-        Assert.assertTrue(s2.contains("\"isFalse\" : false"))
+        listOf("\"listOfInts\" : [1, 3, 5]",
+                "\"listOfStrings\" : [\"d\", \"e\", \"f\"]",
+                "\"listOfBooleans\" : [true, false, true]",
+                "\"string\" : \"foo\"",
+                "\"isTrue\" : true",
+                "\"isFalse\" : false").forEach {
+            Assert.assertTrue(s2.contains(it))
+        }
     }
 
     val CARD_CONVERTER = object: Converter<Card> {
-        override fun fromJson(jv: JsonValue): Card {
-            val suit = jv.objString("suit")
-            val value = jv.objInt("value")
-            return Card(value, suit)
-        }
+        override fun fromJson(jv: JsonValue) = Card(jv.objInt("value"), jv.objString("suit"))
 
-        override fun toJson(o: Card): String? {
-            val result = if (o is Card) {
-                """
+        override fun toJson(o: Card) = """
                     "value" : ${o.value},
                     "suit": "${o.suit?.toUpperCase()}"
                 """
-            } else {
-                null
-            }
-            return result
-        }
     }
 
     fun objectsToJson() {
         val klaxon = Klaxon().converter(CARD_CONVERTER)
-
-//        val deck = klaxon.parse<BindingTest.Deck1>("""
-//            {
-//                "cardCount": 1,
-//                "card" : "KS"
-//            }
-//        """)
-
         val deck1 = Deck1(cardCount = 1, card = Card(13, "Clubs"))
-
         val s2 = klaxon.toJsonString(deck1)
         listOf("\"CLUBS\"", "\"suit\"", "\"value\"", "13", "\"cardCount\"", "1").forEach {
             Assert.assertTrue(s2.contains(it))
