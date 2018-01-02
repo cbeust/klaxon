@@ -5,7 +5,8 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
 
 /**
- * Variant class that encapsulates one JSON value.
+ * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
+ * constructor is guaranteed to be non null.
  */
 class JsonValue(value: Any?, val property: KProperty<*>?, private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
@@ -15,16 +16,44 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
     var float: Float? = null
     var char: Char? = null
     var boolean: Boolean? = null
+
+    /**
+     * If this object contains a JsonArray, @return the generic type of that array, null otherwise.
+     */
     var genericType: Class<*>? = null
 
     var type: Class<*>
 
-    private fun error(type: String, name: String) : Nothing {
-        throw KlaxonException("Couldn't find $type on object named $name")
-    }
-
+    /**
+     * Convenience function to retrieve an Int value from the underlying `obj` field.
+     */
     fun objInt(name: String) : Int  = obj?.int(name) ?: error("Int", name)
+
+    /**
+     * Convenience function to retrieve a String value from the underlying `obj` field.
+     */
     fun objString(name: String) : String = obj?.string(name) ?: error("String", name)
+
+    /**
+     * @return the raw value inside this object.
+     */
+    @Suppress("IMPLICIT_CAST_TO_ANY")
+    val inside: Any
+        get() {
+            val result =
+                when {
+                    obj != null -> obj
+                    array != null -> array
+                    string != null -> string
+                    int != null -> int
+                    float != null -> float
+                    char != null -> char
+                    boolean != null -> boolean
+                    else -> throw KlaxonException("Should never happen")
+                }
+            return result!!
+        }
+
 
     init {
         when(value) {
@@ -95,21 +124,6 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
         return result
     }
 
-    @Suppress("IMPLICIT_CAST_TO_ANY")
-    val inside: Any
-        get() {
-            val result =
-                if (obj != null) obj
-                    else if (array != null) array
-                    else if (string != null) string
-                    else if (int != null) int
-                    else if (float != null) float
-                    else if (char != null) char
-                    else if (boolean != null) boolean
-                    else throw KlaxonException("Should never happen")
-            return result!!
-        }
-
     override fun toString() : String {
         return if (obj != null) "{object: $obj}"
             else if (array != null) "{array: $array}"
@@ -136,4 +150,7 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
         }
     }
 
+    private fun error(type: String, name: String) : Nothing {
+        throw KlaxonException("Couldn't find $type on object named $name")
+    }
 }
