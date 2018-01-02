@@ -39,11 +39,12 @@ You then specify the class of your object as a type parameter when invoking the 
 ```kotlin
     val result = Klaxon()
         .parse<Person>("""
-    {
-      "name": "John Smith",
-      "age": 23
-    }
+        {
+          "name": "John Smith",
+          "age": 23
+        }
     """)
+
     assertThat(result.name).isEqualTo("John Smith")
     assertThat(result.age).isEqualTo(23)
 ```
@@ -56,18 +57,18 @@ You can map names found in JSON with field names with the `@Json` annotation:
 data class Person(
     @Json(name = "the_name")
     var name: String? = null,
-    var age: Int? = null
 )
 ```
 
 ```kotlin
     val result = Klaxon()
         .parse<Person>("""
-    {
-      "the_name": "John Smith", // not the field name
-      "age": 23
-    }
+        {
+          "the_name": "John Smith", // note the field name
+          "age": 23
+        }
     """)
+
     assertThat(result.name).isEqualTo("John Smith")
     assertThat(result.age).isEqualTo(23)
 ```
@@ -88,7 +89,7 @@ interface Converter<T> {
 
 You define a class that implements this interface and implement the logic that converts your class to and from JSON.
 For example, suppose you receive a JSON document with a field that can either be a `0` or a `1` and you want to
-converter that field into your own type that's initialized with a boolean:
+convert that field into your own type that's initialized with a boolean:
 
 ```kotlin
     class BooleanHolder(var flag: Boolean? = null)
@@ -173,6 +174,7 @@ Finally, declare the association between that converter and your annotation in y
           "theDate": "2017-05-10 16:30"
         }
     """)
+
     assertThat(result?.date).isEqualTo(LocalDateTime.of(2017, 5, 10, 16, 30))
 
 ``` 
