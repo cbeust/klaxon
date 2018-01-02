@@ -86,6 +86,49 @@ interface Converter<T> {
 }
 ```
 
+You define a class that implements this interface and implement the logic that converts your class to and from JSON.
+For example, suppose you receive a JSON document with a field that can either be a `0` or a `1` and you want to
+converter that field into your own type that's initialized with a boolean:
+
+```kotlin
+    class BooleanHolder(var flag: Boolean? = null)
+
+    val myConverter = object: Converter<BooleanHolder> {
+        override fun toJson(value: BooleanHolder): String?
+            = """{"flag" : "${if (value.flag == true) 1 else 0}""""
+    
+        override fun fromJson(jv: JsonValue)
+            = BooleanHolder(jv.objInt("flag") != 0)
+    
+    }
+```
+
+Next, you declare your converter to your `Klaxon` object before parsing:
+
+```kotlin
+    val result = Klaxon()
+        .converter(myConverter)
+        .parse<BooleanHolder>("""
+            { "flag" : 1 }
+        """)
+
+    assertThat(result?.flag).isTrue()
+```
+
+### JsonValue
+
+The `Converter` type passes you an instance of the [`JsonValue`](https://github.com/cbeust/klaxon/blob/master/src/main/kotlin/com/beust/klaxon/JsonValue.kt) class.
+This class is a container of a Json value. It
+is guaranteed to contain one and exactly one of either a number, a string, a character, a `JsonObject` or a `JsonArray`.
+If one of these fields is set, the others are guaranteed to be `null`. Inspect that value in your converter to make
+sure that the value you are expecting is present, otherwise, you can cast a `KlaxonException` to report the invalid
+JSON that you just found.
+
+### Field conversion overriding
+
+It's sometimes useful to be able to specify a type conversion for a specific field without that conversion applying
+to all types of your document.
+
 
 ## Low level API
 
