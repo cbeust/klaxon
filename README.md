@@ -1,6 +1,6 @@
 <img src="doc/klaxon.png" alt="Klaxon logo" height="101" width="220" />
 
-Klaxon is a lightweight library to parse JSON in Kotlin.
+Klaxon is a library to parse JSON in Kotlin.
 
 ## Install
 
@@ -14,7 +14,80 @@ dependencies {
 }
 ```
 
-## API
+## Use
+
+Klaxon has different API's depending on your needs:
+
+- A high level API that lets you bind JSON documents directly to your objects, and vice versa.
+- A low level API that lets you manipulate JSON objects and use queries on them
+
+## High level API (object binding)
+
+### General usage
+
+To use Klaxon's high level API, you define your objects as nullable `var`'s:
+
+```kotlin
+data class Person(
+    var name: String? = null,
+    var age: Int? = null
+)
+```
+
+You then specify the class of your object as a type parameter when invoking the `parse()` function:
+
+```kotlin
+    val result = Klaxon()
+        .parse<Person>("""
+    {
+      "name": "John Smith",
+      "age": 23
+    }
+    """)
+    assertThat(result.name).isEqualTo("John Smith")
+    assertThat(result.age).isEqualTo(23)
+```
+
+### Customizing field names
+
+You can map names found in JSON with field names with the `@Json` annotation:
+
+```kotlin
+data class Person(
+    @Json(name = "the_name")
+    var name: String? = null,
+    var age: Int? = null
+)
+```
+
+```kotlin
+    val result = Klaxon()
+        .parse<Person>("""
+    {
+      "the_name": "John Smith", // not the field name
+      "age": 23
+    }
+    """)
+    assertThat(result.name).isEqualTo("John Smith")
+    assertThat(result.age).isEqualTo(23)
+```
+
+### Custom types
+
+Klaxon will do its best to initialize the objects with what it found in the JSON document but you can take control
+of this mapping yourself by defining type converters.
+
+The converter interface is as follows:
+
+```kotlin
+interface Converter<T> {
+    fun toJson(value: T): String?
+    fun fromJson(jv: JsonValue) : T
+}
+```
+
+
+## Low level API
 
 Values parsed from a valid JSON file can be of the following type:
 
@@ -273,6 +346,25 @@ do {
     world = sm.next(world, token)
 } while (token.tokenType != Type.EOF)
 ```
+
+## Troubleshooting
+
+Here are a few common errors and how to resolve them.
+
+- `NoSuchMethodException: <init>`
+
+You might see the following exception:
+
+```kotlin
+Caused by: java.lang.NoSuchMethodException: com.beust.klaxon.BindingAdapterTest$personMappingTest$Person.<init>()
+	at java.lang.Class.getConstructor0(Class.java:3082)
+	at java.lang.Class.newInstance(Class.java:412)
+```
+
+This is typically caused by your object class being defined inside a function (which makes its constructor require an
+ additional parameter that Klaxon doesn't know how to fill).
+ 
+Solution: move that class definition outside of the function.
 
 ## Limitations
 

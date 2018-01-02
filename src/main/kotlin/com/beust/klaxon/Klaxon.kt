@@ -70,7 +70,7 @@ class Klaxon : ConverterFinder {
                     is Boolean -> value
                     is Int -> value
                     is Collection<*> -> value.map {
-                        val jt = jv.property.returnType.javaType
+                        val jt = jv.property?.returnType?.javaType
                         // Try to find a converter for the element type of the collection
                         val converter =
                             if (jt is ParameterizedType) {
@@ -232,35 +232,42 @@ class Klaxon : ConverterFinder {
             }
         }
 
-        val result = cls.newInstance().apply {
-            kc?.declaredMemberProperties?.forEach { prop ->
-                //
-                // Check if the name of the field was overridden with a @Json annotation
-                //
-                val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
-                val fieldName =
-                        if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
-                        else prop.name
+        val classConverter = findConverterFromClass(cls, null)
+        val result =
+            if (classConverter != DEFAULT_CONVERTER) {
+                classConverter.fromJson(JsonValue(jsonObject, null, this@Klaxon)) as Any
+            } else {
+                cls.newInstance().apply {
+                    kc?.declaredMemberProperties?.forEach { prop ->
+                        //
+                        // Check if the name of the field was overridden with a @Json annotation
+                        //
+                        val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
+                        val fieldName =
+                                if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
+                                else prop.name
 
-                // Retrieve the value of that property and convert it from JSON
-                val jValue = jsonObject[fieldName]
+                        // Retrieve the value of that property and convert it from JSON
+                        val classConverter = findConverterFromClass(cls, null)
+                        val jValue = jsonObject[fieldName]
 
-                if (jValue == null) {
-                    val jsonFields = jsonObject.keys.joinToString(",")
-                    throw KlaxonException("Don't know how to map class field \"$fieldName\" " +
-                            "to any JSON field: $jsonFields")
-                } else {
-                    val convertedValue = findConverter(jValue, prop).fromJson(JsonValue(jValue, prop, this@Klaxon))
-                    if (convertedValue != null) {
-                        setField(this, prop, convertedValue)
-                    } else {
-                        throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
-                                + "field named \"${prop.name}\"")
+                        if (jValue == null) {
+                            val jsonFields = jsonObject.keys.joinToString(",")
+                            throw KlaxonException("Don't know how to map class field \"$fieldName\" " +
+                                    "to any JSON field: $jsonFields")
+                        } else {
+                            val convertedValue = findConverterFromClass(cls, prop).fromJson(JsonValue(jValue, prop,
+                                    this@Klaxon))
+                            if (convertedValue != null) {
+                                setField(this, prop, convertedValue)
+                            } else {
+                                throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
+                                        + "field named \"${prop.name}\"")
+                            }
+                        }
                     }
                 }
-
             }
-        }
         return result
     }
 

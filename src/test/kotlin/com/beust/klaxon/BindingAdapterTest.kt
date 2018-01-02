@@ -135,4 +135,25 @@ class BindingAdapterTest {
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun withoutConverter2() = privateConverter2(withAdapter = false)
 
+    class Person(var fullName: String? = null)
+    fun personMappingTest() {
+
+        val result = Klaxon()
+            .converter(object: Converter<Person> {
+                override fun toJson(value: Person): String? {
+                    return """{"fullName" : "${value.fullName}""""
+                }
+
+                override fun fromJson(jv: JsonValue)
+                        = Person(jv.objString("firstName") + " " + jv.objString("lastName"))
+
+            })
+            .parse<Person>("""
+            {
+                "firstName": "John",
+                "lastName": "Smith"
+            }
+        """)
+        Assert.assertEquals(result?.fullName, "John Smith")
+    }
 }

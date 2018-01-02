@@ -7,7 +7,7 @@ import kotlin.reflect.full.declaredMemberProperties
 /**
  * Variant class that encapsulates one JSON value.
  */
-class JsonValue(value: Any?, val property: KProperty<*>, private val converterFinder: ConverterFinder) {
+class JsonValue(value: Any?, val property: KProperty<*>?, private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
