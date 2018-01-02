@@ -127,8 +127,55 @@ JSON that you just found.
 ### Field conversion overriding
 
 It's sometimes useful to be able to specify a type conversion for a specific field without that conversion applying
-to all types of your document.
+to all types of your document (for example, your JSON document might contain various dates of different formats).
+You can use field conversion types for this kind of situation.
 
+Such fields are specified by your own annotation, which you need to specify as targetting a `FIELD`:
+
+```kotlin
+@Target(AnnotationTarget.FIELD)
+annotation class KlaxonDate
+```
+
+Next, annotate the field that requires this specific handling in the constructor of your class. Do note that such
+a constructor needs to be annotated with `@JvmOverloads`:
+
+```kotlin
+    class WithDate @JvmOverloads constructor(
+        @KlaxonDate
+        var date: LocalDateTime? = null,
+    )
+```
+
+Define your type converter (which has the same type as the converters defined previously). In this case, we
+are converting a `String` from JSON into a `LocalDateTime`:
+
+```kotlin
+val dateConverter = object: Converter<LocalDateTime> {
+    override fun fromJson(jv: JsonValue) =
+        if (jv.string != null) {
+            LocalDateTime.parse(jv.string, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        } else {
+            throw KlaxonException("Couldn't parse date: ${jv.string}")
+        }
+
+    override fun toJson(o: LocalDateTime)
+            = """ { "date" : $o } """
+```
+
+Finally, declare the association between that converter and your annotation in your `Klaxon` object before parsing:
+
+```kotlin
+    val result = Klaxon()
+        .fieldConverter(dateConverter)
+        .parse<WithDate>("""
+        {
+          "theDate": "2017-05-10 16:30"
+        }
+    """)
+    assertThat(result?.date).isEqualTo(LocalDateTime.of(2017, 5, 10, 16, 30))
+
+``` 
 
 ## Low level API
 
