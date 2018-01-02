@@ -84,7 +84,7 @@ class Parser {
     private val verbose = false
 
     private fun log(s: String) {
-        if (verbose) {
+        if (Debug.verbose) {
             println("[Parser2] ${s}")
         }
     }

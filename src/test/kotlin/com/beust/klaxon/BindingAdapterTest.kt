@@ -156,4 +156,24 @@ class BindingAdapterTest {
         """)
         Assert.assertEquals(result?.fullName, "John Smith")
     }
+
+    class BooleanHolder(var flag: Boolean? = null)
+    fun booleanConverter() {
+        val result = Klaxon()
+            .converter(object: Converter<BooleanHolder> {
+                override fun toJson(value: BooleanHolder): String? {
+                    return """{"flag" : "${if (value.flag == true) 1 else 0}""""
+                }
+
+                override fun fromJson(jv: JsonValue)
+                    = BooleanHolder(jv.objInt("flag") != 0)
+
+            })
+            .parseArray<BooleanHolder>("""[
+            { "flag": 1 }, { "flag": 0 }
+            ]
+        """)
+        Assert.assertEquals(result?.get(0)?.flag, true)
+        Assert.assertEquals(result?.get(1)?.flag, false)
+    }
 }

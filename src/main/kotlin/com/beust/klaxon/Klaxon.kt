@@ -33,19 +33,33 @@ class Klaxon : ConverterFinder {
      * Parse a JSON string into an object.
      */
     inline fun <reified T> parse(json: String): T?
-            = maybeParse(parser.parse(StringReader(json)))
+            = maybeParse(parser.parse(StringReader(json)) as JsonObject)
+
+    /**
+     * Parse a JSON string into a JsonArray.
+     */
+    inline fun <reified T> parseArray(json: String): List<T>?
+            = parseFromJsonArray(parser.parse(StringReader(json)) as JsonArray<*>)
 
     /**
      * Parse a JSON file into an object.
      */
     inline fun <reified T> parse(file: File): T?
-            = maybeParse(parser.parse(FileReader(file)))
+            = maybeParse(parser.parse(FileReader(file)) as JsonObject)
 
     /**
      * Parse an InputStream into an object.
      */
-    inline fun <reified T> parse(inputStream: InputStream): T?
-            = maybeParse(parser.parse(toReader(inputStream)))
+    inline fun <reified T> parse(inputStream: InputStream): T? {
+        return maybeParse(parser.parse(toReader(inputStream)) as JsonObject)
+    }
+
+    /**
+     * Parse an InputStream into a JsonArray.
+     */
+    inline fun <reified T> parseArray(inputStream: InputStream): List<T>? {
+        return parseFromJsonArray(parser.parse(toReader(inputStream)) as JsonArray<*>)
+    }
 
     /**
      * Parse a JsonObject into an object.
@@ -53,8 +67,21 @@ class Klaxon : ConverterFinder {
     inline fun <reified T> parseFromJsonObject(map: JsonObject): T?
             = fromJsonObject(map, T::class.java, T::class) as T?
 
-    inline fun <reified T> maybeParse(map: Any?): T? =
-            if (map is JsonObject) parseFromJsonObject(map) else null
+    inline fun <reified T> parseFromJsonArray(map: JsonArray<*>): List<T>? {
+        val result = arrayListOf<T>()
+        map.forEach { jo ->
+            if (jo is JsonObject) {
+                val t = parseFromJsonObject<T>(jo)
+                if (t != null) result.add(t)
+                else throw KlaxonException("Couldn't convert $jo")
+            } else {
+                throw KlaxonException("Couldn't convert $jo")
+            }
+        }
+        return result
+    }
+
+    inline fun <reified T> maybeParse(map: JsonObject): T? = parseFromJsonObject(map)
 
     fun toReader(inputStream: InputStream, charset: Charset = Charsets.UTF_8)
             = inputStream.reader(charset)
@@ -272,6 +299,6 @@ class Klaxon : ConverterFinder {
     }
 
     private fun log(s: String) {
-//        println(s)
+        if (Debug.verbose) println(s)
     }
 }
