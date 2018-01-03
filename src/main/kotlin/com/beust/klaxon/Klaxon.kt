@@ -2,7 +2,6 @@ package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
 import java.io.*
-import java.lang.reflect.ParameterizedType
 import java.nio.charset.Charset
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -88,60 +87,7 @@ class Klaxon : ConverterFinder {
 
     val parser = Parser()
 
-    private val DEFAULT_CONVERTER = object : Converter<Any> {
-        override fun fromJson(jv: JsonValue): Any {
-            val value = jv.inside
-            val result =
-                when(value) {
-                    is String -> value
-                    is Boolean -> value
-                    is Int -> value
-                    is Collection<*> -> value.map {
-                        val jt = jv.property?.returnType?.javaType
-                        // Try to find a converter for the element type of the collection
-                        val converter =
-                            if (jt is ParameterizedType) {
-                                val cls = jt.actualTypeArguments[0] as Class<*>
-                                findConverterFromClass(cls, null)
-                            } else {
-                                if (it != null) {
-                                    findConverter(it)
-                                } else {
-                                    throw KlaxonException("Don't know how to convert null value in array $jv")
-                                }
-                            }
-
-                        converter.fromJson(JsonValue(it, jv.property, this@Klaxon))
-                    }
-                    else -> throw KlaxonException("Don't know how to convert $value")
-                }
-            return result
-        }
-
-        override fun toJson(value: Any): String? {
-            val result = when (value) {
-                is Boolean -> value.toString()
-                is String -> "\"" + value + "\""
-                is Int -> value.toString()
-                is Collection<*> -> {
-                    val elements = value.filterNotNull().map { toJson(it) }
-                    "[" + elements.joinToString(", ") + "]"
-                }
-                else -> {
-                    val valueList = arrayListOf<String>()
-                    value::class.declaredMemberProperties.forEach { prop ->
-                        prop.getter.call(value)?.let { getValue ->
-                            val jsonValue = toJsonString(getValue)
-                            valueList.add("\"${prop.name}\" : $jsonValue")
-                        }
-                    }
-                    return "{" + valueList.joinToString(", ") + "}"
-                }
-
-            }
-            return result
-        }
-    }
+    private val DEFAULT_CONVERTER = DefaultConverter(this)
 
     /**
      * Type converters that convert a JsonObject into an object.
@@ -210,7 +156,7 @@ class Klaxon : ConverterFinder {
         return result
     }
 
-    private fun findConverterFromClass(jc: Class<*>, prop: KProperty<*>?) : Converter<*> {
+    fun findConverterFromClass(jc: Class<*>, prop: KProperty<*>?) : Converter<*> {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
             val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
             return result
@@ -283,8 +229,8 @@ class Klaxon : ConverterFinder {
                             throw KlaxonException("Don't know how to map class field \"$fieldName\" " +
                                     "to any JSON field: $jsonFields")
                         } else {
-                            val convertedValue = findConverterFromClass(cls, prop).fromJson(JsonValue(jValue, prop,
-                                    this@Klaxon))
+                            val convertedValue = findConverterFromClass(cls, prop)
+                                    .fromJson(JsonValue(jValue, prop, this@Klaxon))
                             if (convertedValue != null) {
                                 setField(this, prop, convertedValue)
                             } else {

@@ -157,4 +157,14 @@ class BindingTest {
     companion object {
         private fun assertContains(s1: String, s2: String) = Assert.assertTrue(s1.contains(s2))
     }
+
+    enum class Cardinal { NORTH, SOUTH }
+    class Direction(var cardinal: Cardinal? = null)
+    fun enum() {
+        val result = Klaxon().parse<Direction>("""
+            { "cardinal": "NORTH" }
+        """
+        )
+        Assert.assertEquals(result?.cardinal, Cardinal.NORTH)
+    }
 }
