@@ -2,7 +2,7 @@ package com.beust.klaxon
 
 private data class TokenStatus(val status: Status, val tokenType: Type)
 
-class StateMachine(val lenient: Boolean) {
+class StateMachine(val streaming: Boolean) {
     private val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
 
     fun put(status: Status, tokenType: Type, processor: (world: World, token: Token) -> World) {
@@ -15,7 +15,7 @@ class StateMachine(val lenient: Boolean) {
         val result = if (processor != null) {
             processor(world, token)
         } else {
-            if (! lenient) {
+            if (! streaming) {
                 val message = "No state found: ${world.status} $token"
                 throw KlaxonException(message)
             } else {

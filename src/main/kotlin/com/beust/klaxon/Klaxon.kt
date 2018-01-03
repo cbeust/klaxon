@@ -64,7 +64,7 @@ class Klaxon : ConverterFinder {
      * Parse a JsonReader into an array.
      */
     inline fun <reified T> parse(jsonReader: JsonReaderK): T? {
-        val p = Parser(jsonReader.lexer, lenient = true)
+        val p = Parser(jsonReader.lexer, streaming = true)
         return maybeParse(p.parse(jsonReader) as JsonObject)
     }
 
