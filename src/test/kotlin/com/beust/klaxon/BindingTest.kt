@@ -167,4 +167,11 @@ class BindingTest {
         )
         Assert.assertEquals(result?.cardinal, Cardinal.NORTH)
     }
+
+    class TestObj(var id: Long? = null)
+    fun longTest() {
+        val expected = 53147483640L
+        val result = Klaxon().parse<TestObj>(""" {"id": $expected } """)
+        Assert.assertEquals(result?.id, expected)
+    }
 }

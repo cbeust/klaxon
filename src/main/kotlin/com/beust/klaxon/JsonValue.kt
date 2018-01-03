@@ -13,6 +13,7 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
     var array: JsonArray<*>? = null
     var string: String? = null
     var int: Int? = null
+    var longValue: Long? = null
     var float: Float? = null
     var char: Char? = null
     var boolean: Boolean? = null
@@ -46,6 +47,7 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
                     array != null -> array
                     string != null -> string
                     int != null -> int
+                    longValue != null -> longValue
                     float != null -> float
                     char != null -> char
                     boolean != null -> boolean
@@ -90,6 +92,10 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
             is Int -> {
                 int = value
                 type = Int::class.java
+            }
+            is Long -> {
+                longValue = value
+                type = Long::class.java
             }
             is Float -> {
                 float = value

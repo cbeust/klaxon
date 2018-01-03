@@ -56,6 +56,7 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             is String -> value
             is Boolean -> value
             is Int -> value
+            is Long -> value
             is Collection<*> -> value.map {
                 val jt = jv.property?.returnType?.javaType
                 // Try to find a converter for the element type of the collection
