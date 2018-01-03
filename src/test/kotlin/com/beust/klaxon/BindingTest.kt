@@ -168,10 +168,13 @@ class BindingTest {
         Assert.assertEquals(result?.cardinal, Cardinal.NORTH)
     }
 
-    class TestObj(var id: Long? = null)
+    class TestObj(var idShort: Long? = null, var idLong: Long? = null)
+
     fun longTest() {
-        val expected = 53147483640L
-        val result = Klaxon().parse<TestObj>(""" {"id": $expected } """)
-        Assert.assertEquals(result?.id, expected)
+        val expectedShort = 123 // Test widening Int -> Long property
+        val expectedLong = 53147483640L
+        val result = Klaxon().parse<TestObj>(""" {"idShort": $expectedShort, "idLong": $expectedLong } """)
+        Assert.assertEquals(result?.idShort, expectedShort.toLong())
+        Assert.assertEquals(result?.idLong, expectedLong)
     }
 }

@@ -14,9 +14,8 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
 
     override fun toJson(value: Any): String? {
         val result = when (value) {
-            is Boolean -> value.toString()
             is String -> "\"" + value + "\""
-            is Int -> value.toString()
+            is Int, is Boolean, is Long -> value.toString()
             is Collection<*> -> {
                 val elements = value.filterNotNull().map { toJson(it) }
                 "[" + elements.joinToString(", ") + "]"
@@ -55,7 +54,12 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
         val result = when(value) {
             is String -> value
             is Boolean -> value
-            is Int -> value
+            is Int -> {
+                // If the value is an Int and the property is a Long, widen the value
+                val propertyType = jv.property?.getter?.returnType?.javaType as? Class<*>
+                val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
+                if (isLong) value.toLong() else value
+            }
             is Long -> value
             is Collection<*> -> value.map {
                 val jt = jv.property?.returnType?.javaType
