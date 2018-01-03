@@ -37,12 +37,11 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
 
     private fun maybeConvertEnum(jv: JsonValue): Any? {
         var result: Any? = null
-        if (jv.property != null) {
-            val cls = jv.property.returnType.javaType
+        jv.property?.let { property ->
+            val cls = property.returnType.javaType
             if (cls is Class<*> && cls.isEnum) {
                 val valueOf = cls.getMethod("valueOf", String::class.java)
                 result = valueOf.invoke(null, jv.inside)
-                println("ENUM")
             }
         }
 
