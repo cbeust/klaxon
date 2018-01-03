@@ -172,7 +172,7 @@ class Lexer(reader: Reader) {
                 jsonValue = null
             } else {
                 throw RuntimeException("Unexpected character at position ${index-1}"
-                    + ": '${c} (${c.toInt()})'")
+                    + ": '${c}' (ASCII: ${c.toInt()})'")
             }
 
             tokenType = Type.VALUE
