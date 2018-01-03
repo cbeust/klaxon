@@ -26,7 +26,7 @@ class Token(val tokenType: Type, val value: Any?) {
     }
 }
 
-class Lexer(reader: Reader) {
+class Lexer(val reader: Reader) {
     private val EOF = Token(Type.EOF, null)
     private var index = 1
 
@@ -37,7 +37,7 @@ class Lexer(reader: Reader) {
         return c == ' ' || c == '\r' || c == '\n' || c == '\t'
     }
 
-    private val reader = reader.buffered()
+    private val buffererReader = reader//reader.buffered()
     private var next: Char?
 
     init {
@@ -48,8 +48,9 @@ class Lexer(reader: Reader) {
     private fun nextChar(): Char {
         if (isDone()) throw IllegalStateException("Cannot get next char: EOF reached")
         val c = next!!
-        next = reader.read().let { if (it == -1) null else it.toChar() }
+        next = buffererReader.read().let { if (it == -1) null else it.toChar() }
         index++
+        log("Next char: '$c'")
         return c
     }
 
@@ -72,7 +73,28 @@ class Lexer(reader: Reader) {
                 || c in NULL_LETTERS
     }
 
-    fun nextToken() : Token {
+    private var peeked: Token? = null
+
+    fun peek() : Token {
+        if (peeked == null) {
+            peeked = actualNextToken()
+        }
+        return peeked!!
+    }
+
+    fun nextToken(): Token {
+        val result =
+            if (peeked != null) {
+                val r = peeked!!
+                peeked = null
+                r
+            } else {
+                actualNextToken()
+            }
+        return result
+    }
+
+    private fun actualNextToken() : Token {
 
         if (isDone()) {
             return EOF
@@ -182,4 +204,6 @@ class Lexer(reader: Reader) {
 
         return Token(tokenType, jsonValue)
     }
+
+    private fun log(s: String) = if (Debug.verbose) println(s) else ""
 }

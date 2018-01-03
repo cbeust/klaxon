@@ -5,13 +5,14 @@ import java.nio.charset.Charset
 
 /**
  * Main entry for Klaxon's parser.
+ *
+ * If {lenient} is true, the parser doesn't expect to finish on an EOF token. This is used for streaming, when
+ * the user requests to read a subset of the entire JSON document.
  */
-class Parser {
-    private val verbose = false
-
+class Parser(private val passedLexer: Lexer? = null, val lenient: Boolean = false) {
     private fun log(s: String) {
         if (Debug.verbose) {
-            println("[Parser2] ${s}")
+            println("[Parser] $s")
         }
     }
 
@@ -31,7 +32,7 @@ class Parser {
 
     fun parse(reader: Reader): Any? {
 
-        val sm = StateMachine()
+        val sm = StateMachine(lenient)
         with(sm) {
             put(Status.INIT, Type.VALUE, { world: World, token: Token ->
                 world.pushAndSet(Status.IN_FINISHED_VALUE, token.value!!)
@@ -43,14 +44,14 @@ class Parser {
                 world.pushAndSet(Status.IN_ARRAY, JsonArray<Any>())
             })
             // else error
-    
+
             put(Status.IN_FINISHED_VALUE, Type.EOF, { world: World, _: Token ->
                 world.result = world.popValue()
                 world
             })
             // else error
-    
-    
+
+
             put(Status.IN_OBJECT, Type.COMMA, { world: World, _: Token ->
                 world
             })
@@ -67,8 +68,8 @@ class Parser {
                 }
                 world
             })
-    
-    
+
+
             put(Status.PASSED_PAIR_KEY, Type.COLON, { world: World, _: Token ->
                 world
             })
@@ -97,7 +98,7 @@ class Parser {
                 world.pushAndSet(Status.IN_OBJECT, newObject)
             })
             // else error
-    
+
             put(Status.IN_ARRAY, Type.COMMA, { world: World, _: Token ->
                 world
             })
@@ -129,9 +130,27 @@ class Parser {
                 world.pushAndSet(Status.IN_ARRAY, newArray)
             })
         }
-            // else error
+        // else error
 
-        val lexer = Lexer(reader)
+        return if (lenient) partialParseLoop(sm, (reader as JsonReaderK).reader) else fullParseLoop(sm, reader)
+    }
+
+    private fun partialParseLoop(sm: StateMachine, reader: Reader): Any? {
+        val lexer = passedLexer ?: Lexer(reader)
+
+        var world = World(Status.INIT)
+        if (lexer.peek().tokenType == Type.COMMA) lexer.nextToken()
+        do {
+            val token = lexer.nextToken()
+            log("Token: $token")
+            world = sm.next(world, token)
+        } while (token.tokenType != Type.RIGHT_BRACE && token.tokenType != Type.EOF)
+
+        return world.popValue()
+    }
+
+    private fun fullParseLoop(sm: StateMachine, reader: Reader): Any? {
+        val lexer = passedLexer ?: Lexer(reader)
 
         var world = World(Status.INIT)
         do {
