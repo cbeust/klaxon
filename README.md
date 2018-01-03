@@ -431,12 +431,12 @@ We can find all emails by
 The Parser is implemented as a mutable state machine supported by a simplistic `State` monad, making the main loop very simple:
 
 ```kotlin
-val sm = StateMachine()
+val stateMachine = StateMachine()
 val lexer = Lexer(inputStream)
 var world = World(Status.INIT)
 do {
     val token = lexer.nextToken()
-    world = sm.next(world, token)
+    world = stateMachine.next(world, token)
 } while (token.tokenType != Type.EOF)
 ```
 
