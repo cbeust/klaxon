@@ -1,8 +1,6 @@
 package com.beust.klaxon
 
-import java.io.InputStream
 import java.io.Reader
-import java.nio.charset.Charset
 import java.util.regex.Pattern
 
 enum class Type {
@@ -18,22 +16,24 @@ enum class Type {
 
 class Token(val tokenType: Type, val value: Any?) {
     override fun toString() : String {
-        val v = if (value != null) { " (" + value + ")" } else {""}
-        val result = tokenType.toString() + v
-        return result
+        val v =
+            if (value != null) {
+                " ($value)"
+            } else {
+                ""
+            }
+        return tokenType.toString() + v
     }
 }
 
 class Lexer(reader: Reader) {
-    constructor(stream: InputStream, charset: Charset = Charsets.UTF_8) : this(stream.reader(charset))
+    private val EOF = Token(Type.EOF, null)
+    private var index = 1
 
-    val EOF = Token(Type.EOF, null)
-    var index = 1
+    private val NUMERIC = Pattern.compile("[-]?[0-9]+")
+    private val DOUBLE = Pattern.compile(NUMERIC.toString() + "((\\.[0-9]+)?([eE][-+]?[0-9]+)?)")!!
 
-    val NUMERIC = Pattern.compile("[-]?[0-9]+")
-    val DOUBLE = Pattern.compile(NUMERIC.toString() + "((\\.[0-9]+)?([eE][-+]?[0-9]+)?)")
-
-    fun isSpace(c: Char): Boolean {
+    private fun isSpace(c: Char): Boolean {
         return c == ' ' || c == '\r' || c == '\n' || c == '\t'
     }
 
@@ -78,7 +78,7 @@ class Lexer(reader: Reader) {
             return EOF
         }
 
-        var tokenType: Type
+        val tokenType: Type
         var c = nextChar()
         val currentValue = StringBuilder()
         var jsonValue: Any? = null
@@ -118,7 +118,7 @@ class Lexer(reader: Reader) {
                                     .append(nextChar())
                                     .append(nextChar())
 
-                                val intValue = java.lang.Integer.parseInt(unicodeChar.toString(), 16);
+                                val intValue = java.lang.Integer.parseInt(unicodeChar.toString(), 16)
                                 currentValue.append(intValue.toChar())
                             }
                             else -> currentValue.append(c)
@@ -146,7 +146,7 @@ class Lexer(reader: Reader) {
             while (isValueLetter(c)) {
                 currentValue.append(c)
                 if (! isValueLetter(peekChar())) {
-                    break;
+                    break
                 } else {
                     c = nextChar()
                 }
@@ -154,7 +154,7 @@ class Lexer(reader: Reader) {
             val v = currentValue.toString()
             if (NUMERIC.matcher(v).matches()) {
                 try {
-                    jsonValue = java.lang.Integer.parseInt(v);
+                    jsonValue = java.lang.Integer.parseInt(v)
                 } catch (e: NumberFormatException){
                     try {
                         jsonValue = java.lang.Long.parseLong(v)
@@ -164,15 +164,15 @@ class Lexer(reader: Reader) {
                 }
             } else if (DOUBLE.matcher(v).matches()) {
                 jsonValue = java.lang.Double.parseDouble(v)
-            } else if ("true".equals(v.toLowerCase())) {
+            } else if ("true" == v.toLowerCase()) {
                 jsonValue = true
-            } else if ("false".equals(v.toLowerCase())) {
+            } else if ("false" == v.toLowerCase()) {
                 jsonValue = false
             } else if (v == "null") {
                 jsonValue = null
             } else {
                 throw RuntimeException("Unexpected character at position ${index-1}"
-                    + ": '${c}' (ASCII: ${c.toInt()})'")
+                    + ": '$c' (ASCII: ${c.toInt()})'")
             }
 
             tokenType = Type.VALUE
