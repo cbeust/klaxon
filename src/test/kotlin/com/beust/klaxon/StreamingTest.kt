@@ -1,6 +1,6 @@
 package com.beust.klaxon
 
-import com.google.gson.stream.JsonReader
+//import com.google.gson.stream.JsonReader
 import org.testng.Assert
 import org.testng.annotations.Test
 import java.io.StringReader
@@ -10,9 +10,9 @@ import java.io.StringReader
 class StreamingTest {
 //    data class Person2(var name: String? = null, var age: Int? = null, var flag: Boolean? = false,
 //            var array: List<Int> = emptyList())
-    fun streaming1() {
-        val jr = JsonReader(StringReader(array))
-    }
+//    fun streaming1() {
+//        val jr = JsonReader(StringReader(array))
+//    }
 
     fun streamingObject() {
         val objectString = """{

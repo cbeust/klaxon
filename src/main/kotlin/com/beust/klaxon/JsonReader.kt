@@ -2,7 +2,73 @@ package com.beust.klaxon
 
 import java.io.Reader
 
+/**
+ * Manages JSON streaming.
+ */
 class JsonReaderK(val reader: Reader) : Reader() {
+    fun nextString() = consumeValue { value -> value.toString() }
+
+    fun nextInt() = consumeValue { value -> value as Int }
+
+    fun nextBoolean() = consumeValue { value -> value as Boolean }
+
+    fun nextObject() : JsonObject {
+        skip()
+        return beginObject {
+            val result = JsonObject()
+            while (hasNext()) {
+                val name = nextName()
+                val value = consumeValue { value -> value }
+                result[name] = value
+            }
+            result
+        }
+    }
+
+    fun nextArray() : List<Any> {
+        skip()
+        val result = arrayListOf<Any>()
+        return beginArray {
+            while (hasNext()) {
+                val v = consumeValue { value -> value }
+                if (v != null) {
+                    result.add(v)
+                } else {
+                    throw KlaxonException("Couldn't parse")
+                }
+            }
+            result
+        }
+    }
+
+
+    /**
+     * Makes sure that the next token is the beginning of an object (open brace),
+     * consume it, run the closure and then make sure the object is closed (closed brace).
+     */
+    fun <T> beginObject(closure: () -> T) : T {
+        privateBeginObject()
+        val result = closure()
+        privateEndObject()
+        return result
+    }
+
+    /**
+     * Makes sure that the next token is the beginning of an array (open bracket),
+     * consume it, run the closure and then make sure the array is closed (closed bracket).
+     */
+    fun <T> beginArray(closure: () -> T) : T {
+        privateBeginArray()
+        val result = closure()
+        privateEndArray()
+        return result
+    }
+
+    /**
+     * @return true of this reader has more tokens to read before finishing the current object/array.
+     */
+    fun hasNext(): Boolean = lexer.peek().tokenType.let { it != Type.RIGHT_BRACKET && it != Type.RIGHT_BRACE }
+
     override fun close() {
         reader.close()
     }
@@ -52,50 +118,4 @@ class JsonReaderK(val reader: Reader) : Reader() {
         }
     }
 
-    fun nextString() = consumeValue { value -> value.toString() }
-
-    fun nextInt() = consumeValue { value -> value as Int }
-
-    fun <T> beginObject(closure: () -> T) : T {
-        privateBeginObject()
-        val result = closure()
-        privateEndObject()
-        return result
-    }
-
-    fun <T> beginArray(closure: () -> T) : T {
-        privateBeginArray()
-        val result = closure()
-        privateEndArray()
-        return result
-    }
-
-    fun nextBoolean() = consumeValue { value -> value as Boolean }
-
-    fun nextObject() : JsonObject {
-        skip()
-        return beginObject {
-            val result = JsonObject()
-            while (hasNext()) {
-                val name = nextName()
-                val value = consumeValue { value -> value }
-                result[name] = value
-            }
-            result
-        }
-    }
-
-    fun nextArray() : List<Any> {
-        skip()
-        val result = arrayListOf<Any>()
-        return beginArray {
-            while (hasNext()) {
-                val v = consumeValue { value -> value }
-                result.add(v!!)
-            }
-            result
-        }
-    }
-
-    fun hasNext(): Boolean = lexer.peek().tokenType.let { it != Type.RIGHT_BRACKET && it != Type.RIGHT_BRACE }
 }
