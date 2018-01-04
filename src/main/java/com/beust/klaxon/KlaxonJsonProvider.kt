@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+/*
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.Reader
@@ -73,3 +74,4 @@ class KlaxonJsonProvider: JsonProvider() {
     }
 
 }
+        */
