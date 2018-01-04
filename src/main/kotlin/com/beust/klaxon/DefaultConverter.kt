@@ -77,6 +77,22 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
 
                 converter.fromJson(JsonValue(it, jv.property, klaxon))
             }
+            is JsonObject -> {
+                val jt = jv.property?.returnType?.javaType
+                when (jt) {
+                    is ParameterizedType -> {
+                        val cls = jt.actualTypeArguments[0] as Class<*>
+                        klaxon.fromJsonObject(value, cls, cls.kotlin)
+                    }
+                    is Class<*> -> {
+                        val cls = jv.property?.getter?.returnType?.javaType as Class<*>
+                        klaxon.fromJsonObject(value, cls, cls.kotlin)
+                    }
+                    else -> {
+                        throw KlaxonException("Don't know how to convert $value")
+                    }
+                }
+            }
             else -> {
                 throw KlaxonException("Don't know how to convert $value")
             }

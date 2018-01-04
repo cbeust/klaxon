@@ -83,6 +83,29 @@ class BindingTest {
 
     fun compoundObject() {
         val result = Klaxon()
+                .parse<Deck1>("""
+        {
+          "cardCount": 2,
+          "card":
+            {"value" : 5,"suit" : "Hearts"}
+        }
+        """)
+
+        if (result != null) {
+            Assert.assertEquals(result.cardCount, 2)
+            val card = result.card
+            if (card != null) {
+                Assert.assertEquals(card, Card(5, "Hearts"))
+            } else {
+                Assert.fail("Should have received a non null card")
+            }
+        } else {
+            Assert.fail("Should have received a non null deck")
+        }
+    }
+
+    fun compoundObjectWithConverter() {
+        val result = Klaxon()
                 .converter(CARD_CONVERTER)
                 .parse<Deck1>("""
         {
@@ -111,6 +134,26 @@ class BindingTest {
     )
 
     fun compoundObjectWithArray() {
+        val result = Klaxon()
+                .parse<Deck2>("""
+        {
+          "cardCount": 2,
+          "cards": [
+            {"value" : 5, "suit" : "Hearts"},
+            {"value" : 8, "suit" : "Spades"},
+          ]
+        }
+    """)
+
+        if (result != null) {
+            Assert.assertEquals(result.cardCount, 2)
+            Assert.assertEquals(result.cards, listOf(Card(5, "Hearts"), Card(8, "Spades")))
+        } else {
+            Assert.fail("Should have received a non null deck")
+        }
+    }
+
+    fun compoundObjectWithArrayWithConverter() {
         val result = Klaxon()
                 .converter(CARD_CONVERTER)
                 .parse<Deck2>("""
