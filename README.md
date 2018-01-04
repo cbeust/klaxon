@@ -18,11 +18,11 @@ dependencies {
 
 Klaxon has different API's depending on your needs:
 
-- A high level API that lets you bind JSON documents directly to your objects, and vice versa.
-- A low level API that lets you manipulate JSON objects and use queries on them.
-- [_Coming soon_] A streaming API so you can act on the JSON document as it's being read.
+- [An object binding API](#objectBindingApi) that lets you bind JSON documents directly to your objects, and vice versa.
+- [A low level API](#lowLevelApi)that lets you manipulate JSON objects and use queries on them.
+- [A streaming API](#streamingApi) so you can act on the JSON document as it's being read.
 
-## High level API (object binding)
+## <a name="objectBindingApi">Object binding API</a>
 
 ### General usage
 
@@ -180,7 +180,7 @@ Finally, declare the association between that converter and your annotation in y
 
 ``` 
 
-## Low level API
+## <a name="lowLevelApi">Low level API</a>
 
 Values parsed from a valid JSON file can be of the following type:
 
@@ -385,7 +385,7 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get pretty-printed
 version then you can call `toJsonString(true)`
 
-## Advanced DSL
+## <a name="advancedDsl">Advanced DSL</a>
 
 Creating a JSON object with the Klaxon DSL makes it possible to insert arbitrary pieces of Kotlin code anywhere you want. For example, the following creates an object that maps each number from 1 to 3 with its string key:
 
@@ -403,6 +403,8 @@ will output:
 ```text
 Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
 ```
+
+Functions that you can use inside a `json {}` expression are defined in the [`KlaxonJson`](https://github.com/cbeust/klaxon/blob/master/src/main/kotlin/com/beust/klaxon/KlaxonJson.kt) class.
 
 ## Flattening and path lookup
 
@@ -425,6 +427,26 @@ We can find all emails by
 ```kotlin
 (parse("my.json") as JsonObject).lookup<String?>("users.email")
 ```
+
+## <a name="streamingApi">Streaming API</a>
+
+The streaming API is useful in a few scenarios:
+
+- When your JSON document is very large and reading it all in memory might cause issues.
+- When you want your code to react as soon as JSON values are being read, without waiting for the entire document
+to be read.
+
+This second point is especially important to make mobile apps as responsive as possible and make them less reliant
+on network speed.
+
+### Writing JSON
+
+As opposed to conventional JSON libraries, Klaxon doesn't supply a `JsonWriter` class to create JSON documents since
+this need is already covered by the `json()` function, documented in the [Advanced DSL](#advancedDsl) section.
+
+### Reading JSON  
+
+<TBD>
 
 ## Implementation
 
