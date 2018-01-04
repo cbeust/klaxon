@@ -27,13 +27,14 @@ class JsonReaderK(val reader: Reader) : Reader() {
     fun nextObject() : JsonObject {
         skip()
         return beginObject {
-            val result = JsonObject()
-            while (hasNext()) {
-                val name = nextName()
-                val value = consumeValue { value -> value }
-                result[name] = value
+            JsonObject().let { result ->
+                while (hasNext()) {
+                    val name = nextName()
+                    val value = consumeValue { value -> value }
+                    result[name] = value
+                }
+                result
             }
-            result
         }
     }
 
@@ -42,17 +43,18 @@ class JsonReaderK(val reader: Reader) : Reader() {
      */
     fun nextArray() : List<Any> {
         skip()
-        val result = arrayListOf<Any>()
         return beginArray {
-            while (hasNext()) {
-                val v = consumeValue { value -> value }
-                if (v != null) {
-                    result.add(v)
-                } else {
-                    throw KlaxonException("Couldn't parse")
+            arrayListOf<Any>().let { result ->
+                while (hasNext()) {
+                    val v = consumeValue { value -> value }
+                    if (v != null) {
+                        result.add(v)
+                    } else {
+                        throw KlaxonException("Couldn't parse")
+                    }
                 }
+                result
             }
-            result
         }
     }
 
