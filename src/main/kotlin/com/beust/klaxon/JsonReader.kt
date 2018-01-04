@@ -6,12 +6,24 @@ import java.io.Reader
  * Manages JSON streaming.
  */
 class JsonReaderK(val reader: Reader) : Reader() {
+    /**
+     * @return the next String.
+     */
     fun nextString() = consumeValue { value -> value.toString() }
 
+    /**
+     * @return the next Int.
+     */
     fun nextInt() = consumeValue { value -> value as Int }
 
+    /**
+     * @return the next boolean.
+     */
     fun nextBoolean() = consumeValue { value -> value as Boolean }
 
+    /**
+     * @return the next object, making sure the current token is an open brace and the last token is a closing brace.
+     */
     fun nextObject() : JsonObject {
         skip()
         return beginObject {
@@ -25,6 +37,9 @@ class JsonReaderK(val reader: Reader) : Reader() {
         }
     }
 
+    /**
+     * @return the next array, making sure the current token is an open bracket and the last token is a closing bracket.
+     */
     fun nextArray() : List<Any> {
         skip()
         val result = arrayListOf<Any>()
@@ -41,9 +56,21 @@ class JsonReaderK(val reader: Reader) : Reader() {
         }
     }
 
+    /**
+     * @return the next name (the string left of a colon character).
+     */
+    fun nextName(): String {
+        skip()
+        val next = lexer.nextToken()
+        if (next.tokenType == Type.VALUE) {
+            return next.value.toString()
+        } else {
+            throw KlaxonException("Expected a name but got $next")
+        }
+    }
 
     /**
-     * Makes sure that the next token is the beginning of an object (open brace),
+     * Make sure that the next token is the beginning of an object (open brace),
      * consume it, run the closure and then make sure the object is closed (closed brace).
      */
     fun <T> beginObject(closure: () -> T) : T {
@@ -65,7 +92,7 @@ class JsonReaderK(val reader: Reader) : Reader() {
     }
 
     /**
-     * @return true of this reader has more tokens to read before finishing the current object/array.
+     * @return true if this reader has more tokens to read before finishing the current object/array.
      */
     fun hasNext(): Boolean = lexer.peek().tokenType.let { it != Type.RIGHT_BRACKET && it != Type.RIGHT_BRACE }
 
@@ -91,16 +118,6 @@ class JsonReaderK(val reader: Reader) : Reader() {
 
     private fun privateBeginObject() = consumeToken(Type.LEFT_BRACE, "{")
     private fun privateEndObject() = consumeToken(Type.RIGHT_BRACE, "}")
-
-    fun nextName(): String {
-        skip()
-        val next = lexer.nextToken()
-        if (next.tokenType == Type.VALUE) {
-            return next.value.toString()
-        } else {
-            throw KlaxonException("Expected a name but got $next")
-        }
-    }
 
     private val SKIPS = setOf(Type.COLON, Type.COMMA)
     private fun skip() {
