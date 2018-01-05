@@ -214,7 +214,14 @@ class Klaxon : ConverterFinder {
         return result
     }
 
+    /**
+     * Convert a JsonObject into a real value.
+     */
     fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>?): Any {
+        /**
+         * Retrieve all the properties found on the class of the object and then look up each of these
+         * properties names on `jsonObject`.
+         */
         fun retrieveKeyValues() : Map<String, Any> {
             val result = hashMapOf<String, Any>()
             kc?.declaredMemberProperties?.forEach { prop ->
@@ -238,11 +245,20 @@ class Klaxon : ConverterFinder {
                         throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
                                 + "field named \"${prop.name}\"")
                     }
+                } else {
+                    // Didn't find any value for that property: don't do anything. If a value is missing here,
+                    // it might still be found as a default value on the constructor, and we'll find out once we
+                    // try to instantiate that object.
                 }
             }
             return result
         }
 
+        /**
+         * Go through all the constructors found on that object and attempt to invoke them with the key values
+         * found on the object. We return the first successful instantiation, or fail with an exception if
+         * no suitable constructor was found.
+         */
         fun instantiateAndInitializeObject() : Any {
             val map = retrieveKeyValues()
 
@@ -257,6 +273,8 @@ class Klaxon : ConverterFinder {
                 try {
                     constructor.call(*params.toArray())
                 } catch(ex: Exception) {
+                    // Lazy way to find out of that constructor worked. Easier than trying to make sure each
+                    // parameter matches the parameter type.
                     null
                 }
             }
@@ -264,6 +282,7 @@ class Klaxon : ConverterFinder {
             return result ?: throw KlaxonException("Couldn't find a suitable constructor to initialize with $map")
         }
 
+        // If the user provided a type converter, use it, otherwise try to instantiate the object ourselves.
         val classConverter = findConverterFromClass(cls, null)
         val result =
             if (classConverter != DEFAULT_CONVERTER) {
