@@ -1,0 +1,10 @@
+
+2.0.2
+=====
+
+- Added: Streaming API
+
+2.0.0
+=====
+
+- Added: Object binding API
