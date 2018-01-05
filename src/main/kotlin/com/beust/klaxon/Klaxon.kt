@@ -257,7 +257,6 @@ class Klaxon : ConverterFinder {
                 try {
                     constructor.call(*params.toArray())
                 } catch(ex: Exception) {
-                    println("Constructor $constructor didn't work: $ex")
                     null
                 }
             }
