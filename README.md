@@ -26,13 +26,11 @@ Klaxon has different API's depending on your needs:
 
 ### General usage
 
-To use Klaxon's high level API, you define your objects as nullable `var`'s:
+To use Klaxon's high level API, you define your objects inside a class (note that with Klaxon, these data classes
+can be immutable):
 
 ```kotlin
-data class Person(
-    var name: String? = null,
-    var age: Int? = null
-)
+data class Person(val name: String, val age: Int)
 ```
 
 You then specify the class of your object as a type parameter when invoking the `parse()` function:
@@ -57,7 +55,7 @@ You can map names found in JSON with field names with the `@Json` annotation:
 ```kotlin
 data class Person(
     @Json(name = "the_name")
-    var name: String? = null,
+    val name: String
 )
 ```
 
@@ -93,7 +91,7 @@ For example, suppose you receive a JSON document with a field that can either be
 convert that field into your own type that's initialized with a boolean:
 
 ```kotlin
-    class BooleanHolder(var flag: Boolean? = null)
+    class BooleanHolder(val flag: Boolean)
 
     val myConverter = object: Converter<BooleanHolder> {
         override fun toJson(value: BooleanHolder): String?
@@ -143,10 +141,10 @@ Next, annotate the field that requires this specific handling in the constructor
 a constructor needs to be annotated with `@JvmOverloads`:
 
 ```kotlin
-    class WithDate @JvmOverloads constructor(
-        @KlaxonDate
-        var date: LocalDateTime? = null,
-    )
+class WithDate @JvmOverloads constructor(
+    @KlaxonDate
+    val date: LocalDateTime
+)
 ```
 
 Define your type converter (which has the same type as the converters defined previously). In this case, we

@@ -1,10 +1,10 @@
 package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
+import com.beust.klaxon.internal.firstNotNullResult
 import java.io.*
 import java.nio.charset.Charset
 import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredFunctions
@@ -215,16 +215,54 @@ class Klaxon : ConverterFinder {
     }
 
     fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>?): Any {
-        fun setField(obj: Any, prop: KProperty<*>, value: Any) {
-            if (prop is KMutableProperty<*>) {
-                try {
-                    prop.setter.call(obj, value)
-                } catch(ex: IllegalArgumentException) {
-                    throw KlaxonException("Can't set value $value on property $prop")
+        fun retrieveKeyValues() : Map<String, Any> {
+            val result = hashMapOf<String, Any>()
+            kc?.declaredMemberProperties?.forEach { prop ->
+                //
+                // Check if the name of the field was overridden with a @Json annotation
+                //
+                val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
+                val fieldName =
+                        if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
+                        else prop.name
+
+                // Retrieve the value of that property and convert it from JSON
+                val jValue = jsonObject[fieldName]
+
+                if (jValue != null) {
+                    val convertedValue = findConverterFromClass(cls, prop)
+                            .fromJson(JsonValue(jValue, prop, this@Klaxon))
+                    if (convertedValue != null) {
+                        result[prop.name] = convertedValue
+                    } else {
+                        throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
+                                + "field named \"${prop.name}\"")
+                    }
                 }
-            } else {
-                throw KlaxonException("Property $prop is not mutable")
             }
+            return result
+        }
+
+        fun instantiateAndInitializeObject() : Any {
+            val map = retrieveKeyValues()
+
+            val result = kc?.constructors?.firstNotNullResult { constructor ->
+                val params = arrayListOf<Any>()
+                constructor.parameters.forEach { parameter ->
+                    val convertedValue = map[parameter.name]
+                    if (convertedValue != null) {
+                        params.add(convertedValue)
+                    }
+                }
+                try {
+                    constructor.call(*params.toArray())
+                } catch(ex: Exception) {
+                    println("Constructor $constructor didn't work: $ex")
+                    null
+                }
+            }
+
+            return result ?: throw KlaxonException("Couldn't find a suitable constructor to initialize with $map")
         }
 
         val classConverter = findConverterFromClass(cls, null)
@@ -232,36 +270,7 @@ class Klaxon : ConverterFinder {
             if (classConverter != DEFAULT_CONVERTER) {
                 classConverter.fromJson(JsonValue(jsonObject, null, this@Klaxon)) as Any
             } else {
-                cls.newInstance().apply {
-                    kc?.declaredMemberProperties?.forEach { prop ->
-                        //
-                        // Check if the name of the field was overridden with a @Json annotation
-                        //
-                        val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
-                        val fieldName =
-                                if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
-                                else prop.name
-
-                        // Retrieve the value of that property and convert it from JSON
-                        val classConverter = findConverterFromClass(cls, null)
-                        val jValue = jsonObject[fieldName]
-
-                        if (jValue == null) {
-                            val jsonFields = jsonObject.keys.joinToString(",")
-                            throw KlaxonException("Don't know how to map class field \"$fieldName\" " +
-                                    "to any JSON field: $jsonFields")
-                        } else {
-                            val convertedValue = findConverterFromClass(cls, prop)
-                                    .fromJson(JsonValue(jValue, prop, this@Klaxon))
-                            if (convertedValue != null) {
-                                setField(this, prop, convertedValue)
-                            } else {
-                                throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
-                                        + "field named \"${prop.name}\"")
-                            }
-                        }
-                    }
-                }
+                instantiateAndInitializeObject()
             }
         return result
     }

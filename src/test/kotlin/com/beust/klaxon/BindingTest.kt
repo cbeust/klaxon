@@ -3,14 +3,8 @@ package com.beust.klaxon
 import org.testng.Assert
 import org.testng.annotations.Test
 
-data class Card(
-        var value: Int? = null,
-        var suit: String? = null
-)
-data class Deck1(
-        var card: Card? = null,
-        var cardCount: Int? = null
-)
+data class Card(val value: Int, val suit: String)
+data class Deck1(val card: Card, val cardCount: Int)
 
 @Test
 class BindingTest {
