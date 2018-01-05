@@ -66,25 +66,27 @@ class BindingTest {
         val result = Klaxon().parse<AllTypes>("""
         {
             "int": 42,
+            "array": [11, 12],
             "string": "foo",
             "isTrue": true,
-            "isFalse": false,
-            "array": [11, 12]
+            "isFalse": false
         }
         """)
         Assert.assertEquals(result, AllTypes(42, "foo", true, false, listOf(11, 12)))
     }
 
     fun compoundObject() {
-        val result = Klaxon()
-                .parse<Deck1>("""
-        {
-          "cardCount": 2,
-          "card":
-            {"value" : 5,"suit" : "Hearts"}
-        }
-        """)
+        val jsonString = json {
+            obj(
+                "cardCount" to 2,
+                "card" to obj(
+                    "value" to 5,
+                    "suit" to "Hearts"
+                )
+            )
+        }.toJsonString()
 
+        val result = Klaxon().parse<Deck1>(jsonString)
         if (result != null) {
             Assert.assertEquals(result.cardCount, 2)
             val card = result.card
