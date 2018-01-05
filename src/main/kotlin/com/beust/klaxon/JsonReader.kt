@@ -5,7 +5,7 @@ import java.io.Reader
 /**
  * Manages JSON streaming.
  */
-class JsonReaderK(val reader: Reader) : Reader() {
+class JsonReader(val reader: Reader) : Reader() {
     /**
      * @return the next String.
      */

@@ -25,7 +25,7 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
     }
 
     fun parse(reader: Reader): Any? {
-        return if (streaming) partialParseLoop(stateMachine, (reader as JsonReaderK).reader)
+        return if (streaming) partialParseLoop(stateMachine, (reader as JsonReader).reader)
             else fullParseLoop(stateMachine, reader)
     }
 
