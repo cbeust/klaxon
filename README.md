@@ -36,16 +36,16 @@ data class Person(val name: String, val age: Int)
 You then specify the class of your object as a type parameter when invoking the `parse()` function:
 
 ```kotlin
-    val result = Klaxon()
-        .parse<Person>("""
-        {
-          "name": "John Smith",
-          "age": 23
-        }
-    """)
+val result = Klaxon()
+    .parse<Person>("""
+    {
+      "name": "John Smith",
+      "age": 23
+    }
+""")
 
-    assertThat(result.name).isEqualTo("John Smith")
-    assertThat(result.age).isEqualTo(23)
+assertThat(result.name).isEqualTo("John Smith")
+assertThat(result.age).isEqualTo(23)
 ```
 
 ### Customizing field names
@@ -60,16 +60,16 @@ data class Person(
 ```
 
 ```kotlin
-    val result = Klaxon()
-        .parse<Person>("""
-        {
-          "the_name": "John Smith", // note the field name
-          "age": 23
-        }
-    """)
+val result = Klaxon()
+    .parse<Person>("""
+    {
+      "the_name": "John Smith", // note the field name
+      "age": 23
+    }
+""")
 
-    assertThat(result.name).isEqualTo("John Smith")
-    assertThat(result.age).isEqualTo(23)
+assertThat(result.name).isEqualTo("John Smith")
+assertThat(result.age).isEqualTo(23)
 ```
 
 ### Custom types
@@ -91,28 +91,28 @@ For example, suppose you receive a JSON document with a field that can either be
 convert that field into your own type that's initialized with a boolean:
 
 ```kotlin
-    class BooleanHolder(val flag: Boolean)
+class BooleanHolder(val flag: Boolean)
 
-    val myConverter = object: Converter<BooleanHolder> {
-        override fun toJson(value: BooleanHolder): String?
-            = """{"flag" : "${if (value.flag == true) 1 else 0}""""
-    
-        override fun fromJson(jv: JsonValue)
-            = BooleanHolder(jv.objInt("flag") != 0)
-    
-    }
+val myConverter = object: Converter<BooleanHolder> {
+    override fun toJson(value: BooleanHolder): String?
+        = """{"flag" : "${if (value.flag == true) 1 else 0}""""
+
+    override fun fromJson(jv: JsonValue)
+        = BooleanHolder(jv.objInt("flag") != 0)
+
+}
 ```
 
 Next, you declare your converter to your `Klaxon` object before parsing:
 
 ```kotlin
-    val result = Klaxon()
-        .converter(myConverter)
-        .parse<BooleanHolder>("""
-            { "flag" : 1 }
-        """)
+val result = Klaxon()
+    .converter(myConverter)
+    .parse<BooleanHolder>("""
+        { "flag" : 1 }
+    """)
 
-    assertThat(result?.flag).isTrue()
+assertThat(result?.flag).isTrue()
 ```
 
 ### JsonValue
@@ -161,21 +161,21 @@ val dateConverter = object: Converter<LocalDateTime> {
 
     override fun toJson(o: LocalDateTime)
             = """ { "date" : $o } """
+}
 ```
 
 Finally, declare the association between that converter and your annotation in your `Klaxon` object before parsing:
 
 ```kotlin
-    val result = Klaxon()
-        .fieldConverter(dateConverter)
-        .parse<WithDate>("""
-        {
-          "theDate": "2017-05-10 16:30"
-        }
-    """)
+val result = Klaxon()
+    .fieldConverter(dateConverter)
+    .parse<WithDate>("""
+    {
+      "theDate": "2017-05-10 16:30"
+    }
+""")
 
-    assertThat(result?.date).isEqualTo(LocalDateTime.of(2017, 5, 10, 16, 30))
-
+assertThat(result?.date).isEqualTo(LocalDateTime.of(2017, 5, 10, 16, 30))
 ``` 
 
 ## <a name="streamingApi">Streaming API</a>
@@ -199,34 +199,34 @@ this need is already covered by the `json()` function, documented in the [Advanc
 Streaming JSON is performed with the `JsonReader` class. Here is an example:
 
 ```kotlin
-    val objectString = """{
-         "name" : "Joe",
-         "age" : 23,
-         "flag" : true,
-         "array" : [1, 3],
-         "obj1" : { "a" : 1, "b" : 2 }
-    }"""
+val objectString = """{
+     "name" : "Joe",
+     "age" : 23,
+     "flag" : true,
+     "array" : [1, 3],
+     "obj1" : { "a" : 1, "b" : 2 }
+}"""
 
-    JsonReader(StringReader(objectString)).use { reader ->
-        reader.beginObject() {
-            var name: String? = null
-            var age: Int? = null
-            var flag: Boolean? = null
-            var array: List<Any> = arrayListOf<Any>()
-            var obj1: JsonObject? = null
-            while (reader.hasNext()) {
-                val readName = reader.nextName()
-                when (readName) {
-                    "name" -> name = reader.nextString()
-                    "age" -> age = reader.nextInt()
-                    "flag" -> flag = reader.nextBoolean()
-                    "array" -> array = reader.nextArray()
-                    "obj1" -> obj1 = reader.nextObject()
-                    else -> Assert.fail("Unexpected name: $readName")
-                }
+JsonReader(StringReader(objectString)).use { reader ->
+    reader.beginObject() {
+        var name: String? = null
+        var age: Int? = null
+        var flag: Boolean? = null
+        var array: List<Any> = arrayListOf<Any>()
+        var obj1: JsonObject? = null
+        while (reader.hasNext()) {
+            val readName = reader.nextName()
+            when (readName) {
+                "name" -> name = reader.nextString()
+                "age" -> age = reader.nextInt()
+                "flag" -> flag = reader.nextBoolean()
+                "array" -> array = reader.nextArray()
+                "obj1" -> obj1 = reader.nextObject()
+                else -> Assert.fail("Unexpected name: $readName")
             }
         }
     }
+}
 ```
 
 There are two special functions to be aware of: `beginObject()` and `beginArray()`. Use these functions
@@ -242,24 +242,24 @@ being an object in your code base. You can use the streaming API to consume the 
 use the object binding API to easily map these elements directly to one of your objects:
 
 ```kotlin
-    data class Person(val name: String, val age: Int)
-    val array = """[
-            { "name": "Joe", "age": 23 },
-            { "name": "Jill", "age": 35 }
-        ]"""
+data class Person(val name: String, val age: Int)
+val array = """[
+        { "name": "Joe", "age": 23 },
+        { "name": "Jill", "age": 35 }
+    ]"""
 
-    fun streamingArray() {
-        val klaxon = Klaxon()
-        JsonReader(StringReader(array)).use { reader ->
-            val result = arrayListOf<Person>()
-            reader.beginArray {
-                while (reader.hasNext()) {
-                    val person = klaxon.parse<Person1>(reader)
-                    result.add(person)
-                }
+fun streamingArray() {
+    val klaxon = Klaxon()
+    JsonReader(StringReader(array)).use { reader ->
+        val result = arrayListOf<Person>()
+        reader.beginArray {
+            while (reader.hasNext()) {
+                val person = klaxon.parse<Person1>(reader)
+                result.add(person)
             }
         }
     }
+}
 ```
 
 ## <a name="lowLevelApi">Low level API</a>
@@ -316,24 +316,24 @@ You can also access the JSON content as a file, or any other resource you can ge
 Let's query these values:
 
 ```kotlin
-    val firstName = obj.string("firstName")
-    val lastName = obj.string("lastName")
-    println("Name: $firstName $lastName")
+val firstName = obj.string("firstName")
+val lastName = obj.string("lastName")
+println("Name: $firstName $lastName")
 
-    // Prints: Name: Cedric Beust
+// Prints: Name: Cedric Beust
 ```
 
 `JsonObject` implements the following methods:
 
 ```kotlin
-    fun int(fieldName: String) : Int?
-    fun long(fieldName: String) : Long?
-    fun bigInt(fieldName: String) : BigInteger?
-    fun string(fieldName: String) : String?
-    fun double(fieldName: String) : Double?
-    fun boolean(fieldName: String) : Boolean?
-    fun obj(fieldName: String) : JsonObject?
-    fun <T> array(thisType: T, fieldName: String) : JsonArray<T>?
+fun int(fieldName: String) : Int?
+fun long(fieldName: String) : Long?
+fun bigInt(fieldName: String) : BigInteger?
+fun string(fieldName: String) : String?
+fun double(fieldName: String) : Double?
+fun boolean(fieldName: String) : Boolean?
+fun obj(fieldName: String) : JsonObject?
+fun <T> array(thisType: T, fieldName: String) : JsonArray<T>?
 ```
 
 `JsonArray` implements the same methods, except that they return `JsonArray`s of the same type. This allows you to easily fetch collections of fields or even sub-objects. For example, consider the following:
@@ -545,8 +545,7 @@ Solution: move that class definition outside of the function.
 
 ## Limitations
 
-* Currently reads the entire JSON content in memory, streaming is not available yet
-* Error handling is very primitive
+* Error handling is primitive
 
 
 
