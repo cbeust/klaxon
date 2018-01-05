@@ -8,7 +8,7 @@ val p = project {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
-    version = "2.0.1"
+    version = "2.0.2"
 
     dependencies {
         compile("org.jetbrains.kotlin:kotlin-reflect:1.1.4-3")
