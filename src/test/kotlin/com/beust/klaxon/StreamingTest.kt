@@ -52,7 +52,7 @@ class StreamingTest {
         }
     }
 
-    data class Person1(var name: String? = null, var age: Int? = null)
+    data class Person1(val name: String, val age: Int)
     val array = """[
             { "name": "Joe", "age": 23 },
             { "name": "Jill", "age": 35 }
