@@ -19,8 +19,8 @@ dependencies {
 Klaxon has different API's depending on your needs:
 
 - [An object binding API](#objectBindingApi) that lets you bind JSON documents directly to your objects, and vice versa.
-- [A low level API](#lowLevelApi)that lets you manipulate JSON objects and use queries on them.
 - [A streaming API](#streamingApi) so you can act on the JSON document as it's being read.
+- [A low level API](#lowLevelApi)that lets you manipulate JSON objects and use queries on them.
 
 ## <a name="objectBindingApi">Object binding API</a>
 
@@ -177,6 +177,90 @@ Finally, declare the association between that converter and your annotation in y
     assertThat(result?.date).isEqualTo(LocalDateTime.of(2017, 5, 10, 16, 30))
 
 ``` 
+
+## <a name="streamingApi">Streaming API</a>
+
+The streaming API is useful in a few scenarios:
+
+- When your JSON document is very large and reading it all in memory might cause issues.
+- When you want your code to react as soon as JSON values are being read, without waiting for the entire document
+to be parsed.
+
+This second point is especially important to make mobile apps as responsive as possible and make them less reliant
+on network speed.
+
+### Writing JSON with the streaming API
+
+As opposed to conventional JSON libraries, Klaxon doesn't supply a `JsonWriter` class to create JSON documents since
+this need is already covered by the `json()` function, documented in the [Advanced DSL](#advancedDsl) section.
+
+### Reading JSON with the streaming API
+
+Streaming JSON is performed with the `JsonReader` class. Here is an example:
+
+```kotlin
+    val objectString = """{
+         "name" : "Joe",
+         "age" : 23,
+         "flag" : true,
+         "array" : [1, 3],
+         "obj1" : { "a" : 1, "b" : 2 }
+    }"""
+
+    JsonReader(StringReader(objectString)).use { reader ->
+        reader.beginObject() {
+            var name: String? = null
+            var age: Int? = null
+            var flag: Boolean? = null
+            var array: List<Any> = arrayListOf<Any>()
+            var obj1: JsonObject? = null
+            while (reader.hasNext()) {
+                val readName = reader.nextName()
+                when (readName) {
+                    "name" -> name = reader.nextString()
+                    "age" -> age = reader.nextInt()
+                    "flag" -> flag = reader.nextBoolean()
+                    "array" -> array = reader.nextArray()
+                    "obj1" -> obj1 = reader.nextObject()
+                    else -> Assert.fail("Unexpected name: $readName")
+                }
+            }
+        }
+    }
+```
+
+There are two special functions to be aware of: `beginObject()` and `beginArray()`. Use these functions
+when you are about to read an object or an array from your JSON stream. These functions will make sure
+that the stream is correctly positioned (open brace or open bracket) and once you are done consuming
+the content of that entity, the functions will make sure that your object is correctly closed (closing brace
+or closing bracket). Note that these functions accept a closure as an argument, so there are no `closeObject()/closeArray()` functions.
+
+It is possible to mix both the object binding and streaming API's, so you can benefit from the best of both worlds.
+
+For example, suppose your JSON document contains an array with thousands of elements in them, each of these elements
+being an object in your code base. You can use the streaming API to consume the array one element at a time and then
+use the object binding API to easily map these elements directly to one of your objects:
+
+```kotlin
+    data class Person(val name: String, val age: Int)
+    val array = """[
+            { "name": "Joe", "age": 23 },
+            { "name": "Jill", "age": 35 }
+        ]"""
+
+    fun streamingArray() {
+        val klaxon = Klaxon()
+        JsonReader(StringReader(array)).use { reader ->
+            val result = arrayListOf<Person>()
+            reader.beginArray {
+                while (reader.hasNext()) {
+                    val person = klaxon.parse<Person1>(reader)
+                    result.add(person)
+                }
+            }
+        }
+    }
+```
 
 ## <a name="lowLevelApi">Low level API</a>
 
@@ -425,26 +509,6 @@ We can find all emails by
 ```kotlin
 (parse("my.json") as JsonObject).lookup<String?>("users.email")
 ```
-
-## <a name="streamingApi">Streaming API</a>
-
-The streaming API is useful in a few scenarios:
-
-- When your JSON document is very large and reading it all in memory might cause issues.
-- When you want your code to react as soon as JSON values are being read, without waiting for the entire document
-to be read.
-
-This second point is especially important to make mobile apps as responsive as possible and make them less reliant
-on network speed.
-
-### Writing JSON
-
-As opposed to conventional JSON libraries, Klaxon doesn't supply a `JsonWriter` class to create JSON documents since
-this need is already covered by the `json()` function, documented in the [Advanced DSL](#advancedDsl) section.
-
-### Reading JSON  
-
-<TBD>
 
 ## Implementation
 
