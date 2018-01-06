@@ -26,14 +26,27 @@ Klaxon has different API's depending on your needs:
 
 ### General usage
 
-To use Klaxon's high level API, you define your objects inside a class (note that with Klaxon, these data classes
-can be immutable):
+To use Klaxon's high level API, you define your objects inside a class. Klaxon supports all the classes you can
+define in Kotlin as long as they are not generic:
+
+- Regular and data classes
+- Mutable and immutable classes
+- Classes with default parameters
+
+For example:
 
 ```kotlin
-data class Person(val name: String, val age: Int)
+class Person(val name: String, val age: Int)
 ```
 
-You then specify the class of your object as a type parameter when invoking the `parse()` function:
+Note that for classes with default parameters, you need to specify the `@JvmOverloads` annotation on
+your constructor:
+
+```kotlin
+class Person @JvmOverloads constructor(val name: String, var age: Int = 23)
+```
+
+Once you've specified your value class, you invoke the `parse()` function, parameterized with that class:
 
 ```kotlin
 val result = Klaxon()

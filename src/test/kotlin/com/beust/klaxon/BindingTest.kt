@@ -172,7 +172,7 @@ class BindingTest {
 
     class Mapping @JvmOverloads constructor(
             @field:Json(name = "theName")
-            var name: String? = null
+            val name: String
     )
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
@@ -217,10 +217,10 @@ class BindingTest {
         Assert.assertEquals(result?.idLong, expectedLong)
     }
 
-    class Person @JvmOverloads constructor(val age: Int, var name: String = "Foo")
+    class PersonWithDefaults @JvmOverloads constructor(val age: Int, var name: String = "Foo")
     fun defaultParameters() {
 
-        val result = Klaxon().parse<Person>(json {
+        val result = Klaxon().parse<PersonWithDefaults>(json {
             obj(
                 "age" to 23
             )
