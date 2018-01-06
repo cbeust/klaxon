@@ -15,7 +15,7 @@ val p = project {
     }
 
     dependenciesTest {
-        compile("org.testng:testng:6.11",
+        compile("org.testng:testng:6.13.1",
                 "org.jetbrains.kotlin:kotlin-test:1.1.51")
     }
 
