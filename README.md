@@ -18,9 +18,9 @@ dependencies {
 
 Klaxon has different API's depending on your needs:
 
-- [An object binding API](#objectBindingApi) that lets you bind JSON documents directly to your objects, and vice versa.
-- [A streaming API](#streamingApi) so you can act on the JSON document as it's being read.
-- [A low level API](#lowLevelApi)that lets you manipulate JSON objects and use queries on them.
+- [An object binding API](#objectBindingApi) to bind JSON documents directly to your objects, and vice versa.
+- [A streaming API](#streamingApi) to process your JSON documents as they're being read.
+- [A low level API](#lowLevelApi) to manipulate JSON objects and use queries on them.
 
 ## <a name="objectBindingApi">Object binding API</a>
 
@@ -29,9 +29,9 @@ Klaxon has different API's depending on your needs:
 To use Klaxon's high level API, you define your objects inside a class. Klaxon supports all the classes you can
 define in Kotlin as long as they are not generic:
 
-- Regular and data classes
-- Mutable and immutable classes
-- Classes with default parameters
+- Regular and `data` classes.
+- Mutable and immutable classes.
+- Classes with default parameters.
 
 For example:
 
@@ -55,10 +55,10 @@ val result = Klaxon()
       "name": "John Smith",
       "age": 23
     }
-""")
+    """)
 
-assertThat(result.name).isEqualTo("John Smith")
-assertThat(result.age).isEqualTo(23)
+assert(result.name == "John Smith")
+assert(result.age == 23)
 ```
 
 ### Customizing field names
@@ -81,8 +81,8 @@ val result = Klaxon()
     }
 """)
 
-assertThat(result.name).isEqualTo("John Smith")
-assertThat(result.age).isEqualTo(23)
+assert(result.name == "John Smith")
+assert(result.age == 23)
 ```
 
 ### Custom types
@@ -125,7 +125,7 @@ val result = Klaxon()
         { "flag" : 1 }
     """)
 
-assertThat(result?.flag).isTrue()
+assert(result.flag)
 ```
 
 ### JsonValue
@@ -188,7 +188,7 @@ val result = Klaxon()
     }
 """)
 
-assertThat(result?.date).isEqualTo(LocalDateTime.of(2017, 5, 10, 16, 30))
+assert(result?.date == LocalDateTime.of(2017, 5, 10, 16, 30))
 ``` 
 
 ## <a name="streamingApi">Streaming API</a>
