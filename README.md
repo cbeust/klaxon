@@ -53,7 +53,6 @@ val result = Klaxon()
     .parse<Person>("""
     {
       "name": "John Smith",
-      "age": 23
     }
     """)
 
