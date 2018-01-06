@@ -11,7 +11,7 @@ val p = project {
     version = "2.0.2"
 
     dependencies {
-        compile("org.jetbrains.kotlin:kotlin-reflect:1.1.4-3")
+        compile("org.jetbrains.kotlin:kotlin-reflect:1.1.51")
     }
 
     dependenciesTest {
