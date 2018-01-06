@@ -216,4 +216,17 @@ class BindingTest {
         Assert.assertEquals(result?.idShort, expectedShort.toLong())
         Assert.assertEquals(result?.idLong, expectedLong)
     }
+
+    class Person @JvmOverloads constructor(val age: Int, var name: String = "Foo")
+    fun defaultParameters() {
+
+        val result = Klaxon().parse<Person>(json {
+            obj(
+                "age" to 23
+            )
+        }.toJsonString())!!
+
+        Assert.assertEquals(result.age, 23)
+        Assert.assertEquals(result.name, "Foo")
+    }
 }
