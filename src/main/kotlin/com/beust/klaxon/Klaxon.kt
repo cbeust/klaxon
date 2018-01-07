@@ -263,23 +263,18 @@ class Klaxon : ConverterFinder {
             val map = retrieveKeyValues()
 
             // Go through all the Kotlin constructors and associate each parameter with its value.
-            // (Kotlin constructors contain the names of their parameters as opposed to Java constructors)
-            val kotlinConstructors = kc?.constructors
-            val params = arrayListOf<Any>()
-            kotlinConstructors?.forEach { constructor ->
+            // (Kotlin constructors contain the names of their parameters as opposed to Java constructors).
+            // Note that this code will work for default parameters as well: values missing in the JSON map
+            // will be filled by Kotlin reflection if they can't be found.
+            val result = kc?.constructors?.firstNotNullResult { constructor ->
+                val parameterMap = hashMapOf<KParameter,Any>()
                 constructor.parameters.forEach { parameter ->
-                    val convertedValue = map[parameter.name]
-                    if (convertedValue != null) {
-                        params.add(convertedValue)
+                    map[parameter.name]?.let { convertedValue ->
+                        parameterMap[parameter] = convertedValue
                     }
                 }
-            }
-
-            // Attempt to invoke each Java constructor with the parameters built above
-            // If the user used @JvmOverloads, we should end up finding a matching constructor
-            val result = cls.constructors.toList().firstNotNullResult { constructor ->
                 try {
-                    constructor.newInstance(*params.toArray())
+                    constructor.callBy(parameterMap)
                 } catch(ex: Exception) {
                     // Lazy way to find out of that constructor worked. Easier than trying to make sure each
                     // parameter matches the parameter type.

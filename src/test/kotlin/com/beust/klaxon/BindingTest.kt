@@ -217,7 +217,7 @@ class BindingTest {
         Assert.assertEquals(result?.idLong, expectedLong)
     }
 
-    class PersonWithDefaults @JvmOverloads constructor(val age: Int, var name: String = "Foo")
+    class PersonWithDefaults(val age: Int, var name: String = "Foo")
     fun defaultParameters() {
 
         val result = Klaxon().parse<PersonWithDefaults>(json {

@@ -39,11 +39,10 @@ For example:
 class Person(val name: String, val age: Int)
 ```
 
-Note that for classes with default parameters, you need to specify the `@JvmOverloads` annotation on
-your constructor:
+Classes with default parameters are supported as well:
 
 ```kotlin
-class Person @JvmOverloads constructor(val name: String, var age: Int = 23)
+class Person (val name: String, var age: Int = 23)
 ```
 
 Once you've specified your value class, you invoke the `parse()` function, parameterized with that class:
