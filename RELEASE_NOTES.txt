@@ -1,3 +1,8 @@
+2.0.5
+=====
+
+- Fix how Maps are mapped.
+
 2.0.4
 =====
 
