@@ -1,5 +1,6 @@
 
 import com.beust.kobalt.plugin.java.javaCompiler
+import com.beust.kobalt.plugin.kotlin.kotlinCompiler
 import com.beust.kobalt.plugin.packaging.assemble
 import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
@@ -29,5 +30,9 @@ val p = project {
 
     javaCompiler {
         args("-source", "1.7", "-target", "1.7")
+    }
+
+    kotlinCompiler {
+        args("-no-stdlib")
     }
 }
