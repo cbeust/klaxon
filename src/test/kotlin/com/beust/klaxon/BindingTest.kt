@@ -37,9 +37,9 @@ class BindingTest {
     val CARD_CONVERTER = object: Converter<Card> {
         override fun fromJson(jv: JsonValue) = Card(jv.objInt("value"), jv.objString("suit"))
 
-        override fun toJson(o: Card) = """
-                    "value" : ${o.value},
-                    "suit": "${o.suit?.toUpperCase()}"
+        override fun toJson(value: Card) = """
+                    "value" : ${value.value},
+                    "suit": "${value.suit.toUpperCase()}"
                 """
     }
 
@@ -88,13 +88,7 @@ class BindingTest {
 
         val result = Klaxon().parse<Deck1>(jsonString)
         if (result != null) {
-            Assert.assertEquals(result.cardCount, 2)
-            val card = result.card
-            if (card != null) {
-                Assert.assertEquals(card, Card(5, "Hearts"))
-            } else {
-                Assert.fail("Should have received a non null card")
-            }
+            Assert.assertEquals(result, Deck1(Card(5, "Hearts"), 2))
         } else {
             Assert.fail("Should have received a non null deck")
         }
@@ -112,13 +106,7 @@ class BindingTest {
         """)
 
         if (result != null) {
-            Assert.assertEquals(result.cardCount, 2)
-            val card = result.card
-            if (card != null) {
-                Assert.assertEquals(card, Card(5, "Hearts"))
-            } else {
-                Assert.fail("Should have received a non null card")
-            }
+            Assert.assertEquals(result, Deck1(Card(5, "Hearts"), 2))
         } else {
             Assert.fail("Should have received a non null deck")
         }
