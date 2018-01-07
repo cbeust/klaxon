@@ -20,7 +20,7 @@ class StreamingTest {
              "obj1": { "a":1, "b":2 }
         }"""
 
-        JsonReader(StringReader(objectString)).let { reader ->
+        JsonReader(StringReader(objectString)).use { reader ->
             reader.beginObject() {
                 var name: String? = null
                 var age: Int? = null
@@ -60,7 +60,7 @@ class StreamingTest {
 
     fun streamingArray() {
         val klaxon = Klaxon()
-        JsonReader(StringReader(array)).let { reader ->
+        JsonReader(StringReader(array)).use { reader ->
             val result = arrayListOf<Person1>()
             reader.beginArray {
                 while (reader.hasNext()) {
