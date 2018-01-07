@@ -81,8 +81,29 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
                 val jt = jv.property?.returnType?.javaType
                 when (jt) {
                     is ParameterizedType -> {
-                        val cls = jt.actualTypeArguments[0] as Class<*>
-                        klaxon.fromJsonObject(value, cls, cls.kotlin)
+                        val rawType = jt.rawType as Class<*>
+                        val isMap = Map::class.java.isAssignableFrom(rawType)
+                        val isCollection = Collection::class.java.isAssignableFrom(rawType)
+                        if (isCollection) {
+                            val cls = jt.actualTypeArguments[0] as Class<*>
+                            klaxon.fromJsonObject(value, cls, cls.kotlin)
+                        } else if (isMap) {
+                            val result = linkedMapOf<String, Any>()
+                            value.entries.forEach { kv ->
+                                val key = kv.key
+                                kv.value?.let { mv ->
+                                    val vc = mv::class.java
+                                    val converter = klaxon.findConverterFromClass(vc, null)
+                                    val convertedValue = converter.fromJson(JsonValue(mv, null, klaxon))
+                                    if (convertedValue != null) {
+                                        result[key] = convertedValue
+                                    }
+                                }
+                            }
+                            result
+                        } else {
+                            throw KlaxonException("Can't convert generic value $value")
+                        }
                     }
                     is Class<*> -> {
                         val cls = jv.property.getter.returnType.javaType as Class<*>

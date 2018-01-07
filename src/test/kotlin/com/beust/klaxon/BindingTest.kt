@@ -137,6 +137,21 @@ class BindingTest {
         }
     }
 
+    fun compoundObjectWithObjectWithConverter() {
+        val json = """{
+            "preferences": [1,2,3],
+            "properties":{"a":"b"}
+            }"""
+
+        data class Person(
+                val preferences: List<Int>,
+                val properties: Map<String, String> = sortedMapOf("a" to "b")
+        )
+
+        val p: Person = Klaxon().parse(json)!!
+        Assert.assertEquals(p, Person(listOf(1, 2, 3), mapOf("a" to "b")))
+    }
+
     fun compoundObjectWithArrayWithConverter() {
         val result = Klaxon()
                 .converter(CARD_CONVERTER)
@@ -217,4 +232,5 @@ class BindingTest {
         Assert.assertEquals(result.age, 23)
         Assert.assertEquals(result.name, "Foo")
     }
+
 }
