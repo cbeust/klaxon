@@ -11,12 +11,12 @@ import java.nio.charset.Charset
  */
 class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = false) {
     fun parse(rawValue: StringBuilder): Any? =
-        StringReader(rawValue.toString()).use {
+        StringReader(rawValue.toString()).let {
             parse(it)
         }
 
     fun parse(fileName: String) : Any? =
-        FileInputStream(File(fileName)).use {
+        FileInputStream(File(fileName)).let {
             parse(it)
         }
 

@@ -170,7 +170,7 @@ class BindingTest {
         }
     }
 
-    class Mapping @JvmOverloads constructor(
+    class Mapping(
             @field:Json(name = "theName")
             val name: String
     )

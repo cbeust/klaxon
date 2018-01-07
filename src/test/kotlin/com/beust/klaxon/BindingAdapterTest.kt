@@ -12,7 +12,7 @@ annotation class KlaxonDayOfTheWeek
 
 @Test
 class BindingAdapterTest {
-    class WrongFieldAdapter @JvmOverloads constructor (
+    class WrongFieldAdapter(
         @KlaxonDate
         var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
@@ -32,7 +32,7 @@ class BindingAdapterTest {
         }
     }
 
-    class WithDate @JvmOverloads constructor(
+    class WithDate(
         @Json(name = "theDate")
         @KlaxonDate
         var date: LocalDateTime? = null,
