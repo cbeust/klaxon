@@ -1,4 +1,4 @@
-2.0.3
+2.0.4
 =====
 
 - Removed the restriction for @JvmOverloads for classes with default parameters.
