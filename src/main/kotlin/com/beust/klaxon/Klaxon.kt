@@ -10,6 +10,7 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.functions
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.javaType
 
@@ -266,6 +267,7 @@ class Klaxon : ConverterFinder {
             // (Kotlin constructors contain the names of their parameters as opposed to Java constructors).
             // Note that this code will work for default parameters as well: values missing in the JSON map
             // will be filled by Kotlin reflection if they can't be found.
+            var error: String? = null
             val result = kc?.constructors?.firstNotNullResult { constructor ->
                 val parameterMap = hashMapOf<KParameter,Any>()
                 constructor.parameters.forEach { parameter ->
@@ -274,15 +276,20 @@ class Klaxon : ConverterFinder {
                     }
                 }
                 try {
+                    if (! constructor.isAccessible) {
+                        constructor.isAccessible = true
+                    }
                     constructor.callBy(parameterMap)
                 } catch(ex: Exception) {
                     // Lazy way to find out of that constructor worked. Easier than trying to make sure each
                     // parameter matches the parameter type.
+                    error = ex::class.qualifiedName + " " + ex.message
                     null
                 }
             }
 
-            return result ?: throw KlaxonException("Couldn't find a suitable constructor to initialize with $map")
+            return result ?: throw KlaxonException(
+                    "Couldn't find a suitable constructor for class ${kc?.simpleName} to initialize with $map: $error")
         }
 
         // If the user provided a type converter, use it, otherwise try to instantiate the object ourselves.

@@ -222,7 +222,6 @@ class BindingTest {
 
     class PersonWithDefaults(val age: Int, var name: String = "Foo")
     fun defaultParameters() {
-
         val result = Klaxon().parse<PersonWithDefaults>(json {
             obj(
                 "age" to 23
@@ -233,4 +232,15 @@ class BindingTest {
         Assert.assertEquals(result.name, "Foo")
     }
 
+    sealed class Dir(val name: String) {
+        class Left(val n: Int): Dir("Left")
+    }
+    fun sealedClass() {
+        val result = Klaxon().parse<Dir.Left>("""{
+            "n": 2
+        }"""
+        )!!
+
+        Assert.assertEquals(result.n, 2)
+    }
 }

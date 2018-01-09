@@ -19,7 +19,8 @@ class TestLexerInputSize {
                 if (i == -1) i++
                 read++
                 if (read > 2 * DEFAULT_BUFFER_SIZE) {
-                    throw AssertionError("Was read ($read) more than expected (2 * DEFAULT_BUFFER_SIZE($DEFAULT_BUFFER_SIZE)) bytes")
+                    throw AssertionError("Was read ($read) more than expected" +
+                            " (2 * DEFAULT_BUFFER_SIZE($DEFAULT_BUFFER_SIZE)) bytes")
                 }
                 return i++
             }
