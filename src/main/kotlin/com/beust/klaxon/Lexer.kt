@@ -29,7 +29,7 @@ data class Token(val tokenType: Type, val value: Any? = null) {
 /**
  * if `lenient` is true, names (the identifiers left of the colon) are allowed to not be surrounded by double quotes.
  */
-class Lexer(val reader: Reader, val lenient: Boolean = false): Iterator<Token> {
+class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<Token> {
     private val EOF = Token(Type.EOF, null)
     var index = 0
     var line = 1
@@ -42,7 +42,7 @@ class Lexer(val reader: Reader, val lenient: Boolean = false): Iterator<Token> {
         return c == ' ' || c == '\r' || c == '\n' || c == '\t'
     }
 
-    private val bufferedReader = reader//reader.buffered()
+    private val reader = passedReader.buffered()
     private var next: Char?
 
     init {
@@ -53,7 +53,7 @@ class Lexer(val reader: Reader, val lenient: Boolean = false): Iterator<Token> {
     private fun nextChar(): Char {
         if (isDone()) throw IllegalStateException("Cannot get next char: EOF reached")
         val c = next!!
-        next = bufferedReader.read().let { if (it == -1) null else it.toChar() }
+        next = reader.read().let { if (it == -1) null else it.toChar() }
         index++
 //        log("Next char: '$c' index:$index")
         return c
