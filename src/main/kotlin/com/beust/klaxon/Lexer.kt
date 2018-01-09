@@ -14,7 +14,7 @@ enum class Type {
     EOF
 }
 
-class Token(val tokenType: Type, val value: Any?) {
+data class Token(val tokenType: Type, val value: Any? = null) {
     override fun toString() : String {
         val v =
             if (value != null) {
@@ -26,7 +26,10 @@ class Token(val tokenType: Type, val value: Any?) {
     }
 }
 
-class Lexer(val reader: Reader) {
+/**
+ * if `lenient` is true, names (the identifiers left of the colon) are allowed to not be surrounded by double quotes.
+ */
+class Lexer(reader: Reader, val lenient: Boolean = false): Iterator<Token> {
     private val EOF = Token(Type.EOF, null)
     private var index = 1
 
@@ -82,6 +85,9 @@ class Lexer(val reader: Reader) {
         return peeked!!
     }
 
+    override fun next() = nextToken()
+    override fun hasNext() = peek() != EOF
+
     fun nextToken(): Token {
         val result =
             if (peeked != null) {
@@ -93,6 +99,8 @@ class Lexer(val reader: Reader) {
             }
         return result
     }
+
+    private var expectName = false
 
     private fun actualNextToken() : Token {
 
@@ -109,7 +117,10 @@ class Lexer(val reader: Reader) {
             c = nextChar()
         }
 
-        if ('"' == c) {
+        if ('"' == c || (lenient && expectName)) {
+            if (lenient) {
+                currentValue.append(c)
+            }
             tokenType = Type.VALUE
             loop@
             do {
@@ -117,7 +128,7 @@ class Lexer(val reader: Reader) {
                     throw RuntimeException("Unterminated string")
                 }
 
-                c = nextChar()
+                c = if (lenient) peekChar() else nextChar()
                 when (c) {
                     '\\' -> {
                         if (isDone()) {
@@ -147,23 +158,40 @@ class Lexer(val reader: Reader) {
                         }
                     }
                     '"' -> break@loop
-                    else -> currentValue.append(c)
+                    else ->
+                        if (lenient) {
+                            if (! c.isJavaIdentifierPart()) {
+                                expectName = false
+                                break@loop
+                            } else {
+                                currentValue.append(c)
+                                c = nextChar()
+                            }
+                        } else {
+                            currentValue.append(c)
+                        }
                 }
             } while (true)
 
             jsonValue = currentValue.toString()
         } else if ('{' == c) {
             tokenType = Type.LEFT_BRACE
+            expectName = true
         } else if ('}' == c) {
             tokenType = Type.RIGHT_BRACE
+            expectName = false
         } else if ('[' == c) {
             tokenType = Type.LEFT_BRACKET
+            expectName = false
         } else if (']' == c) {
             tokenType = Type.RIGHT_BRACKET
+            expectName = false
         } else if (':' == c) {
             tokenType = Type.COLON
+            expectName = false
         } else if (',' == c) {
             tokenType = Type.COMMA
+            expectName = true
         } else if (! isDone()) {
             while (isValueLetter(c)) {
                 currentValue.append(c)
