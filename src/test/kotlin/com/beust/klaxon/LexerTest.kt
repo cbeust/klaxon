@@ -22,7 +22,7 @@ class LexerTest {
             "ab": 1,
             "ab": 12
         }"""
-        testLexer(s, Lexer(StringReader(s)))
+        testLexer(Lexer(StringReader(s)))
     }
 
     fun lenient() {
@@ -32,10 +32,10 @@ class LexerTest {
             ab: 12
             }
             """
-        testLexer(s, Lexer(StringReader(s), lenient = true))
+        testLexer(Lexer(StringReader(s), lenient = true))
     }
 
-    private fun testLexer(s: String, lexer: Lexer) {
+    private fun testLexer(lexer: Lexer) {
         val result = Sequence{ -> lexer }.map { it }.toList()
         Assert.assertEquals(result, expected)
     }
