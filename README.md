@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:2.0.3'
+    compile 'com.beust:klaxon:2.0.5'
 }
 ```
 
