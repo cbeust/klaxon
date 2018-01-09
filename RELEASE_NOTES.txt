@@ -2,6 +2,14 @@
 =====
 
 - Fix how Maps are mapped.
+=======
+
+
+2.0.5
+=====
+
+- Performance improvement
+- Better error message
 
 2.0.4
 =====
