@@ -25,6 +25,16 @@ class World(var status : Status) {
         return this
     }
 
+    /**
+     * The index of the character we are currently on.
+     */
+    var index: Int = 0
+
+    /**
+     * The current line.
+     */
+    var line: Int = 0
+
     fun popValue() : Any {
         return valueStack.removeFirst()
     }
@@ -49,4 +59,5 @@ class World(var status : Status) {
     fun hasValues() : Boolean {
         return valueStack.size > 1
     }
+
 }

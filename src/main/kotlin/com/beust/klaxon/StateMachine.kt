@@ -13,12 +13,12 @@ class StateMachine(private val streaming: Boolean) {
         val pair = TokenStatus(world.status, token.tokenType)
         val processor = map[pair]
 
-//        println("${status} ${token.tokenType} -> ${world.status}")
         return if (processor != null) {
             processor(world, token)
         } else {
             if (!streaming) {
-                val message = "No state found: ${world.status} $token"
+                val message = "Did not expect ${token.tokenType} at line ${world.line}" +
+                    " (internal error: \"No processor found for: (${world.status}, $token)\""
                 throw KlaxonException(message)
             } else {
                 World(Status.EOF)

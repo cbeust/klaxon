@@ -29,18 +29,20 @@ data class Token(val tokenType: Type, val value: Any? = null) {
 /**
  * if `lenient` is true, names (the identifiers left of the colon) are allowed to not be surrounded by double quotes.
  */
-class Lexer(reader: Reader, val lenient: Boolean = false): Iterator<Token> {
+class Lexer(val reader: Reader, val lenient: Boolean = false): Iterator<Token> {
     private val EOF = Token(Type.EOF, null)
-    private var index = 1
+    var index = 0
+    var line = 1
 
     private val NUMERIC = Pattern.compile("[-]?[0-9]+")
     private val DOUBLE = Pattern.compile(NUMERIC.toString() + "((\\.[0-9]+)?([eE][-+]?[0-9]+)?)")!!
 
     private fun isSpace(c: Char): Boolean {
+        if (c == '\n') line++
         return c == ' ' || c == '\r' || c == '\n' || c == '\t'
     }
 
-    private val buffererReader = reader//reader.buffered()
+    private val bufferedReader = reader//reader.buffered()
     private var next: Char?
 
     init {
@@ -51,9 +53,9 @@ class Lexer(reader: Reader, val lenient: Boolean = false): Iterator<Token> {
     private fun nextChar(): Char {
         if (isDone()) throw IllegalStateException("Cannot get next char: EOF reached")
         val c = next!!
-        next = buffererReader.read().let { if (it == -1) null else it.toChar() }
+        next = bufferedReader.read().let { if (it == -1) null else it.toChar() }
         index++
-        log("Next char: '$c'")
+//        log("Next char: '$c' index:$index")
         return c
     }
 
@@ -141,7 +143,10 @@ class Lexer(reader: Reader, val lenient: Boolean = false): Iterator<Token> {
                             '/' -> currentValue.append("/")
                             'b' -> currentValue.append("\b")
                             'f' -> currentValue.append("\u000c")
-                            'n' -> currentValue.append("\n")
+                            'n' -> {
+                                currentValue.append("\n")
+                                line++
+                            }
                             'r' -> currentValue.append("\r")
                             't' -> currentValue.append("\t")
                             'u' -> {
