@@ -321,4 +321,32 @@ class KlaxonTest {
 
         assertEquals(valueToString(list), "[null,1,true,false,\"a\"]")
     }
+
+
+
+    data class StockEntry(
+            val date: String,
+            val close: Double,
+            val volume: Int,
+            val open: Double,
+            val high: Double,
+            val low: Double
+    )
+
+    fun issue77() {
+        val json = """
+            [
+          {
+            "date": "2018/01/10",
+            "close": 0.25,
+            "volume": 500000,
+            "open": 0.5,
+            "high": 0.5,
+            "low": 0.25
+          }
+        ]
+        """
+        val data = Klaxon().parseArray<StockEntry>(json)
+        println(data)
+    }
 }
