@@ -7,8 +7,10 @@ import java.nio.charset.Charset
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
+import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
@@ -225,10 +227,17 @@ class Klaxon : ConverterFinder {
          */
         fun retrieveKeyValues() : Map<String, Any> {
             val result = hashMapOf<String, Any>()
-            kc?.declaredMemberProperties?.forEach { prop ->
+
+            // Only keep the properties that are public and do not have @Json(ignored = true)
+            val allProperties = kc?.declaredMemberProperties?.filter {
+                val ignored = it.findAnnotation<Json>()?.ignored
+                it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
+            }
+            allProperties?.forEach { prop ->
                 //
                 // Check if the name of the field was overridden with a @Json annotation
                 //
+                val prop = kc.declaredMemberProperties.first { it.name == prop.name }
                 val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
                 val fieldName =
                         if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name

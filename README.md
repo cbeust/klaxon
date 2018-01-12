@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:2.0.6'
+    compile 'com.beust:klaxon:2.0.7'
 }
 ```
 
@@ -59,9 +59,15 @@ assert(result.name == "John Smith")
 assert(result.age == 23)
 ```
 
-### Customizing field names
+### The @Json annotation
 
-You can map names found in JSON with field names with the `@Json` annotation:
+The `@Json` annotation allows you to customize how the mapping between your JSON documents and
+your Kotlin objects is performed. It supports the following attributes:
+
+#### `name`
+
+Use the `name` attribute when your Kotlin property has a different name than the field found in your
+JSON document:
 
 ```kotlin
 data class Person(
@@ -82,6 +88,29 @@ val result = Klaxon()
 assert(result.name == "John Smith")
 assert(result.age == 23)
 ```
+
+#### `ignored`
+
+You can set this boolean attribute to `true` if you want certain properties of your value class not to be
+mapped during the JSON parsing process. This is useful if you defined additional properties in your value classes.
+
+```kotlin
+class Ignored(val name: String) {
+   @Json(ignored = true)
+   val actualName: String get() = ...
+}
+```
+
+In this example, Klaxon will not try to find a field called `actualName` in your JSON document.
+
+Note that you can achieve the same result by declaring these properties `private`:
+
+```kotlin
+class Ignored(val name: String) {
+   private val actualName: String get() = ...
+}
+```
+
 
 ### Custom types
 
