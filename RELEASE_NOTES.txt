@@ -1,7 +1,9 @@
 2.0.7
 =====
 
-- Added @Json(ignored)
+- GITHUB-80: Supports both Double and Float correctly
+- GITHUB-79: toJson() was not honoring @Json(name)
+- GITHUB-78: Added @Json(ignored)
 
 
 2.0.6

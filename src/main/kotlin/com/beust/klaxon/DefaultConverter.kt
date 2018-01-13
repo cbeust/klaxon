@@ -53,15 +53,13 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
     private fun convertValue(jv: JsonValue) : Any {
         val value = jv.inside
         val result = when(value) {
-            is String -> value
-            is Boolean -> value
             is Int -> {
-                // If the value is an Int and the property is a Long, widen the value
+                // If the value is an Int and the property is a Long, widen it
                 val propertyType = jv.property?.getter?.returnType?.javaType as? Class<*>
                 val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
                 if (isLong) value.toLong() else value
             }
-            is Double, is Long -> value
+            is Boolean, is String, is Double, is Float, is Long -> value
             is Collection<*> -> value.map {
                 val jt = jv.property?.returnType?.javaType
                 // Try to find a converter for the element type of the collection

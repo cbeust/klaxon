@@ -33,14 +33,14 @@ class TestTypes {
         assertEquals(false, j.boolean("boolean_value"))
     }
 
-    fun typeDouble(){
+    fun typeFloat(){
         val j = getJsonObject()
-        assertEquals(12.34, j.double("double_value"))
+        assertEquals(12.34f, j.float("float_value"))
     }
 
-    fun typeDoubleExp(){
+    fun typeFloatExp(){
         val j = getJsonObject()
-        assertEquals(3.141E-10, j.double("double_exp_value"))
+        assertEquals(3.141E-10f, j.float("float_exp_value"))
     }
 
     fun typeString(){

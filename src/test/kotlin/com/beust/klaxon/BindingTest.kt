@@ -61,18 +61,24 @@ class BindingTest {
             var string: String? = null,
             var isTrue: Boolean? = null,
             var isFalse: Boolean? = null,
+            val balanceFloat: Float? = 0.0f,
+            val balanceDouble: Double,
             var array: List<Int> = emptyList())
     fun allTypes() {
+        val expectedDouble = Double.MAX_VALUE - 1
         val result = Klaxon().parse<AllTypes>("""
         {
             "int": 42,
             "array": [11, 12],
             "string": "foo",
             "isTrue": true,
-            "isFalse": false
+            "isFalse": false,
+            "balanceFloat": 2.71,
+            "balanceDouble": $expectedDouble
         }
         """)
-        Assert.assertEquals(result, AllTypes(42, "foo", true, false, listOf(11, 12)))
+        Assert.assertEquals(result, AllTypes(42, "foo", true, false, 2.71f,
+                expectedDouble, listOf(11, 12)))
     }
 
     fun compoundObject() {
@@ -240,6 +246,7 @@ class BindingTest {
     sealed class Dir(val name: String) {
         class Left(val n: Int): Dir("Left")
     }
+
     fun sealedClass() {
         val result = Klaxon().parse<Dir.Left>("""{
             "n": 2
@@ -248,4 +255,5 @@ class BindingTest {
 
         Assert.assertEquals(result.n, 2)
     }
+
 }

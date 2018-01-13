@@ -30,7 +30,7 @@ class KlaxonTest {
     fun simple() {
         val j = read("/b.json")
         val expected = json {
-            array(1, "abc", 2.34, false)
+            array(1, "abc", false)
         }
         assertEquals(expected, j)
     }
@@ -39,7 +39,7 @@ class KlaxonTest {
         val j = read("/a.json")
         val expected = json {
             obj("a" to "b",
-                    "c" to array(1, 2.34, "abc", false),
+                    "c" to array(1, "abc", false),
                     "e" to obj("f" to 30, "g" to 31)
             )
         }

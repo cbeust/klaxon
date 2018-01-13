@@ -213,7 +213,10 @@ class Lexer(reader: Reader, val lenient: Boolean = false): Iterator<Token> {
                     }
                 }
             } else if (DOUBLE.matcher(v).matches()) {
-                jsonValue = java.lang.Double.parseDouble(v)
+                val convertedValue = java.lang.Double.parseDouble(v)
+                jsonValue =
+                    if (convertedValue < Float.MAX_VALUE) convertedValue.toFloat()
+                    else convertedValue
             } else if ("true" == v.toLowerCase()) {
                 jsonValue = true
             } else if ("false" == v.toLowerCase()) {
