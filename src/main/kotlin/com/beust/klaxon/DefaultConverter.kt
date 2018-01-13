@@ -25,7 +25,9 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
                 value::class.declaredMemberProperties.forEach { prop ->
                     prop.getter.call(value)?.let { getValue ->
                         val jsonValue = klaxon.toJsonString(getValue)
-                        valueList.add("\"${prop.name}\" : $jsonValue")
+                        val jsonFieldName = Annotations.findJsonAnnotation(value::class, prop.name)?.name
+                        val fieldName = if (jsonFieldName != null && jsonFieldName != "") jsonFieldName else prop.name
+                        valueList.add("\"$fieldName\" : $jsonValue")
                     }
                 }
                 return "{" + valueList.joinToString(", ") + "}"

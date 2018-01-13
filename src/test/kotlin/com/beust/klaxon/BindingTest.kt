@@ -174,9 +174,14 @@ class BindingTest {
     }
 
     class Mapping(
-            @field:Json(name = "theName")
-            val name: String
+        @Json(name = "theName")
+        val name: String
     )
+
+    fun toJsonStringHonorsJsonAnnotation() {
+        val s = Klaxon().toJsonString(Mapping("John"))
+        Assert.assertTrue(s.contains("theName"))
+    }
 
     @Test(expectedExceptions = arrayOf(KlaxonException::class))
     fun badFieldMapping() {

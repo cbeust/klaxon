@@ -238,7 +238,7 @@ class Klaxon : ConverterFinder {
                 // Check if the name of the field was overridden with a @Json annotation
                 //
                 val prop = kc.declaredMemberProperties.first { it.name == prop.name }
-                val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
+                val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
                 val fieldName =
                         if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
                         else prop.name
