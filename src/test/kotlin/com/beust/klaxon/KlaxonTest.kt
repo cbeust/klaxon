@@ -349,4 +349,19 @@ class KlaxonTest {
         val data = Klaxon().parseArray<StockEntry>(json)
         println(data)
     }
+
+    class PersonWitCity(val name: String, val city: City) {
+        class City(val name: String)
+    }
+
+    fun nested() {
+        val r = Klaxon().parse<PersonWitCity>("""{
+            "name": "John",
+            "city": {
+                "name": "San Francisco"
+            }
+        }""")
+        Assert.assertEquals(r?.name, "John")
+        Assert.assertEquals(r?.city?.name, "San Francisco")
+    }
 }
