@@ -19,7 +19,7 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             is String -> "\"" + value + "\""
             is Double, is Int, is Boolean, is Long -> value.toString()
             is Collection<*> -> {
-                val elements = value.filterNotNull().map { toJson(it) }
+                val elements = value.filterNotNull().map { klaxon.toJsonString(it) }
                 joinToString(elements, "[", "]")
             }
             is Map<*, *> -> {
