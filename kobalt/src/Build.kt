@@ -12,12 +12,12 @@ val p = project {
     version = "2.0.8"
 
     dependencies {
-        compile("org.jetbrains.kotlin:kotlin-reflect:1.1.51")
+        compile("org.jetbrains.kotlin:kotlin-reflect:1.2.10")
     }
 
     dependenciesTest {
         compile("org.testng:testng:6.13.1",
-                "org.jetbrains.kotlin:kotlin-test:1.1.51")
+                "org.jetbrains.kotlin:kotlin-test:1.2.10")
     }
 
     assemble {
