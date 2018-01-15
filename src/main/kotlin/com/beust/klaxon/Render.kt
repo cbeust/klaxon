@@ -35,7 +35,7 @@ private fun isNotPrintableUnicode(c: Char): Boolean =
     c in '\u007F'..'\u009F' ||
     c in '\u2000'..'\u20FF'
 
-private val decimalFormat = DecimalFormat("0.0####E0##;-0.0####E0##")
+private val decimalFormat = DecimalFormat("0.0####E0;-0.0####E0")
 
 tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
     when (v) {
