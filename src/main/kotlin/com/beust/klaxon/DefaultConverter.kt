@@ -1,7 +1,6 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
-import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaType
 
 /**
@@ -22,7 +21,7 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             }
             else -> {
                 val valueList = arrayListOf<String>()
-                value::class.declaredMemberProperties.forEach { prop ->
+                Annotations.findNonIgnoredProperties(value::class)?.forEach { prop ->
                     prop.getter.call(value)?.let { getValue ->
                         val jsonValue = klaxon.toJsonString(getValue)
                         val jsonFieldName = Annotations.findJsonAnnotation(value::class, prop.name)?.name

@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import kotlin.reflect.KClass
+import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 
@@ -23,5 +24,12 @@ class Annotations {
                     }
             return result
         }
+
+        fun findNonIgnoredProperties(kc: KClass<*>?)
+                = kc?.declaredMemberProperties?.filter {
+            val ignored = it.findAnnotation<Json>()?.ignored
+            it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
+        }
     }
+
 }
