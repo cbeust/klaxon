@@ -1,3 +1,9 @@
+2.0.9
+=====
+
+- GITHUB-82: Ignored fields not handled correctly
+- GITHUB-83: Exception when serializing Map
+
 2.0.8
 =====
 
