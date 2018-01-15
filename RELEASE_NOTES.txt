@@ -1,3 +1,8 @@
+2.0.10
+======
+
+- GITHUB-84: Values in list are not properly converted
+
 2.0.9
 =====
 
