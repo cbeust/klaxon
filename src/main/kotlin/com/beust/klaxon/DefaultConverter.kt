@@ -12,12 +12,23 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             = maybeConvertEnum(jv) ?: convertValue(jv)
 
     override fun toJson(value: Any): String? {
+        fun joinToString(list: Collection<*>, open: String, close: String)
+            = open + list.joinToString(", ") + close
+
         val result = when (value) {
             is String -> "\"" + value + "\""
             is Double, is Int, is Boolean, is Long -> value.toString()
             is Collection<*> -> {
                 val elements = value.filterNotNull().map { toJson(it) }
-                "[" + elements.joinToString(", ") + "]"
+                joinToString(elements, "[", "]")
+            }
+            is Map<*, *> -> {
+                val valueList = arrayListOf<String>()
+                value.entries.forEach { entry ->
+                    val jsonValue = klaxon.toJsonString(entry.value as Any)
+                    valueList.add("\"${entry.key}\": $jsonValue")
+                }
+                joinToString(valueList, "{", "}")
             }
             else -> {
                 val valueList = arrayListOf<String>()
@@ -29,7 +40,7 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
                         valueList.add("\"$fieldName\" : $jsonValue")
                     }
                 }
-                return "{" + valueList.joinToString(", ") + "}"
+                joinToString(valueList, "{", "}")
             }
 
         }

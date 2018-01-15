@@ -256,4 +256,10 @@ class BindingTest {
         Assert.assertEquals(result.n, 2)
     }
 
+    fun serializeMap() {
+        val data = mapOf("firstName" to "John")
+        val result = Klaxon().toJsonString(data)
+        Assert.assertTrue(result.contains("firstName"))
+        Assert.assertTrue(result.contains("John"))
+    }
 }
