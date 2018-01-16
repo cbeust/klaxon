@@ -1,3 +1,32 @@
+2.0.10
+======
+
+- GITHUB-84: Values in list are not properly converted
+
+2.0.9
+=====
+
+- GITHUB-82: Ignored fields not handled correctly
+- GITHUB-83: Exception when serializing Map
+
+2.0.8
+=====
+
+- GITHUB-81: Adjust the DecimalFormat to work on Android
+
+2.0.7
+=====
+
+- GITHUB-80: Supports both Double and Float correctly
+- GITHUB-79: toJson() was not honoring @Json(name)
+- GITHUB-78: Added @Json(ignored)
+
+
+2.0.6
+=====
+
+- Add support for Doubles.
+
 2.0.5
 =====
 

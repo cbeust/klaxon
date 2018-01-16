@@ -1,7 +1,6 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
-import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaType
 
 /**
@@ -13,22 +12,35 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             = maybeConvertEnum(jv) ?: convertValue(jv)
 
     override fun toJson(value: Any): String? {
+        fun joinToString(list: Collection<*>, open: String, close: String)
+            = open + list.joinToString(", ") + close
+
         val result = when (value) {
             is String -> "\"" + value + "\""
-            is Int, is Boolean, is Long -> value.toString()
+            is Double, is Int, is Boolean, is Long -> value.toString()
             is Collection<*> -> {
-                val elements = value.filterNotNull().map { toJson(it) }
-                "[" + elements.joinToString(", ") + "]"
+                val elements = value.filterNotNull().map { klaxon.toJsonString(it) }
+                joinToString(elements, "[", "]")
+            }
+            is Map<*, *> -> {
+                val valueList = arrayListOf<String>()
+                value.entries.forEach { entry ->
+                    val jsonValue = klaxon.toJsonString(entry.value as Any)
+                    valueList.add("\"${entry.key}\": $jsonValue")
+                }
+                joinToString(valueList, "{", "}")
             }
             else -> {
                 val valueList = arrayListOf<String>()
-                value::class.declaredMemberProperties.forEach { prop ->
+                Annotations.findNonIgnoredProperties(value::class)?.forEach { prop ->
                     prop.getter.call(value)?.let { getValue ->
                         val jsonValue = klaxon.toJsonString(getValue)
-                        valueList.add("\"${prop.name}\" : $jsonValue")
+                        val jsonFieldName = Annotations.findJsonAnnotation(value::class, prop.name)?.name
+                        val fieldName = if (jsonFieldName != null && jsonFieldName != "") jsonFieldName else prop.name
+                        valueList.add("\"$fieldName\" : $jsonValue")
                     }
                 }
-                return "{" + valueList.joinToString(", ") + "}"
+                joinToString(valueList, "{", "}")
             }
 
         }
@@ -51,15 +63,13 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
     private fun convertValue(jv: JsonValue) : Any {
         val value = jv.inside
         val result = when(value) {
-            is String -> value
-            is Boolean -> value
             is Int -> {
-                // If the value is an Int and the property is a Long, widen the value
+                // If the value is an Int and the property is a Long, widen it
                 val propertyType = jv.property?.getter?.returnType?.javaType as? Class<*>
                 val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
                 if (isLong) value.toLong() else value
             }
-            is Long -> value
+            is Boolean, is String, is Double, is Float, is Long -> value
             is Collection<*> -> value.map {
                 val jt = jv.property?.returnType?.javaType
                 // Try to find a converter for the element type of the collection

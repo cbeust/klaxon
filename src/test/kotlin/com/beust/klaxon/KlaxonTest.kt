@@ -30,7 +30,7 @@ class KlaxonTest {
     fun simple() {
         val j = read("/b.json")
         val expected = json {
-            array(1, "abc", 2.34, false)
+            array(1, "abc", false)
         }
         assertEquals(expected, j)
     }
@@ -39,7 +39,7 @@ class KlaxonTest {
         val j = read("/a.json")
         val expected = json {
             obj("a" to "b",
-                    "c" to array(1, 2.34, "abc", false),
+                    "c" to array(1, "abc", false),
                     "e" to obj("f" to 30, "g" to 31)
             )
         }
@@ -320,5 +320,48 @@ class KlaxonTest {
         val list = listOf(null, 1, true, false, "a")
 
         assertEquals(valueToString(list), "[null,1,true,false,\"a\"]")
+    }
+
+
+
+    data class StockEntry(
+            val date: String,
+            val close: Double,
+            val volume: Int,
+            val open: Double,
+            val high: Double,
+            val low: Double
+    )
+
+    fun issue77() {
+        val json = """
+            [
+          {
+            "date": "2018/01/10",
+            "close": 0.25,
+            "volume": 500000,
+            "open": 0.5,
+            "high": 0.5,
+            "low": 0.25
+          }
+        ]
+        """
+        val data = Klaxon().parseArray<StockEntry>(json)
+        println(data)
+    }
+
+    class PersonWitCity(val name: String, val city: City) {
+        class City(val name: String)
+    }
+
+    fun nested() {
+        val r = Klaxon().parse<PersonWitCity>("""{
+            "name": "John",
+            "city": {
+                "name": "San Francisco"
+            }
+        }""")
+        Assert.assertEquals(r?.name, "John")
+        Assert.assertEquals(r?.city?.name, "San Francisco")
     }
 }

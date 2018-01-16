@@ -218,18 +218,23 @@ class Klaxon : ConverterFinder {
     /**
      * Convert a JsonObject into a real value.
      */
-    fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>?): Any {
+    fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>): Any {
         /**
          * Retrieve all the properties found on the class of the object and then look up each of these
          * properties names on `jsonObject`.
          */
         fun retrieveKeyValues() : Map<String, Any> {
             val result = hashMapOf<String, Any>()
-            kc?.declaredMemberProperties?.forEach { prop ->
+
+            // Only keep the properties that are public and do not have @Json(ignored = true)
+            val allProperties = Annotations.findNonIgnoredProperties(kc)
+
+            allProperties?.forEach { prop ->
                 //
                 // Check if the name of the field was overridden with a @Json annotation
                 //
-                val jsonAnnotation = kc.java.getDeclaredField(prop.name).getDeclaredAnnotation(Json::class.java)
+                val prop = kc.declaredMemberProperties.first { it.name == prop.name }
+                val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
                 val fieldName =
                         if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
                         else prop.name

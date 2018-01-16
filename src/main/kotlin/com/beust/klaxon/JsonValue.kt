@@ -15,6 +15,7 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
     var int: Int? = null
     var longValue: Long? = null
     var float: Float? = null
+    var double: Double? = null
     var char: Char? = null
     var boolean: Boolean? = null
 
@@ -49,6 +50,7 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
                     int != null -> int
                     longValue != null -> longValue
                     float != null -> float
+                    double != null -> double
                     char != null -> char
                     boolean != null -> boolean
                     else -> throw KlaxonException("Should never happen")
@@ -97,6 +99,10 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
                 longValue = value
                 type = Long::class.java
             }
+            is Double -> {
+                double = value
+                type = Double::class.java
+            }
             is Float -> {
                 float = value
                 type = Float::class.java
@@ -136,6 +142,7 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
             else if (string != null) "{string: $string}"
             else if (int != null) "{int: $int}"
             else if (float != null) "{float: $float}"
+            else if (double != null) "{double: $double}"
             else if (char != null) "{char: $char}"
             else if (boolean != null) "{boolean: $boolean}"
             else throw KlaxonException("Should never happen")
