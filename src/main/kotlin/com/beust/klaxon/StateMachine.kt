@@ -17,8 +17,24 @@ class StateMachine(private val streaming: Boolean) {
             processor(world, token)
         } else {
             if (!streaming) {
-                val message = "Did not expect ${token.tokenType} at line ${world.line}" +
-                    " (internal error: \"No processor found for: (${world.status}, $token)\""
+                fun formatList(l: List<String>) : String {
+                    val result = StringBuilder()
+                    l.withIndex().forEach { iv ->
+                        if (iv.index == l.size - 1) result.append(" or ")
+                        else if (iv.index > 0) result.append(", ")
+                        result.append(iv.value)
+                    }
+                    return result.toString()
+                }
+
+                val validTokens = map.keys.filter { it.status == world.status }.map { it.tokenType.value }
+                val validTokenMessage =
+                        if (validTokens.size == 1) validTokens[0]
+                        else formatList(validTokens)
+
+                val message = "Expected $validTokenMessage, not '${token.tokenType.value}' at line ${world
+                        .line}" +
+                    "\n   (internal error: \"No processor found for: (${world.status}, $token)\""
                 throw KlaxonException(message)
             } else {
                 World(Status.EOF)

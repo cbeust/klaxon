@@ -3,15 +3,15 @@ package com.beust.klaxon
 import java.io.Reader
 import java.util.regex.Pattern
 
-enum class Type {
-    VALUE,
-    LEFT_BRACE,
-    RIGHT_BRACE,
-    LEFT_BRACKET,
-    RIGHT_BRACKET,
-    COMMA,
-    COLON,
-    EOF
+enum class Type(val value: String) {
+    VALUE("a value"),
+    LEFT_BRACE("\"{\""),
+    RIGHT_BRACE("\"}\""),
+    LEFT_BRACKET("\"[\""),
+    RIGHT_BRACKET("\"]\""),
+    COMMA("\",\""),
+    COLON("\":\""),
+    EOF("EOF")
 }
 
 data class Token(val tokenType: Type, val value: Any? = null) {
