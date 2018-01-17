@@ -347,7 +347,6 @@ class KlaxonTest {
         ]
         """
         val data = Klaxon().parseArray<StockEntry>(json)
-        println(data)
     }
 
     class PersonWitCity(val name: String, val city: City) {
