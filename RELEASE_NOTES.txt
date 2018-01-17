@@ -1,3 +1,8 @@
+2.0.11
+======
+
+- GITHUB-85: Support enum for toJson().
+
 2.0.10
 ======
 
