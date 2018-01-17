@@ -208,7 +208,7 @@ class BindingTest {
     }
 
     companion object {
-        private fun assertContains(s1: String, s2: String) = Assert.assertTrue(s1.contains(s2))
+        fun assertContains(s1: String, s2: String) = Assert.assertTrue(s1.contains(s2))
     }
 
     enum class Cardinal { NORTH, SOUTH }
@@ -256,4 +256,10 @@ class BindingTest {
         Assert.assertEquals(result.n, 2)
     }
 
+    fun serializeMap() {
+        val data = mapOf("firstName" to "John")
+        val result = Klaxon().toJsonString(data)
+        Assert.assertTrue(result.contains("firstName"))
+        Assert.assertTrue(result.contains("John"))
+    }
 }

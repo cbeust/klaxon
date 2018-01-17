@@ -7,10 +7,8 @@ import java.nio.charset.Charset
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
-import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
@@ -220,7 +218,7 @@ class Klaxon : ConverterFinder {
     /**
      * Convert a JsonObject into a real value.
      */
-    fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>?): Any {
+    fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>): Any {
         /**
          * Retrieve all the properties found on the class of the object and then look up each of these
          * properties names on `jsonObject`.
@@ -229,10 +227,8 @@ class Klaxon : ConverterFinder {
             val result = hashMapOf<String, Any>()
 
             // Only keep the properties that are public and do not have @Json(ignored = true)
-            val allProperties = kc?.declaredMemberProperties?.filter {
-                val ignored = it.findAnnotation<Json>()?.ignored
-                it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
-            }
+            val allProperties = Annotations.findNonIgnoredProperties(kc)
+
             allProperties?.forEach { prop ->
                 //
                 // Check if the name of the field was overridden with a @Json annotation

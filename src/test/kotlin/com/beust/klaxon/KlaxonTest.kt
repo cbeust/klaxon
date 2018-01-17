@@ -364,4 +364,11 @@ class KlaxonTest {
         Assert.assertEquals(r?.name, "John")
         Assert.assertEquals(r?.city?.name, "San Francisco")
     }
+
+    enum class Colour { Red, Green, Blue }
+
+    @Test
+    fun serializeEnum() {
+        Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
+    }
 }

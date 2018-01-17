@@ -1,7 +1,6 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
-import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaType
 
 /**
@@ -13,16 +12,27 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             = maybeConvertEnum(jv) ?: convertValue(jv)
 
     override fun toJson(value: Any): String? {
+        fun joinToString(list: Collection<*>, open: String, close: String)
+            = open + list.joinToString(", ") + close
+
         val result = when (value) {
-            is String -> "\"" + value + "\""
+            is String, is Enum<*> -> "\"" + value + "\""
             is Double, is Int, is Boolean, is Long -> value.toString()
             is Collection<*> -> {
-                val elements = value.filterNotNull().map { toJson(it) }
-                "[" + elements.joinToString(", ") + "]"
+                val elements = value.filterNotNull().map { klaxon.toJsonString(it) }
+                joinToString(elements, "[", "]")
+            }
+            is Map<*, *> -> {
+                val valueList = arrayListOf<String>()
+                value.entries.forEach { entry ->
+                    val jsonValue = klaxon.toJsonString(entry.value as Any)
+                    valueList.add("\"${entry.key}\": $jsonValue")
+                }
+                joinToString(valueList, "{", "}")
             }
             else -> {
                 val valueList = arrayListOf<String>()
-                value::class.declaredMemberProperties.forEach { prop ->
+                Annotations.findNonIgnoredProperties(value::class)?.forEach { prop ->
                     prop.getter.call(value)?.let { getValue ->
                         val jsonValue = klaxon.toJsonString(getValue)
                         val jsonFieldName = Annotations.findJsonAnnotation(value::class, prop.name)?.name
@@ -30,7 +40,7 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
                         valueList.add("\"$fieldName\" : $jsonValue")
                     }
                 }
-                return "{" + valueList.joinToString(", ") + "}"
+                joinToString(valueList, "{", "}")
             }
 
         }

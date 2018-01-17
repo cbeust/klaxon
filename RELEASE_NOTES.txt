@@ -1,3 +1,14 @@
+2.0.10
+======
+
+- GITHUB-84: Values in list are not properly converted
+
+2.0.9
+=====
+
+- GITHUB-82: Ignored fields not handled correctly
+- GITHUB-83: Exception when serializing Map
+
 2.0.8
 =====
 
@@ -20,6 +31,14 @@
 =====
 
 - Fix how Maps are mapped.
+=======
+
+
+2.0.5
+=====
+
+- Performance improvement
+- Better error message
 
 2.0.4
 =====

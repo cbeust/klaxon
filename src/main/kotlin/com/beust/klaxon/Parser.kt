@@ -56,6 +56,8 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
         do {
             val token = lexer.nextToken()
             log("Token: $token")
+            world.index = lexer.index
+            world.line = lexer.line
             world = sm.next(world, token)
         } while (token.tokenType != Type.EOF)
 
