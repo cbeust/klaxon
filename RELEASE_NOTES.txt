@@ -26,7 +26,6 @@
 - GITHUB-79: toJson() was not honoring @Json(name)
 - GITHUB-78: Added @Json(ignored)
 
-
 2.0.6
 =====
 
@@ -36,12 +35,6 @@
 =====
 
 - Fix how Maps are mapped.
-=======
-
-
-2.0.5
-=====
-
 - Performance improvement
 - Better error message
 
