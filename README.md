@@ -208,7 +208,7 @@ Finally, declare the association between that converter and your annotation in y
 
 ```kotlin
 val result = Klaxon()
-    .fieldConverter(dateConverter)
+    .fieldConverter(KlaxonDate::class,dateConverter)
     .parse<WithDate>("""
     {
       "theDate": "2017-05-10 16:30"
