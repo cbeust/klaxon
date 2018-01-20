@@ -381,15 +381,18 @@ class KlaxonTest {
         Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
     }
 
-    fun jsonp() {
+    fun pathObserver() {
         val po = object : PathObserver {
+            override fun pathMatches(path: String) = Pattern.matches(".*store.book.*author.*", path)
+
             val authors = arrayListOf<String>()
             override fun onMatch(path: String, value: Any) {
+                println("Adding $path = $value")
                 authors.add(value.toString())
             }
         }
         Klaxon()
-            .pathObserver(".*author.*", po)
+            .pathObserver(po)
             .parseJsonObject(StringReader("""{
             "name": "John",
             "store": {
@@ -427,7 +430,7 @@ class KlaxonTest {
                 }
             },
             "expensive": 10
-                }"""))
+        }"""))
         Assert.assertEquals(po.authors,
                 listOf("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"))
     }

@@ -1,9 +1,8 @@
 package com.beust.klaxon
 
 import java.util.*
-import java.util.regex.Pattern
 
-class World(var status : Status, val pathObservers: List<Pair<String, PathObserver>> = emptyList()) {
+class World(var status : Status, val pathObservers: List<PathObserver> = emptyList()) {
     private val statusStack = LinkedList<Status>()
     private val valueStack = LinkedList<Any>()
     var result : Any? = null
@@ -91,9 +90,9 @@ class World(var status : Status, val pathObservers: List<Pair<String, PathObserv
             val value = first.values.last()
             if (value != null && value !is JsonArray<*> && value !is JsonObject) {
                 pathObservers.filter {
-                    Pattern.matches(it.first, path)
+                    it.pathMatches(path)
                 }.forEach {
-                    it.second.onMatch(path, value)
+                    it.onMatch(path, value)
                 }
             }
         }

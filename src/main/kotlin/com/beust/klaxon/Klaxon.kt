@@ -108,10 +108,10 @@ class Klaxon : ConverterFinder {
     fun toReader(inputStream: InputStream, charset: Charset = Charsets.UTF_8)
             = inputStream.reader(charset)
 
-    val pathObservers = arrayListOf<Pair<String, PathObserver>>()
+    val pathObservers = arrayListOf<PathObserver>()
 
-    fun pathObserver(s: String, po: PathObserver): Klaxon {
-        pathObservers.add(Pair(s, po))
+    fun pathObserver(po: PathObserver): Klaxon {
+        pathObservers.add(po)
         return this
     }
 
