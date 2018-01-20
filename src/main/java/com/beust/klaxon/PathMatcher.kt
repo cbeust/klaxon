@@ -3,7 +3,7 @@ package com.beust.klaxon
 /**
  * Invoked whenever the JSON Path encountered matches as a regexp the given path.
  */
-interface PathObserver {
+interface PathMatcher {
     /**
      * @return true if we want to observe this path.
      */

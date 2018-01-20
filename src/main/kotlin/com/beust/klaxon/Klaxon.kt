@@ -65,7 +65,7 @@ class Klaxon : ConverterFinder {
      * Parse a JsonReader into an array.
      */
     inline fun <reified T> parse(jsonReader: JsonReader): T? {
-        val p = Parser(pathObservers,jsonReader.lexer, streaming = true)
+        val p = Parser(pathMatchers,jsonReader.lexer, streaming = true)
         return maybeParse(p.parse(jsonReader) as JsonObject)
     }
 
@@ -108,14 +108,14 @@ class Klaxon : ConverterFinder {
     fun toReader(inputStream: InputStream, charset: Charset = Charsets.UTF_8)
             = inputStream.reader(charset)
 
-    val pathObservers = arrayListOf<PathObserver>()
+    val pathMatchers = arrayListOf<PathMatcher>()
 
-    fun pathObserver(po: PathObserver): Klaxon {
-        pathObservers.add(po)
+    fun pathMatcher(po: PathMatcher): Klaxon {
+        pathMatchers.add(po)
         return this
     }
 
-    val parser = Parser(pathObservers)
+    val parser = Parser(pathMatchers)
 
     private val DEFAULT_CONVERTER = DefaultConverter(this)
 

@@ -30,8 +30,8 @@ to stream your document and whether you need to query it.
 |---------------------|-----------|--------------|--------------|
 | Object binding API  | No        | No           | Kotlin objects |
 | Streaming API       | Yes       | No           | Kotlin objects and JsonObject/JsonArray |
-| Low level API       | No        | Yes (Kotlin) | Kotlin objects |
-| JSON Path query API | Yes       | Yes (regexp) | JsonObject/JsonArray |
+| Low level API       | No        | Yes          | Kotlin objects |
+| JSON Path query API | Yes       | Yes          | JsonObject/JsonArray |
 
 
 ## <a name="objectBindingApi">Object binding API</a>
@@ -339,17 +339,17 @@ Consider the following docoument:
 }
 ```
 
-According to the JSON Path spec, the two authors have the following JSON path:
+According to the JSON Path spec, the two authors have the following JSON paths:
 
 ```
 $.library.books[0].author
 $.library.books[1].author
 ```
 
-We'll define a [`PathObserver`](https://github.com/cbeust/klaxon/blob/master/src/main/java/com/beust/klaxon/PathObserver.kt) that uses a regular expression to filter only the elements we want:
+We'll define a [`PathMatcher`](https://github.com/cbeust/klaxon/blob/master/src/main/java/com/beust/klaxon/PathMatcher.kt) that uses a regular expression to filter only the elements we want:
 
 ```kotlin
-val pathObserver = object : PathObserver {
+val pathMatcher = object : PathMatcher {
     override fun pathMatches(path: String) = Pattern.matches(".*library.*books.*author.*", path)
 
     override fun onMatch(path: String, value: Any) {
@@ -358,7 +358,7 @@ val pathObserver = object : PathObserver {
 }
 
 Klaxon()
-    .pathObserver(pathObserver)
+    .pathMatcher(patchMatcher)
     .parseJsonObject(document)
 ```
 

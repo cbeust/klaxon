@@ -9,7 +9,7 @@ import java.nio.charset.Charset
  * If {streaming} is true, the parser doesn't expect to finish on an EOF token. This is used for streaming, when
  * the user requests to read a subset of the entire JSON document.
  */
-class Parser(private val pathObservers: List<PathObserver> = emptyList(),
+class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
         private val passedLexer: Lexer? = null, val streaming: Boolean = false) {
     fun parse(rawValue: StringBuilder): Any? =
         StringReader(rawValue.toString()).use {
@@ -36,7 +36,7 @@ class Parser(private val pathObservers: List<PathObserver> = emptyList(),
     private fun partialParseLoop(sm: StateMachine, reader: Reader): Any? {
         val lexer = passedLexer ?: Lexer(reader)
 
-        var world = World(Status.INIT, pathObservers)
+        var world = World(Status.INIT, pathMatchers)
         if (lexer.peek().tokenType == Type.COMMA) lexer.nextToken()
         do {
             val token = lexer.nextToken()
@@ -53,7 +53,7 @@ class Parser(private val pathObservers: List<PathObserver> = emptyList(),
     private fun fullParseLoop(sm: StateMachine, reader: Reader): Any? {
         val lexer = passedLexer ?: Lexer(reader)
 
-        var world = World(Status.INIT, pathObservers)
+        var world = World(Status.INIT, pathMatchers)
         do {
             val token = lexer.nextToken()
             log("Token: $token")

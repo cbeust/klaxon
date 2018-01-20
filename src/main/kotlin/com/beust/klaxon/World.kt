@@ -2,7 +2,7 @@ package com.beust.klaxon
 
 import java.util.*
 
-class World(var status : Status, val pathObservers: List<PathObserver> = emptyList()) {
+class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList()) {
     private val statusStack = LinkedList<Status>()
     private val valueStack = LinkedList<Any>()
     var result : Any? = null
@@ -89,7 +89,7 @@ class World(var status : Status, val pathObservers: List<PathObserver> = emptyLi
         if (first is JsonObject && first.isNotEmpty()) {
             val value = first.values.last()
             if (value != null && value !is JsonArray<*> && value !is JsonObject) {
-                pathObservers.filter {
+                pathMatchers.filter {
                     it.pathMatches(path)
                 }.forEach {
                     it.onMatch(path, value)
