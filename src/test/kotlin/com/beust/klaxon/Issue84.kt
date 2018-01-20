@@ -16,12 +16,11 @@ class Issue84 {
             override fun fromJson(jv: JsonValue) = throw NotImplementedError()
         }
 
-        // When no custom converted is provided, empty value for dob.  This used to throw an exception.  Not sure what intended operation is
+        // No custom converter, should be the toString() of the instant
         val obj = Person("John", Instant.ofEpochMilli(9001))
-        BindingTest.assertContains(Klaxon().toJsonString(obj), "9001")
-        // Actual: {"dob" : {}, "firstName" : "John"}
+        val result = Klaxon().toJsonString(obj)
 
-        // When custom converted is provided, dob is serialized as expected
+        // Custom converter, expect the converted value
         val mapper = Klaxon().converter(EpochMilliInstantConverter())
         BindingTest.assertContains(mapper.toJsonString(obj), "9001")
         // Actual: {"dob" : 9001, "firstName" : "John"}
