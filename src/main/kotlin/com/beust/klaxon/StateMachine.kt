@@ -6,7 +6,7 @@ class StateMachine(private val streaming: Boolean) {
     private val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
 
     fun put(status: Status, tokenType: Type, processor: (world: World, token: Token) -> World) {
-        map.put(TokenStatus(status, tokenType), processor)
+        map[TokenStatus(status, tokenType)] = processor
     }
 
     fun next(world: World, token: Token) : World {

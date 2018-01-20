@@ -117,7 +117,7 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
                     popStatus()
                     val key = popValue() as String
                     parent = getFirstObject()
-                    parent.put(key, token.value)
+                    parent[key] = token.value
                     status = peekStatus()
                     this
                 }
@@ -128,7 +128,7 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
                     val key = popValue() as String
                     parent = getFirstObject()
                     val newArray = JsonArray<Any>()
-                    parent.put(key, newArray)
+                    parent[key] = newArray
                     pushAndSet(Status.IN_ARRAY, newArray)
                 }
             })
@@ -138,7 +138,7 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
                     val key = popValue() as String
                     parent = getFirstObject()
                     val newObject = JsonObject()
-                    parent.put(key, newObject)
+                    parent[key] = newObject
                     pushAndSet(Status.IN_OBJECT, newObject)
                 }
             })
