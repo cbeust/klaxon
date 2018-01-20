@@ -1,6 +1,5 @@
 package com.beust.klaxon
 
-import org.assertj.core.api.Assertions.assertThat
 import org.testng.Assert
 import org.testng.annotations.Test
 
@@ -31,7 +30,7 @@ class BindingTest {
                 "\"string\" : \"foo\"",
                 "\"isTrue\" : true",
                 "\"isFalse\" : false").forEach {
-            assertContains(s, it)
+            Asserts.assertContains(s, it)
         }
     }
 
@@ -50,7 +49,7 @@ class BindingTest {
                 .converter(CARD_CONVERTER)
                 .toJsonString(deck1)
         listOf("\"CLUBS\"", "\"suit\"", "\"value\"", "13", "\"cardCount\"", "1").forEach {
-            assertContains(s, it)
+            Asserts.assertContains(s, it)
         }
     }
 
@@ -206,10 +205,6 @@ class BindingTest {
         }
         """)
         Assert.assertEquals(result?.name, "foo")
-    }
-
-    companion object {
-        fun assertContains(s1: String, s2: String) = assertThat(s1).contains(s2)
     }
 
     enum class Cardinal { NORTH, SOUTH }
