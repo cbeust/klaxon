@@ -8,6 +8,30 @@ class World(var status : Status) {
     var result : Any? = null
     var parent = JsonObject()
 
+    /**
+     * The path of the current JSON element.
+     * See https://github.com/json-path/JsonPath
+     */
+    val path: String get() {
+        val result = arrayListOf("$")
+        valueStack.reversed().forEach { value ->
+            when(value) {
+                is JsonObject -> {
+                    if (value.any()) {
+                        result.add("." + value.keys.last().toString())
+                    }
+                }
+                is JsonArray<*> -> {
+                    result.add("[" + (value.size - 1) + "]")
+                }
+                else -> {
+                    result.add("." + value)
+                }
+            }
+        }
+        return result.joinToString("")
+    }
+
     fun pushAndSet(status: Status, value: Any) : World {
         pushStatus(status)
         pushValue(value)
