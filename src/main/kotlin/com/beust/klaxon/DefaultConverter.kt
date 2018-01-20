@@ -32,15 +32,20 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             }
             else -> {
                 val valueList = arrayListOf<String>()
-                Annotations.findNonIgnoredProperties(value::class)?.forEach { prop ->
-                    prop.getter.call(value)?.let { getValue ->
-                        val jsonValue = klaxon.toJsonString(getValue)
-                        val jsonFieldName = Annotations.findJsonAnnotation(value::class, prop.name)?.name
-                        val fieldName = if (jsonFieldName != null && jsonFieldName != "") jsonFieldName else prop.name
-                        valueList.add("\"$fieldName\" : $jsonValue")
+                val properties = Annotations.findNonIgnoredProperties(value::class)
+                if (properties?.isNotEmpty() == true) {
+                    properties.forEach { prop ->
+                        prop.getter.call(value)?.let { getValue ->
+                            val jsonValue = klaxon.toJsonString(getValue)
+                            val jsonFieldName = Annotations.findJsonAnnotation(value::class, prop.name)?.name
+                            val fieldName = if (jsonFieldName != null && jsonFieldName != "") jsonFieldName else prop.name
+                            valueList.add("\"$fieldName\" : $jsonValue")
+                        }
                     }
+                    joinToString(valueList, "{", "}")
+                } else {
+                    """"$value""""
                 }
-                joinToString(valueList, "{", "}")
             }
 
         }

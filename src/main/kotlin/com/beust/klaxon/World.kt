@@ -87,7 +87,7 @@ class World(var status : Status, val pathObservers: List<Pair<String, PathObserv
 
     internal fun foundValue() {
         val first = valueStack.peekFirst()
-        if (first is JsonObject) {
+        if (first is JsonObject && first.isNotEmpty()) {
             val value = first.values.last()
             if (value != null && value !is JsonArray<*> && value !is JsonObject) {
                 pathObservers.filter {
