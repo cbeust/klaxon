@@ -9,7 +9,8 @@ import java.nio.charset.Charset
  * If {streaming} is true, the parser doesn't expect to finish on an EOF token. This is used for streaming, when
  * the user requests to read a subset of the entire JSON document.
  */
-class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = false) {
+class Parser(private val pathObservers: List<Pair<String, PathObserver>> = emptyList(),
+        private val passedLexer: Lexer? = null, val streaming: Boolean = false) {
     fun parse(rawValue: StringBuilder): Any? =
         StringReader(rawValue.toString()).use {
             parse(it)
@@ -35,7 +36,7 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
     private fun partialParseLoop(sm: StateMachine, reader: Reader): Any? {
         val lexer = passedLexer ?: Lexer(reader)
 
-        var world = World(Status.INIT)
+        var world = World(Status.INIT, pathObservers)
         if (lexer.peek().tokenType == Type.COMMA) lexer.nextToken()
         do {
             val token = lexer.nextToken()
@@ -52,7 +53,7 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
     private fun fullParseLoop(sm: StateMachine, reader: Reader): Any? {
         val lexer = passedLexer ?: Lexer(reader)
 
-        var world = World(Status.INIT)
+        var world = World(Status.INIT, pathObservers)
         do {
             val token = lexer.nextToken()
             log("Token: $token")
@@ -90,12 +91,14 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
 
 
             put(Status.IN_OBJECT, Type.COMMA, { world: World, _: Token ->
+                world.foundValue()
                 world
             })
             put(Status.IN_OBJECT, Type.VALUE, { world: World, token: Token ->
                 world.pushAndSet(Status.PASSED_PAIR_KEY, token.value!!)
             })
             put(Status.IN_OBJECT, Type.RIGHT_BRACE, { world: World, _: Token ->
+                world.foundValue()
                 with(world) {
                     status = if (hasValues()) {
                         popStatus()
@@ -153,6 +156,7 @@ class Parser(private val passedLexer: Lexer? = null, val streaming: Boolean = fa
                 world
             })
             put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { world: World, _: Token ->
+                world.foundValue()
                 with(world) {
                     status = if (hasValues()) {
                         popStatus()

@@ -65,7 +65,7 @@ class Klaxon : ConverterFinder {
      * Parse a JsonReader into an array.
      */
     inline fun <reified T> parse(jsonReader: JsonReader): T? {
-        val p = Parser(jsonReader.lexer, streaming = true)
+        val p = Parser(pathObservers,jsonReader.lexer, streaming = true)
         return maybeParse(p.parse(jsonReader) as JsonObject)
     }
 
@@ -108,7 +108,14 @@ class Klaxon : ConverterFinder {
     fun toReader(inputStream: InputStream, charset: Charset = Charsets.UTF_8)
             = inputStream.reader(charset)
 
-    val parser = Parser()
+    val pathObservers = arrayListOf<Pair<String, PathObserver>>()
+
+    fun pathObserver(s: String, po: PathObserver): Klaxon {
+        pathObservers.add(Pair(s, po))
+        return this
+    }
+
+    val parser = Parser(pathObservers)
 
     private val DEFAULT_CONVERTER = DefaultConverter(this)
 
@@ -273,7 +280,7 @@ class Klaxon : ConverterFinder {
             // Note that this code will work for default parameters as well: values missing in the JSON map
             // will be filled by Kotlin reflection if they can't be found.
             var error: String? = null
-            val result = kc?.constructors?.firstNotNullResult { constructor ->
+            val result = kc.constructors.firstNotNullResult { constructor ->
                 val parameterMap = hashMapOf<KParameter,Any>()
                 constructor.parameters.forEach { parameter ->
                     map[parameter.name]?.let { convertedValue ->
@@ -311,4 +318,5 @@ class Klaxon : ConverterFinder {
     private fun log(s: String) {
         if (Debug.verbose) println(s)
     }
+
 }

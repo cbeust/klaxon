@@ -3,6 +3,8 @@ package com.beust.klaxon
 import org.testng.Assert
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
+import java.io.StringReader
+import java.util.Collections.emptyMap
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -369,5 +371,56 @@ class KlaxonTest {
     @Test
     fun serializeEnum() {
         Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
+    }
+
+    fun jsonp() {
+        val po = object : PathObserver {
+            val authors = arrayListOf<String>()
+            override fun onMatch(path: String, value: Any) {
+                authors.add(value.toString())
+            }
+        }
+        Klaxon()
+            .pathObserver(".*author.*", po)
+            .parseJsonObject(StringReader("""{
+            "name": "John",
+            "store": {
+                "book": [
+                    {
+                        "category": "reference",
+                        "author": "Nigel Rees",
+                        "title": "Sayings of the Century",
+                        "price": 8.95
+                    },
+                    {
+                        "category": "fiction",
+                        "author": "Evelyn Waugh",
+                        "title": "Sword of Honour",
+                        "price": 12.99
+                    },
+                    {
+                        "category": "fiction",
+                        "author": "Herman Melville",
+                        "title": "Moby Dick",
+                        "isbn": "0-553-21311-3",
+                        "price": 8.99
+                    },
+                    {
+                        "category": "fiction",
+                        "author": "J. R. R. Tolkien",
+                        "title": "The Lord of the Rings",
+                        "isbn": "0-395-19395-8",
+                        "price": 22.99
+                    }
+                ],
+                "bicycle": {
+                    "color": "red",
+                    "price": 19.95
+                }
+            },
+            "expensive": 10
+                }"""))
+        Assert.assertEquals(po.authors,
+                listOf("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"))
     }
 }
