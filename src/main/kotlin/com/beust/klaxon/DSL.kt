@@ -60,6 +60,8 @@ data class JsonObject(val map: MutableMap<String, Any?>) : JsonBase, MutableMap<
 
         result.append("}")
     }
+
+    override fun toString() = keys.joinToString(",")
 }
 
 // Needs to be a separate function since as a constructor, its signature conflicts with the List constructor
