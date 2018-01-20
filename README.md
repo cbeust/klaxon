@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:2.0.11'
+    compile 'com.beust:klaxon:2.0.12'
 }
 ```
 
@@ -25,6 +25,7 @@ Klaxon has different API's depending on your needs:
 ## <a name="objectBindingApi">Object binding API</a>
 
 ### General usage
+
 
 To use Klaxon's high level API, you define your objects inside a class. Klaxon supports all the classes you can
 define in Kotlin as long as they are not generic:

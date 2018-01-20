@@ -2,6 +2,7 @@ Current
 =======
 
 - Better error messages.
+- GITHUB-91: Escape quotes in strings
 
 2.0.11
 ======
