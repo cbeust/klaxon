@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import org.assertj.core.api.Assertions.assertThat
 import org.testng.Assert
 import org.testng.annotations.Test
 
@@ -208,7 +209,7 @@ class BindingTest {
     }
 
     companion object {
-        fun assertContains(s1: String, s2: String) = Assert.assertTrue(s1.contains(s2))
+        fun assertContains(s1: String, s2: String) = assertThat(s1).contains(s2)
     }
 
     enum class Cardinal { NORTH, SOUTH }

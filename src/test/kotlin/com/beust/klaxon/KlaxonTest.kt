@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import org.assertj.core.api.Assertions.assertThat
 import org.testng.Assert
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
@@ -150,6 +151,13 @@ class KlaxonTest {
         assertEquals(json {
             obj("s" to "text field \"s\"\nnext line\u000cform feed\ttab\\rev solidus/solidus\bbackspace")
         }, read("/escaped.json"))
+    }
+
+    fun issue91WithQuotedDoubleStrings() {
+        val map = HashMap<String, String>()
+        map["whoops"] = """ Hello "world" """
+        val s = Klaxon().toJsonString(map)
+        assertThat(s).contains("\\\"world\\\"")
     }
 
     fun arrayLookup() {

@@ -21,30 +21,37 @@ object Render {
         }
     }
 
-    private fun <A : Appendable> A.renderString(s: String): A {
-        append("\"")
+    fun renderString(s: String) = StringBuilder().renderString(s).toString()
 
-        for (idx in 0..s.length - 1) {
-            val ch = s[idx]
-            when (ch) {
-                '"' -> append("\\").append(ch)
-                '\\' -> append(ch).append(ch)
-                '\n' -> append("\\n")
-                '\r' -> append("\\r")
-                '\t' -> append("\\t")
-                '\b' -> append("\\b")
-                '\u000c' -> append("\\f")
-                else -> {
-                    if (isNotPrintableUnicode(ch)) {
-                        append("\\u")
-                        append(Integer.toHexString(ch.toInt()).padStart(4, '0'))
-                    } else {
-                        append(ch)
+    fun escapeString(s: String): String {
+        val result = StringBuilder().apply {
+            for (idx in 0..s.length - 1) {
+                val ch = s[idx]
+                when (ch) {
+                    '"' -> append("\\").append(ch)
+                    '\\' -> append(ch).append(ch)
+                    '\n' -> append("\\n")
+                    '\r' -> append("\\r")
+                    '\t' -> append("\\t")
+                    '\b' -> append("\\b")
+                    '\u000c' -> append("\\f")
+                    else -> {
+                        if (isNotPrintableUnicode(ch)) {
+                            append("\\u")
+                            append(Integer.toHexString(ch.toInt()).padStart(4, '0'))
+                        } else {
+                            append(ch)
+                        }
                     }
                 }
             }
         }
+        return result.toString()
+    }
 
+    private fun <A : Appendable> A.renderString(s: String): A {
+        append("\"")
+        append(escapeString(s))
         append("\"")
         return this
     }

@@ -16,7 +16,7 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             = open + list.joinToString(", ") + close
 
         val result = when (value) {
-            is String, is Enum<*> -> "\"" + value + "\""
+            is String, is Enum<*> -> "\"" + Render.escapeString(value.toString()) + "\""
             is Double, is Int, is Boolean, is Long -> value.toString()
             is Collection<*> -> {
                 val elements = value.filterNotNull().map { klaxon.toJsonString(it) }
