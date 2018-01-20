@@ -17,6 +17,7 @@ val p = project {
 
     dependenciesTest {
         compile("org.testng:testng:6.13.1",
+                "org.assertj:assertj-core:3.5.2",
                 "org.jetbrains.kotlin:kotlin-test:1.2.10")
     }
 
