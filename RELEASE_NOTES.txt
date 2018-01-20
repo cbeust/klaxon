@@ -1,5 +1,10 @@
-Current
-=======
+2.1.0
+=====
+
+- Added the JSON Path API.
+
+2.0.12
+======
 
 - Better error messages.
 - GITHUB-91: Escape quotes in strings

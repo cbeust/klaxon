@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:2.0.12'
+    compile 'com.beust:klaxon:2.1.0'
 }
 ```
 
@@ -21,6 +21,18 @@ Klaxon has different API's depending on your needs:
 - [An object binding API](#objectBindingApi) to bind JSON documents directly to your objects, and vice versa.
 - [A streaming API](#streamingApi) to process your JSON documents as they're being read.
 - [A low level API](#lowLevelApi) to manipulate JSON objects and use queries on them.
+- [A JSON path query API](#jsonPath) to extract specific parts of your JSON document while streaming.
+
+These four API's cover various scenarios and you can decide which one to use based on whether you want
+to stream your document and whether you need to query it.
+
+|                     | Streaming | Query        | Manipulation |
+|---------------------|-----------|--------------|--------------|
+| Object binding API  | No        | No           | Kotlin objects |
+| Streaming API       | Yes       | No           | Kotlin objects and JsonObject/JsonArray |
+| Low level API       | No        | Yes (Kotlin) | Kotlin objects |
+| JSON Path query API | Yes       | Yes (regexp) | JsonObject/JsonArray |
+
 
 ## <a name="objectBindingApi">Object binding API</a>
 
@@ -302,6 +314,66 @@ fun streamingArray() {
     }
 }
 ```
+## <a name="jsonPath">JSON Path Query API</a>
+
+The [JSON Path specification](https://github.com/json-path/JsonPath) defines how to locate elements inside
+a JSON document. Klaxon allows you to define path matchers that can match specific elements in your
+document and receive a callback each time a matching element is found.
+
+Consider the following docoument:
+
+```json
+{
+   "library": {
+       "books": [
+           {
+               "author": "Herman Melville",
+               "title": "Moby Dick"
+           },
+           {
+               "author": "Jules Vernes",
+               "title": "L'île mystérieuse"
+           }
+       ]
+   }
+}
+```
+
+According to the JSON Path spec, the two authors have the following JSON path:
+
+```
+$.library.books[0].author
+$.library.books[1].author
+```
+
+We'll define a [`PathObserver`](https://github.com/cbeust/klaxon/blob/master/src/main/java/com/beust/klaxon/PathObserver.kt) that uses a regular expression to filter only the elements we want:
+
+```kotlin
+val pathObserver = object : PathObserver {
+    override fun pathMatches(path: String) = Pattern.matches(".*library.*books.*author.*", path)
+
+    override fun onMatch(path: String, value: Any) {
+        println("Adding $path = $value")
+    }
+}
+
+Klaxon()
+    .pathObserver(pathObserver)
+    .parseJsonObject(document)
+```
+
+Output:
+
+```
+Adding $.library.books[0].author = Herman Melville
+Adding $.library.books[1].author = Jules Vernes
+```
+
+Two notes:
+- Klaxon doesn't support the JSON Path expression language, only the element location specification.
+- This API is streaming: your path observers will be notified as soon as a matching element has been
+detected and its value completely parsed.
+
 
 ## <a name="lowLevelApi">Low level API</a>
 
