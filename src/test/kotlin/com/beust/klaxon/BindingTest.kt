@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import org.assertj.core.api.Assertions.assertThat
 import org.testng.Assert
 import org.testng.annotations.Test
 
@@ -257,5 +258,18 @@ class BindingTest {
         val result = Klaxon().toJsonString(data)
         Assert.assertTrue(result.contains("firstName"))
         Assert.assertTrue(result.contains("John"))
+    }
+
+    interface Entity<T> {
+        val value: T
+    }
+
+    fun generics() {
+        class LongEntity(override val value: Long) : Entity<Long>
+
+        val result = Klaxon().parse<LongEntity>("""{
+            "value": 42
+        }""")
+        assertThat(result?.value).isEqualTo(42)
     }
 }
