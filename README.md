@@ -40,7 +40,7 @@ to stream your document and whether you need to query it.
 
 
 To use Klaxon's high level API, you define your objects inside a class. Klaxon supports all the classes you can
-define in Kotlin as long as they are not generic:
+define in Kotlin:
 
 - Regular and `data` classes.
 - Mutable and immutable classes.
