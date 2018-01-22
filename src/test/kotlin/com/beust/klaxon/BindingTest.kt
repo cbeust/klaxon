@@ -31,7 +31,7 @@ class BindingTest {
                 "\"string\" : \"foo\"",
                 "\"isTrue\" : true",
                 "\"isFalse\" : false").forEach {
-            assertContains(s, it)
+            Asserts.assertContains(s, it)
         }
     }
 
@@ -50,7 +50,7 @@ class BindingTest {
                 .converter(CARD_CONVERTER)
                 .toJsonString(deck1)
         listOf("\"CLUBS\"", "\"suit\"", "\"value\"", "13", "\"cardCount\"", "1").forEach {
-            assertContains(s, it)
+            Asserts.assertContains(s, it)
         }
     }
 
@@ -208,10 +208,6 @@ class BindingTest {
         Assert.assertEquals(result?.name, "foo")
     }
 
-    companion object {
-        fun assertContains(s1: String, s2: String) = assertThat(s1).contains(s2)
-    }
-
     enum class Cardinal { NORTH, SOUTH }
     class Direction(var cardinal: Cardinal? = null)
     fun enum() {
@@ -262,5 +258,18 @@ class BindingTest {
         val result = Klaxon().toJsonString(data)
         Assert.assertTrue(result.contains("firstName"))
         Assert.assertTrue(result.contains("John"))
+    }
+
+    interface Entity<T> {
+        val value: T
+    }
+
+    fun generics() {
+        class LongEntity(override val value: Long) : Entity<Long>
+
+        val result = Klaxon().parse<LongEntity>("""{
+            "value": 42
+        }""")
+        assertThat(result?.value).isEqualTo(42)
     }
 }

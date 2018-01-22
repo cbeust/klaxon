@@ -22,13 +22,9 @@ class Issue84 {
 
         // Custom converter, expect the converted value
         val mapper = Klaxon().converter(EpochMilliInstantConverter())
-        BindingTest.assertContains(mapper.toJsonString(obj), "9001")
-        // Actual: {"dob" : 9001, "firstName" : "John"}
+        Asserts.assertContains(mapper.toJsonString(obj), "9001")
     }
 
-    /**
-     * This test does not pass.
-     */
     @Test
     fun serializeListOfInstants() {
         val dates = listOf(Instant.ofEpochMilli(9001))
@@ -41,7 +37,6 @@ class Issue84 {
         // despite custom converter being provided, instant is not serialized.  Empty value in list
         val mapper = Klaxon().converter(EpochMilliInstantConverter())
         val result = mapper.toJsonString(dates)
-        BindingTest.assertContains(result, "9001")
-        // Actual: [{}]
+        Asserts.assertContains(result, "9001")
     }
 }
