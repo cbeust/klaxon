@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
@@ -25,10 +26,17 @@ class Annotations {
             return result as Json?
         }
 
-        fun findNonIgnoredProperties(kc: KClass<*>?)
-                = kc?.declaredMemberProperties?.filter {
-            val ignored = it.findAnnotation<Json>()?.ignored
-            it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
+        fun findNonIgnoredProperties(kc: KClass<*>?): List<KProperty1<out Any, Any?>>? {
+            val result : List<KProperty1<out Any, Any?>>? =
+                try {
+                    kc?.declaredMemberProperties?.filter {
+                        val ignored = it.findAnnotation<Json>()?.ignored
+                        it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
+                    }
+                } catch (ex: Throwable) {
+                    emptyList()
+            }
+            return result
         }
     }
 

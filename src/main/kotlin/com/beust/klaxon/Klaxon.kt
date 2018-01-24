@@ -90,17 +90,21 @@ class Klaxon : ConverterFinder {
             = fromJsonObject(map, T::class.java, T::class) as T?
 
     inline fun <reified T> parseFromJsonArray(map: JsonArray<*>): List<T>? {
-        val result = arrayListOf<T>()
+        val result = arrayListOf<Any>()
         map.forEach { jo ->
             if (jo is JsonObject) {
                 val t = parseFromJsonObject<T>(jo)
                 if (t != null) result.add(t)
                 else throw KlaxonException("Couldn't convert $jo")
+            } else if (jo != null) {
+                val converter = findConverterFromClass(T::class.java, null)
+                val convertedValue = converter.fromJson(JsonValue(jo, null, this))
+                result.add(convertedValue!!)
             } else {
                 throw KlaxonException("Couldn't convert $jo")
             }
         }
-        return result
+        return result as List<T>
     }
 
     inline fun <reified T> maybeParse(map: JsonObject): T? = parseFromJsonObject(map)
