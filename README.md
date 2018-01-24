@@ -148,7 +148,7 @@ class BooleanHolder(val flag: Boolean)
 
 val myConverter = object: Converter<BooleanHolder> {
     override fun toJson(value: BooleanHolder): String?
-        = """{"flag" : "${if (value.flag == true) 1 else 0}""""
+        = """{"flag" : "${if (value.flag == true) 1 else 0}"""
 
     override fun fromJson(jv: JsonValue)
         = BooleanHolder(jv.objInt("flag") != 0)
