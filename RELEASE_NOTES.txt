@@ -1,3 +1,9 @@
+2.1.2
+=====
+
+GITHUB-94: Doubles everywhere
+GITHUB-95: Fix array serialization issues
+
 2.1.1
 =====
 
