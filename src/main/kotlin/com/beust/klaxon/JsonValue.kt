@@ -104,8 +104,8 @@ class JsonValue(value: Any?, val property: KProperty<*>?, private val converterF
                 type = Double::class.java
             }
             is Float -> {
-                float = value
-                type = Float::class.java
+                double = value.toDouble()
+                type = Double::class.java
             }
             is Char -> {
                 char = value

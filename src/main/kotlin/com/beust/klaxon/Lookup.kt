@@ -24,7 +24,7 @@ fun JsonObject.long(fieldName: String) : Long? {
 fun JsonObject.bigInt(fieldName: String) : BigInteger? = get(fieldName) as BigInteger
 fun JsonObject.string(fieldName: String) : String? = get(fieldName) as String?
 fun JsonObject.double(fieldName: String) : Double? = get(fieldName) as Double?
-fun JsonObject.float(fieldName: String) : Float? = get(fieldName) as Float?
+fun JsonObject.float(fieldName: String) : Float? = (get(fieldName) as Double?)?.toFloat()
 fun JsonObject.boolean(fieldName: String) : Boolean? = get(fieldName) as Boolean?
 
 

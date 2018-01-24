@@ -74,7 +74,8 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
                 val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
                 if (isLong) value.toLong() else value
             }
-            is Boolean, is String, is Double, is Float, is Long -> value
+            is Boolean, is String, is Double, is Long -> value
+            is Float -> value.toDouble()
             is Collection<*> -> value.map {
                 val jt = jv.property?.returnType?.javaType
                 // Try to find a converter for the element type of the collection

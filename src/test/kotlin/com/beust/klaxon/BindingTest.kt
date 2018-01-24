@@ -62,7 +62,6 @@ class BindingTest {
             var string: String? = null,
             var isTrue: Boolean? = null,
             var isFalse: Boolean? = null,
-            val balanceFloat: Float? = 0.0f,
             val balanceDouble: Double,
             var array: List<Int> = emptyList())
     fun allTypes() {
@@ -74,12 +73,10 @@ class BindingTest {
             "string": "foo",
             "isTrue": true,
             "isFalse": false,
-            "balanceFloat": 2.71,
             "balanceDouble": $expectedDouble
         }
         """)
-        Assert.assertEquals(result, AllTypes(42, "foo", true, false, 2.71f,
-                expectedDouble, listOf(11, 12)))
+        Assert.assertEquals(result, AllTypes(42, "foo", true, false, expectedDouble, listOf(11, 12)))
     }
 
     fun compoundObject() {

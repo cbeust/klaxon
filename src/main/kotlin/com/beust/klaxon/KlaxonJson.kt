@@ -24,7 +24,7 @@ class KlaxonJson() {
             is Long -> value
             is String -> value
             is Boolean -> value
-            is Float -> value
+            is Float -> value.toDouble()
             is Double -> value
             is BigInteger -> value
             is JsonObject -> value
