@@ -20,52 +20,52 @@ class Klaxon : ConverterFinder {
      */
     @Suppress("unused")
     fun parseJsonObject(reader: JsonReader)
-            = parser.parse(reader) as JsonObject
+            = parser().parse(reader) as JsonObject
 
     /**
      * Parse a Reader into a JsonObject.
      */
     @Suppress("unused")
     fun parseJsonObject(reader: Reader)
-            = parser.parse(reader) as JsonObject
+            = parser().parse(reader) as JsonObject
 
     /**
      * Parse a Reader into a JsonArray.
      */
     @Suppress("unused")
     fun parseJsonArray(reader: Reader)
-            = parser.parse(reader) as JsonArray<*>
+            = parser().parse(reader) as JsonArray<*>
 
     /**
      * Parse a JSON string into an object.
      */
     inline fun <reified T> parse(json: String): T?
-            = maybeParse(parser.parse(StringReader(json)) as JsonObject)
+            = maybeParse(parser(T::class).parse(StringReader(json)) as JsonObject)
 
     /**
      * Parse a JSON string into a JsonArray.
      */
     inline fun <reified T> parseArray(json: String): List<T>?
-            = parseFromJsonArray(parser.parse(StringReader(json)) as JsonArray<*>)
+            = parseFromJsonArray(parser(T::class).parse(StringReader(json)) as JsonArray<*>)
 
     /**
      * Parse a JSON file into an object.
      */
     inline fun <reified T> parse(file: File): T?
-            = maybeParse(parser.parse(FileReader(file)) as JsonObject)
+            = maybeParse(parser(T::class).parse(FileReader(file)) as JsonObject)
 
     /**
      * Parse an InputStream into an object.
      */
     inline fun <reified T> parse(inputStream: InputStream): T? {
-        return maybeParse(parser.parse(toReader(inputStream)) as JsonObject)
+        return maybeParse(parser(T::class).parse(toReader(inputStream)) as JsonObject)
     }
 
     /**
      * Parse a JsonReader into an array.
      */
     inline fun <reified T> parse(jsonReader: JsonReader): T? {
-        val p = Parser(pathMatchers,jsonReader.lexer, streaming = true)
+        val p = parser(T::class, jsonReader.lexer, streaming = true)
         return maybeParse(p.parse(jsonReader) as JsonObject)
     }
 
@@ -73,14 +73,14 @@ class Klaxon : ConverterFinder {
      * Parse a Reader into an object.
      */
     inline fun <reified T> parse(reader: Reader): T? {
-        return maybeParse(parser.parse(reader) as JsonObject)
+        return maybeParse(parser(T::class).parse(reader) as JsonObject)
     }
 
     /**
      * Parse an InputStream into a JsonArray.
      */
     inline fun <reified T> parseArray(inputStream: InputStream): List<T>? {
-        return parseFromJsonArray(parser.parse(toReader(inputStream)) as JsonArray<*>)
+        return parseFromJsonArray(parser(T::class).parse(toReader(inputStream)) as JsonArray<*>)
     }
 
     /**
@@ -112,6 +112,7 @@ class Klaxon : ConverterFinder {
     fun toReader(inputStream: InputStream, charset: Charset = Charsets.UTF_8)
             = inputStream.reader(charset)
 
+    @Suppress("MemberVisibilityCanBePrivate")
     val pathMatchers = arrayListOf<PathMatcher>()
 
     fun pathMatcher(po: PathMatcher): Klaxon {
@@ -119,7 +120,24 @@ class Klaxon : ConverterFinder {
         return this
     }
 
-    val parser = Parser(pathMatchers)
+    private val allPaths = hashMapOf<String, Any>()
+
+    inner class DefaultPathMatcher(private val paths: Set<String>) : PathMatcher {
+        override fun pathMatches(path: String) : Boolean {
+            println("MATCHING $path")
+            return paths.contains(path)
+        }
+        override fun onMatch(path: String, value: Any) { allPaths[path] = value }
+    }
+
+    fun parser(kc: KClass<*>? = null, passedLexer: Lexer? = null, streaming: Boolean = false): Parser {
+        val result = Annotations.findJsonPaths(kc)
+        if (result.any()) {
+            pathMatchers.add(DefaultPathMatcher(result.toSet()))
+        }
+
+        return Parser(pathMatchers, passedLexer, streaming)
+    }
 
     private val DEFAULT_CONVERTER = DefaultConverter(this)
 
@@ -240,32 +258,39 @@ class Klaxon : ConverterFinder {
             // Only keep the properties that are public and do not have @Json(ignored = true)
             val allProperties = Annotations.findNonIgnoredProperties(kc)
 
-            allProperties?.forEach { prop ->
+            allProperties.forEach { thisProp ->
                 //
                 // Check if the name of the field was overridden with a @Json annotation
                 //
-                val prop = kc.declaredMemberProperties.first { it.name == prop.name }
+                val prop = kc.declaredMemberProperties.first { it.name == thisProp.name }
                 val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
                 val fieldName =
                         if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
                         else prop.name
+                val path = if (jsonAnnotation?.path != "") jsonAnnotation?.path else null
 
                 // Retrieve the value of that property and convert it from JSON
                 val jValue = jsonObject[fieldName]
 
-                if (jValue != null) {
-                    val convertedValue = findConverterFromClass(cls, prop)
-                            .fromJson(JsonValue(jValue, prop, this@Klaxon))
-                    if (convertedValue != null) {
-                        result[prop.name] = convertedValue
+                if (path == null) {
+                    if (jValue != null) {
+                        val convertedValue = findConverterFromClass(cls, prop)
+                                .fromJson(JsonValue(jValue, prop, this@Klaxon))
+                        if (convertedValue != null) {
+                            result[prop.name] = convertedValue
+                        } else {
+                            throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
+                                    + "field named \"${prop.name}\"")
+                        }
                     } else {
-                        throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
-                                + "field named \"${prop.name}\"")
+                        // Didn't find any value for that property: don't do anything. If a value is missing here,
+                        // it might still be found as a default value on the constructor, and we'll find out once we
+                        // try to instantiate that object.
                     }
                 } else {
-                    // Didn't find any value for that property: don't do anything. If a value is missing here,
-                    // it might still be found as a default value on the constructor, and we'll find out once we
-                    // try to instantiate that object.
+                    result[prop.name] = allPaths[path]
+                        ?: throw KlaxonException("Couldn't find path \"$path\" specified on field \"${prop.name}\"")
+
                 }
             }
             return result
@@ -278,13 +303,14 @@ class Klaxon : ConverterFinder {
          */
         fun instantiateAndInitializeObject() : Any {
             val map = retrieveKeyValues()
+            val concreteClass = if (kotlin.collections.List::class.java.isAssignableFrom(kc.java)) ArrayList::class else kc
 
             // Go through all the Kotlin constructors and associate each parameter with its value.
-            // (Kotlin constructors contain the names of their parameters as opposed to Java constructors).
+            // (Kotlin constructors contain the names of their parameters).
             // Note that this code will work for default parameters as well: values missing in the JSON map
             // will be filled by Kotlin reflection if they can't be found.
             var error: String? = null
-            val result = kc.constructors.firstNotNullResult { constructor ->
+            val result = concreteClass.constructors.firstNotNullResult { constructor ->
                 val parameterMap = hashMapOf<KParameter,Any>()
                 constructor.parameters.forEach { parameter ->
                     map[parameter.name]?.let { convertedValue ->
@@ -305,7 +331,7 @@ class Klaxon : ConverterFinder {
             }
 
             return result ?: throw KlaxonException(
-                    "Couldn't find a suitable constructor for class ${kc?.simpleName} to initialize with $map: $error")
+                    "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map: $error")
         }
 
         // If the user provided a type converter, use it, otherwise try to instantiate the object ourselves.

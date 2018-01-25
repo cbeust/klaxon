@@ -26,18 +26,36 @@ class Annotations {
             return result as Json?
         }
 
-        fun findNonIgnoredProperties(kc: KClass<*>?): List<KProperty1<out Any, Any?>>? {
-            val result : List<KProperty1<out Any, Any?>>? =
-                try {
-                    kc?.declaredMemberProperties?.filter {
-                        val ignored = it.findAnnotation<Json>()?.ignored
-                        it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
-                    }
-                } catch (ex: Throwable) {
-                    emptyList()
+        fun findProperties(kc: KClass<*>?): Collection<KProperty1<out Any, Any?>> = try {
+                if (kc != null) kc.declaredMemberProperties else emptyList()
+            } catch (ex: Throwable) {
+                // https://youtrack.jetbrains.com/issue/KT-16616
+                emptyList()
+            }
+
+        fun findNonIgnoredProperties(kc: KClass<*>?): List<KProperty1<out Any, Any?>> {
+            val result = findProperties(kc).filter {
+                val ignored = it.findAnnotation<Json>()?.ignored
+                it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
             }
             return result
         }
-    }
 
+        fun findJsonPaths(kc: KClass<*>?): Set<String> {
+            val result = hashSetOf<String>()
+            val others = arrayListOf<KClass<*>>()
+            val thesePaths = findProperties(kc)
+                    .mapNotNull {
+                        val c = it.returnType.classifier as KClass<*>
+                        others.add(c)
+                        it.findAnnotation<Json>()
+                    }
+                    .map { it.path }
+            val recursive = others.flatMap{ findJsonPaths(it) }
+            result.addAll(thesePaths)
+            result.addAll(recursive)
+//            println("JSON PATHS FOR $kc: $result")
+            return result
+        }
+    }
 }

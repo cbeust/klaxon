@@ -59,46 +59,101 @@ class PathMatcherTest {
             }
         }
         Klaxon()
-                .pathMatcher(po)
-                .parseJsonObject(StringReader("""{
-            "name": "John",
-            "store": {
-                "book": [
-                    {
-                        "category": "reference",
-                        "author": "Nigel Rees",
-                        "title": "Sayings of the Century",
-                        "price": 8.95
-                    },
-                    {
-                        "category": "fiction",
-                        "author": "Evelyn Waugh",
-                        "title": "Sword of Honour",
-                        "price": 12.99
-                    },
-                    {
-                        "category": "fiction",
-                        "author": "Herman Melville",
-                        "title": "Moby Dick",
-                        "isbn": "0-553-21311-3",
-                        "price": 8.99
-                    },
-                    {
-                        "category": "fiction",
-                        "author": "J. R. R. Tolkien",
-                        "title": "The Lord of the Rings",
-                        "isbn": "0-395-19395-8",
-                        "price": 22.99
+            .pathMatcher(po)
+            .parseJsonObject(StringReader("""{
+                "name": "John",
+                "store": {
+                    "book": [
+                        {
+                            "category": "reference",
+                            "author": "Nigel Rees",
+                            "title": "Sayings of the Century",
+                            "price": 8.95
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "Evelyn Waugh",
+                            "title": "Sword of Honour",
+                            "price": 12.99
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "Herman Melville",
+                            "title": "Moby Dick",
+                            "isbn": "0-553-21311-3",
+                            "price": 8.99
+                        },
+                        {
+                            "category": "fiction",
+                            "author": "J. R. R. Tolkien",
+                            "title": "The Lord of the Rings",
+                            "isbn": "0-395-19395-8",
+                            "price": 22.99
+                        }
+                    ],
+                    "bicycle": {
+                        "color": "red",
+                        "price": 19.95
                     }
-                ],
-                "bicycle": {
-                    "color": "red",
-                    "price": 19.95
-                }
-            },
-            "expensive": 10
-        }"""))
+                },
+                "expensive": 10
+            }"""))
         Assert.assertEquals(po.authors,
                 listOf("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"))
     }
+
+    data class WithPath(
+        val id: Int,
+        @Json(path = "$.person.name")
+        val name: String
+    )
+
+    fun fieldWithPath() {
+        val result = Klaxon()
+            .parse<WithPath>(StringReader("""{
+                "id": 2,
+                "person": {
+                   "name": "John"
+                }
+            }"""))
+        assertThat(result).isEqualTo(WithPath(2, "John"))
+    }
+
+    data class Library(val titles: List<String>, val books: List<Book>, val people: List<Author>)
+
+    data class Book(
+            @Json(path = "$.titles[1]")
+            val title: String,
+            val author: Author
+    )
+    data class Author(
+            @Json(path = "$.people[0].authorName")
+            val authorName: String
+    )
+
+    @Test(enabled = false)
+    fun fieldWithNestedPath() {
+        val k = Klaxon()
+        val result = k
+//                .parseJsonObject(StringReader("""{
+                .parse<Library>(StringReader("""{
+                "titles": [
+                  "Bad title",
+                  "Hyperion"
+                ],
+                "book": {
+                    "title": "Wrong title",
+                    "author": {
+                        "authorName": "Wrong author"
+                    }
+                },
+                "people": [
+                    { "authorName": "Simmons" }
+                ],
+            }"""))
+        println("Result: $result")
+//        assertThat(result).isEqualTo(Library(Book("Hyperion", Author("Simmons"))))
+    }
 }
+
+
