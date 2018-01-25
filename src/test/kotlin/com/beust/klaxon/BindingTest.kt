@@ -31,7 +31,7 @@ class BindingTest {
                 "\"string\" : \"foo\"",
                 "\"isTrue\" : true",
                 "\"isFalse\" : false").forEach {
-            Asserts.assertContains(s, it)
+            assertThat(s).contains(it)
         }
     }
 

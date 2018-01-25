@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import org.assertj.core.api.Assertions.assertThat
 import org.testng.Assert
 import org.testng.annotations.Test
 import java.time.LocalDateTime
@@ -126,8 +127,8 @@ class BindingAdapterTest {
                 "card" : "KS"
             }
         """)
-        Assert.assertEquals(result?.cardCount, 1)
-        Assert.assertEquals(result?.card, Card(13, "Spades"))
+        assertThat(result?.cardCount).isEqualTo(1)
+        assertThat(result?.card).isEqualTo(Card(13, "Spades"))
     }
 
     fun withConverter2() = privateConverter2(withAdapter = true)
@@ -154,7 +155,7 @@ class BindingAdapterTest {
                 "lastName": "Smith"
             }
         """)
-        Assert.assertEquals(result?.fullName, "John Smith")
+        assertThat(result?.fullName).isEqualTo("John Smith")
     }
 
     class BooleanHolder(var flag: Boolean? = null)
@@ -173,7 +174,7 @@ class BindingAdapterTest {
             { "flag": 1 }, { "flag": 0 }
             ]
         """)
-        Assert.assertEquals(result?.get(0)?.flag, true)
-        Assert.assertEquals(result?.get(1)?.flag, false)
+        assertThat(result?.get(0)?.flag).isTrue()
+        assertThat(result?.get(1)?.flag).isFalse()
     }
 }
