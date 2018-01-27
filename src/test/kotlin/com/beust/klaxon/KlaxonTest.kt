@@ -315,6 +315,11 @@ class KlaxonTest {
         assertKlaxonEquals(listOf(null, null, null), result)
     }
 
+    private fun valueToString(v: Any?, prettyPrint: Boolean = false, canonical : Boolean = false) : String =
+        StringBuilder().apply {
+            Render.renderValue(v, this, prettyPrint, canonical, 0)
+        }.toString()
+
     fun renderMap() {
         val map = mapOf(
             "a" to 1,

@@ -13,6 +13,13 @@ by map {
     override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
         result.append("{")
 
+        fun indent(a: Appendable, level: Int) {
+            for (i in 1..level) {
+                a.append("  ")
+            }
+        }
+
+
         var comma = false
         for ((k, v) in (if(canonical) map.toSortedMap() else map)) {
             if (comma) {
@@ -23,7 +30,7 @@ by map {
 
             if (prettyPrint && !canonical) {
                 result.appendln()
-                result.indent(level + 1)
+                indent(result, level + 1)
             }
 
             result.append("\"").append(k).append("\":")
@@ -36,7 +43,7 @@ by map {
 
         if (prettyPrint && !canonical && map.isNotEmpty()) {
             result.appendln()
-            result.indent(level)
+            indent(result, level)
         }
 
         result.append("}")
