@@ -11,15 +11,13 @@ by map {
 //    constructor() : this(mutableMapOf<String, Any?>()) {}
 
     override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
-        result.append("{")
-
         fun indent(a: Appendable, level: Int) {
             for (i in 1..level) {
                 a.append("  ")
             }
         }
 
-
+        result.append("{")
         var comma = false
         for ((k, v) in (if(canonical) map.toSortedMap() else map)) {
             if (comma) {
@@ -53,21 +51,25 @@ by map {
 
     @Suppress("UNCHECKED_CAST")
     fun <T> array(fieldName: String) : JsonArray<T>? = get(fieldName) as JsonArray<T>?
+
     fun obj(fieldName: String) : JsonObject? = get(fieldName) as JsonObject?
+
     fun int(fieldName: String) : Int? {
         val value = get(fieldName)
-        when (value) {
-            is Number -> return value.toInt()
-            else -> return value as Int?
+        return when (value) {
+            is Number -> value.toInt()
+            else -> value as Int?
         }
     }
+
     fun long(fieldName: String) : Long? {
         val value = get(fieldName)
-        when (value) {
-            is Number -> return value.toLong()
-            else -> return value as Long?
+        return when (value) {
+            is Number -> value.toLong()
+            else -> value as Long?
         }
     }
+
     fun bigInt(fieldName: String) : BigInteger? = get(fieldName) as BigInteger
     fun string(fieldName: String) : String? = get(fieldName) as String?
     fun double(fieldName: String) : Double? = get(fieldName) as Double?
