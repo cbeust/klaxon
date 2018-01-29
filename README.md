@@ -577,8 +577,8 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 
 ## Pretty printing
 
-You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get pretty-printed
-version then you can call `toJsonString(true)`
+You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get a pretty-printed
+version of that string, call `toJsonString(true)`
 
 ## <a name="advancedDsl">Advanced DSL</a>
 
