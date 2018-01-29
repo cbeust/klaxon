@@ -14,6 +14,10 @@ dependencies {
 }
 ```
 
+## Community
+
+Join the [`#klaxon` Slack channel](https://kotlinlang.slack.com/messages/C90AVCDQU/).
+
 ## Use
 
 Klaxon has different API's depending on your needs:
