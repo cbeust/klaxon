@@ -124,7 +124,6 @@ class Klaxon : ConverterFinder {
 
     inner class DefaultPathMatcher(private val paths: Set<String>) : PathMatcher {
         override fun pathMatches(path: String) : Boolean {
-            println("MATCHING $path")
             return paths.contains(path)
         }
         override fun onMatch(path: String, value: Any) { allPaths[path] = value }

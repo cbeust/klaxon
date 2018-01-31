@@ -269,4 +269,11 @@ class BindingTest {
         }""")
         assertThat(result?.value).isEqualTo(42)
     }
+
+    fun set() {
+        data class A(val data: Set<String>)
+        val b = A(setOf("test"))
+        val json = Klaxon().toJsonString(b)
+        Klaxon().parse<A>(json)
+    }
 }

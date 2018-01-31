@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
+import kotlin.reflect.KClass
 import kotlin.reflect.jvm.javaType
 
 /**
@@ -78,22 +79,28 @@ class DefaultConverter(private val klaxon: Klaxon) : Converter<Any> {
             }
             is Boolean, is String, is Double, is Long -> value
             is Float -> value.toDouble()
-            is Collection<*> -> value.map {
-                val jt = jv.property?.returnType?.javaType
-                // Try to find a converter for the element type of the collection
-                val converter =
-                        if (jt is ParameterizedType) {
-                            val cls = jt.actualTypeArguments[0] as Class<*>
-                            klaxon.findConverterFromClass(cls, null)
-                        } else {
-                            if (it != null) {
-                                klaxon.findConverter(it)
+            is Collection<*> -> {
+                val collection = value.map {
+                    val jt = jv.property?.returnType?.javaType
+                    // Try to find a converter for the element type of the collection
+                    val converter =
+                            if (jt is ParameterizedType) {
+                                val cls = jt.actualTypeArguments[0] as Class<*>
+                                klaxon.findConverterFromClass(cls, null)
                             } else {
-                                throw KlaxonException("Don't know how to convert null value in array $jv")
+                                if (it != null) {
+                                    klaxon.findConverter(it)
+                                } else {
+                                    throw KlaxonException("Don't know how to convert null value in array $jv")
+                                }
                             }
-                        }
 
-                converter.fromJson(JsonValue(it, jv.property, klaxon))
+                    val jValue = JsonValue(it, jv.property, klaxon)
+                    converter.fromJson(jValue)
+                }
+                val classifier = jv.property?.returnType?.classifier as KClass<*>
+                if (Set::class.java.isAssignableFrom(classifier.java)) collection.toSet()
+                else collection
             }
             is JsonObject -> {
                 val jt = jv.property?.returnType?.javaType
