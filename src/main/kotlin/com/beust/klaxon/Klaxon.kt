@@ -12,7 +12,6 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
-import kotlin.reflect.jvm.javaType
 
 class Klaxon : ConverterFinder {
     /**
@@ -162,7 +161,8 @@ class Klaxon : ConverterFinder {
         var cls: java.lang.reflect.Type? = null
         converter::class.declaredFunctions.forEach { f ->
             if (f.name == "toJson") {
-                cls = f.parameters.firstOrNull { it.kind == KParameter.Kind.VALUE }?.type?.javaType
+                val classifier = f.parameters.firstOrNull { it.kind == KParameter.Kind.VALUE }?.type?.classifier
+                cls = (classifier as KClass<*>).java
             }
 //            extractAnnotation(FromJson::class, f)?.let { fromType ->
 //                fromMap[fromType.javaType] = f

@@ -384,4 +384,20 @@ class KlaxonTest {
     fun serializeEnum() {
         Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
     }
+
+    fun mapTest() {
+        val mapConverter = object: Converter<HashMap<String, Any?>> {
+            override fun toJson(value: HashMap<String, Any?>): String? {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun fromJson(jv: JsonValue): HashMap<String, Any?> = HashMap(jv.obj!!)
+        }
+        val m: HashMap<String, String> = Klaxon()
+                .converter(mapConverter)
+                .parse("""{
+            "a": "b"
+            }""")!!
+        assertThat(m["a"]).isEqualTo("b")
+    }
 }
