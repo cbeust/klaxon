@@ -387,12 +387,10 @@ class KlaxonTest {
 
     fun mapTest() {
         val mapConverter = object: Converter<HashMap<String, Any?>> {
-            override fun toJson(value: HashMap<String, Any?>): String? {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
             override fun fromJson(jv: JsonValue): HashMap<String, Any?> = HashMap(jv.obj!!)
+            override fun toJson(value: HashMap<String, Any?>) = TODO("not implemented")
         }
+
         val m: HashMap<String, String> = Klaxon()
                 .converter(mapConverter)
                 .parse("""{
