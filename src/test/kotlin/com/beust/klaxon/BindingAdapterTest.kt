@@ -88,33 +88,36 @@ class BindingAdapterTest {
         Assert.assertEquals(result?.date, LocalDateTime.of(2017, 5, 10, 16, 30))
     }
 
-    val CARD_ADAPTER = object: Converter<Card> {
-        override fun fromJson(value: JsonValue): Card {
-            fun parseCard(str: String) : Card? {
-                val s0 = str[0]
-                val cardValue =
-                        if (s0 == '1' && str[1] == '0') 10
-                        else if (s0 == 'K') 13
-                        else (s0 - '0')
-                val suit = when(str[1]) {
-                    'H' -> "Hearts"
-                    'S' -> "Spades"
-                    else -> ""
-                }
-                return if (suit != "") Card(cardValue, suit) else null
-            }
-            val result =
-                    if (value.string != null) {
-                        val str = value.string
-                        if (str != null) parseCard(str) else null
-                    } else {
-                        null
+    companion object {
+        val CARD_ADAPTER = object : Converter<Card> {
+            override fun fromJson(value: JsonValue): Card {
+                fun parseCard(str: String): Card? {
+                    val s0 = str[0]
+                    val cardValue =
+                            if (s0 == '1' && str[1] == '0') 10
+                            else if (s0 == 'K') 13
+                            else (s0 - '0')
+                    val suit = when (str[1]) {
+                        'H' -> "Hearts"
+                        'S' -> "Spades"
+                        else -> ""
                     }
-            return result ?: throw KlaxonException("Couldn't parse card")
-        }
+                    return if (suit != "") Card(cardValue, suit) else null
+                }
 
-        override fun toJson(obj: Card): String {
-            return "some JSON"
+                val result =
+                        if (value.string != null) {
+                            val str = value.string
+                            if (str != null) parseCard(str) else null
+                        } else {
+                            null
+                        }
+                return result ?: throw KlaxonException("Couldn't parse card")
+            }
+
+            override fun toJson(obj: Card): String {
+                return "some JSON"
+            }
         }
     }
 

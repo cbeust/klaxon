@@ -385,17 +385,4 @@ class KlaxonTest {
         Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
     }
 
-    fun mapTest() {
-        val mapConverter = object: Converter<HashMap<String, Any?>> {
-            override fun fromJson(jv: JsonValue): HashMap<String, Any?> = HashMap(jv.obj!!)
-            override fun toJson(value: HashMap<String, Any?>) = TODO("not implemented")
-        }
-
-        val m: HashMap<String, String> = Klaxon()
-                .converter(mapConverter)
-                .parse("""{
-            "a": "b"
-            }""")!!
-        assertThat(m["a"]).isEqualTo("b")
-    }
 }

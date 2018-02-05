@@ -13,18 +13,23 @@ class Annotations {
          * and then the properties of the class.
          */
         fun findJsonAnnotation(kc: KClass<*>, propertyName: String) : Json? {
-            val field = kc.java.fields.filter { it.name == propertyName }.firstOrNull()
-            val r1 = field?.annotations?.firstOrNull { it.javaClass == Json::class.java }
-            val result =
-                if (r1 == null) {
-                    val r2 = kc.declaredMemberProperties
-                            .filter { it.name == propertyName }
-                            .mapNotNull { it.findAnnotation<Json>() }
-                    if (r2.isEmpty()) null else r2[0]
-                } else {
-                    r1
+            try {
+                val r1 = kc.java.getDeclaredField(propertyName).annotations.firstOrNull {
+                    it.javaClass == Json::class.java
                 }
-            return result as Json?
+                val result =
+                        if (r1 == null) {
+                            val r2 = kc.declaredMemberProperties
+                                    .filter { it.name == propertyName }
+                                    .mapNotNull { it.findAnnotation<Json>() }
+                            if (r2.isEmpty()) null else r2[0]
+                        } else {
+                            r1
+                        }
+                return result as Json?
+            } catch(ex: NoSuchFieldException) {
+                return null
+            }
         }
 
         fun findProperties(kc: KClass<*>?): Collection<KProperty1<out Any, Any?>> = try {

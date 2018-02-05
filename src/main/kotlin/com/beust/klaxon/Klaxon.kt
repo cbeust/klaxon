@@ -3,7 +3,11 @@ package com.beust.klaxon
 import com.beust.klaxon.internal.ConverterFinder
 import com.beust.klaxon.internal.firstNotNullResult
 import java.io.*
+import java.lang.reflect.ParameterizedType
 import java.nio.charset.Charset
+import java.util.HashMap
+import kotlin.collections.ArrayList
+import kotlin.collections.set
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
@@ -12,6 +16,7 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
+import kotlin.reflect.jvm.javaType
 
 class Klaxon : ConverterFinder {
     /**
@@ -138,6 +143,14 @@ class Klaxon : ConverterFinder {
     }
 
     private val DEFAULT_CONVERTER = DefaultConverter(this)
+    companion object {
+        val MAP_CONVERTER = object : Converter<HashMap<String, Any?>> {
+            override fun fromJson(jv: JsonValue): HashMap<String, Any?>
+                    = HashMap(jv.obj!!)
+            override fun toJson(value: HashMap<String, Any?>) = TODO("not implemented")
+        }
+    }
+
 
     /**
      * Type converters that convert a JsonObject into an object.
@@ -158,11 +171,10 @@ class Klaxon : ConverterFinder {
 //            return result
 //        }
 
-        var cls: java.lang.reflect.Type? = null
+        var type: java.lang.reflect.Type? = null
         converter::class.declaredFunctions.forEach { f ->
             if (f.name == "toJson") {
-                val classifier = f.parameters.firstOrNull { it.kind == KParameter.Kind.VALUE }?.type?.classifier
-                cls = (classifier as KClass<*>).java
+                type = f.parameters.firstOrNull { it.kind == KParameter.Kind.VALUE }?.type?.javaType
             }
 //            extractAnnotation(FromJson::class, f)?.let { fromType ->
 //                fromMap[fromType.javaType] = f
@@ -172,8 +184,11 @@ class Klaxon : ConverterFinder {
 //            }
         }
         converters.add(0, converter)
-        if (cls != null) {
-            converterMap[cls!!] = converter
+        if (type != null) {
+            val c: java.lang.reflect.Type =
+                    if (type is ParameterizedType) (type as ParameterizedType).rawType else type!!
+            converterMap.put(c, converter)
+//            converterMap[c] = converter
         } else {
             throw KlaxonException("Couldn't identify which type this converter converts: $converter")
         }
@@ -225,8 +240,26 @@ class Klaxon : ConverterFinder {
                 null
             }
 
-        val result = propConverter ?: converterMap[cls ?: jc] ?: DEFAULT_CONVERTER
+//        if (propConverter == null) {
+//
+//        }
+//        if (cls != null) findConverter(cls as Class<*>)
+//        val t = (if (cls != null) cls as java.lang.reflect.Type else jc as java.lang.reflect.Type)
+//        val cc = converterMap.get(t)
+        val result = propConverter
+                ?: findBestConverter(jc)
+                ?: (if (cls != null) findBestConverter(cls) else null)
+                ?: DEFAULT_CONVERTER
+        log("findConverterFromClass $jc returning $result")
         return result
+    }
+
+    private fun findBestConverter(cls: Class<*>) : Converter<*>? {
+        val result = converterMap.entries.firstOrNull { entry ->
+            val type = entry.key as Class<*>
+            cls.isAssignableFrom(type)
+        }
+        return result?.value
     }
 
     fun toJsonString(value: Any): String {
@@ -274,7 +307,7 @@ class Klaxon : ConverterFinder {
                 if (path == null) {
                     if (jValue != null) {
                         val convertedValue = findConverterFromClass(cls, prop)
-                                .fromJson(JsonValue(jValue, prop, this@Klaxon))
+                                .fromJson(JsonValue(jValue, prop.returnType, this@Klaxon))
                         if (convertedValue != null) {
                             result[prop.name] = convertedValue
                         } else {
@@ -285,6 +318,9 @@ class Klaxon : ConverterFinder {
                         // Didn't find any value for that property: don't do anything. If a value is missing here,
                         // it might still be found as a default value on the constructor, and we'll find out once we
                         // try to instantiate that object.
+//                        val conv = findConverterFromClass(cls, thisProp)
+//                        val cv = conv.fromJson(JsonValue(jsonObject, thisProp.returnType, this@Klaxon))
+//                        println("CV: $cv")
                     }
                 } else {
                     result[prop.name] = allPaths[path]
@@ -301,7 +337,6 @@ class Klaxon : ConverterFinder {
          * no suitable constructor was found.
          */
         fun instantiateAndInitializeObject() : Any {
-            val map = retrieveKeyValues()
             val concreteClass = if (kotlin.collections.List::class.java.isAssignableFrom(kc.java)) ArrayList::class else kc
 
             // Go through all the Kotlin constructors and associate each parameter with its value.
@@ -309,6 +344,7 @@ class Klaxon : ConverterFinder {
             // Note that this code will work for default parameters as well: values missing in the JSON map
             // will be filled by Kotlin reflection if they can't be found.
             var error: String? = null
+            val map = retrieveKeyValues()
             val result = concreteClass.constructors.firstNotNullResult { constructor ->
                 val parameterMap = hashMapOf<KParameter,Any>()
                 constructor.parameters.forEach { parameter ->
@@ -348,4 +384,7 @@ class Klaxon : ConverterFinder {
         if (Debug.verbose) println(s)
     }
 
+    init {
+        converter(MAP_CONVERTER)
+    }
 }
