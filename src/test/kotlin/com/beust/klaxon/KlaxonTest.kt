@@ -384,4 +384,5 @@ class KlaxonTest {
     fun serializeEnum() {
         Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
     }
+
 }

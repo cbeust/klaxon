@@ -1,0 +1,211 @@
+{
+  "events" : {
+    "-L3daccTVLOcYi9hVHsD" : {
+      "description" : "<p>Get your badge and breakfast before the talks start.</p>",
+      "duration" : "PT1H",
+      "isGeneralEvent" : true,
+      "isPublished" : true,
+      "name" : "Registration & Breakfast",
+      "roomIds" : {
+        "-L3dafKRjcsfpsvrqn82" : true
+      },
+      "startTime" : "2018-02-01T14:00:00.000Z",
+      "updatedAt" : 1516821464815,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dbFPwUx9Q6K7pqN-L" : {
+      "description" : "<p>Trying to learn about filmmaking was tough for Zach. In his adventures trying to use Final Cut Pro, he found a lack of resources. He forced himself to learn by creating his own tutorial site. Trial and error gave him invaluable experience, which led to innovating in new mediums and a supporting role in Zootopia.</p>\n<p>Zach shares his story on experience and how it can lead to unexpected paths.</p>",
+      "duration" : "PT1H30M",
+      "isGeneralEvent" : true,
+      "isPublished" : true,
+      "name" : "The New Age of Experience",
+      "roomIds" : {
+        "-L3dbJhcrABxtcCeCE0I" : true
+      },
+      "speakerIds" : {
+        "-L3dd0queRj8ffFi-_sx" : true
+      },
+      "startTime" : "2018-02-01T15:00:00.000Z",
+      "updatedAt" : 1516822759721,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dfyD125eXmG6FAPBx" : {
+      "description" : "<p>A in-depth design workshop.</p>",
+      "duration" : "PT5H30M",
+      "isGeneralEvent" : false,
+      "isPublished" : true,
+      "name" : "Design Workshop",
+      "roomIds" : {
+        "-L3dbNIg6JuunPgD37Os" : true
+      },
+      "speakerIds" : {
+        "-L3dlTYjoDUJrXrrPMDS" : true
+      },
+      "startTime" : "2018-02-01T16:30:00.000Z",
+      "trackId" : "-L3daEMFuTMgXRUqmPdk",
+      "updatedAt" : 1516824313823,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dgDtbhQnkQb75wMlU" : {
+      "description" : "<p>A in-depth engineering workshop.</p>",
+      "duration" : "PT5H30M",
+      "isGeneralEvent" : false,
+      "isPublished" : true,
+      "name" : "Engineering Workshop",
+      "roomIds" : {
+        "-L3dbJhcrABxtcCeCE0I" : true,
+        "-L3dbV4V-I0VIFuPN-GG" : true
+      },
+      "speakerIds" : {
+        "-L3dh2BblGFOUmPwsEib" : true,
+        "-L3diC4vTxzzTok0ODOC" : true,
+        "-L3dosApLejO6jxtrLGg" : true
+      },
+      "startTime" : "2018-02-01T16:30:00.000Z",
+      "trackId" : "-L3daHLsiaLB448RhtOx",
+      "updatedAt" : 1516825189806,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dlnOfnGJGtcq9ebz9" : {
+      "description" : "<p><br></p>",
+      "duration" : "PT8H",
+      "isGeneralEvent" : true,
+      "isPublished" : true,
+      "name" : "Service in the Community",
+      "startTime" : "2018-02-02T14:00:00.000Z",
+      "updatedAt" : 1516824376313,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    }
+  },
+  "rooms" : {
+    "-L3dafKRjcsfpsvrqn82" : {
+      "name" : "Main Lobby",
+      "updatedAt" : 1516821459682,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dbJhcrABxtcCeCE0I" : {
+      "name" : "Main Ballroom",
+      "updatedAt" : 1516821629172,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dbNIg6JuunPgD37Os" : {
+      "name" : "Salon A",
+      "updatedAt" : 1516821643894,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dbV4V-I0VIFuPN-GG" : {
+      "name" : "Salon B",
+      "updatedAt" : 1516821675755,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    }
+  },
+  "sections" : {
+    "-L3dXawqxLOm4bJSBexw" : {
+      "endTime" : "2018-02-01T22:00:00.000Z",
+      "name" : "Day 1",
+      "startTime" : "2018-02-01T14:00:00.000Z",
+      "title" : "Thursday, February 1",
+      "updatedAt" : 1516820394058,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dY4vOLMsk_fdZfV2U" : {
+      "endTime" : "2018-02-02T22:00:00.000Z",
+      "name" : "Day 2",
+      "startTime" : "2018-02-02T14:00:00.000Z",
+      "title" : "Friday, February 2",
+      "updatedAt" : 1516820520710,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    }
+  },
+  "speakers" : {
+    "-L3dd0queRj8ffFi-_sx" : {
+      "bio" : "<p>Zach King is an American Vine star, filmmaker and YouTube personality based in Los Angeles. He is most known for his \"magic vines\" - six-second videos digitally edited to look as if he is doing magic. He calls his videos \"digital sleight of hand\".</p>",
+      "isFeatured" : false,
+      "name" : "Zach King",
+      "org" : "FinalCutKing",
+      "pictureId" : "8e7f7bdd-15ca-46ab-bf49-14ffbfdf1622",
+      "pictureUrl" : "https://firebasestorage.googleapis.com/v0/b/slidesup-test.appspot.com/o/confs%2Fdetail%2Fsample-conference%2Fspeakers%2F8e7f7bdd-15ca-46ab-bf49-14ffbfdf1622.png?alt=media&token=b35350bb-3234-49a7-95fa-7a1bfd6a869d",
+      "socialProfiles" : {
+        "facebook" : "ZachKingVine",
+        "twitter" : "finalcutking",
+        "web" : "finalcutking.com"
+      },
+      "title" : "Filmmaker",
+      "updatedAt" : 1516822076224,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dh2BblGFOUmPwsEib" : {
+      "bio" : "<p>Addy Osmani is an engineer that's worked on the web for over a decade. He's deeply passionate about web performance, tools and helping share knowledge with others. He currently works as an engineering manager and Senior Staff Engineer with the Chrome and Developer Relations teams at Google. His focus is on helping get sites loading fast. His previous jobs have included stints at companies like AOL Online.</p>",
+      "isFeatured" : false,
+      "name" : "Addy Osmani",
+      "org" : "Google",
+      "pictureId" : "d6bcc71f-151a-4370-93a0-418707318f76",
+      "pictureUrl" : "https://firebasestorage.googleapis.com/v0/b/slidesup-test.appspot.com/o/confs%2Fdetail%2Fsample-conference%2Fspeakers%2Fd6bcc71f-151a-4370-93a0-418707318f76.png?alt=media&token=65ca8dbd-b3e9-46f5-b6e3-4aecb2bd1117",
+      "socialProfiles" : {
+        "facebook" : "addyosmaniofficial",
+        "github" : "addyosmani",
+        "linkedIn" : "osmani",
+        "twitter" : "addyosmani",
+        "web" : "addyosmani.com"
+      },
+      "title" : "Engineering Manager",
+      "updatedAt" : 1516823130298,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3diC4vTxzzTok0ODOC" : {
+      "bio" : "<p>Hi folks. I’m Paul. I’m a front-end developer who loves the web. I’m always thinking a lot about how to make you more productive with tools that improve your workflow help you make slicker, sexier, mobile web sites and webapps.</p>\n<p>I work on the <a href=\"http://twitter.com/chromiumdev\">Google Chrome</a> team focused on Developer Tooling. Chrome DevTools and everything else Chrome can do to make you a productive web developer.</p>\n<p>I’ve <strong>developed</strong> tools like <a href=\"http://modernizr.com/\">Modernizr</a>, <a href=\"http://yeoman.io/\">Yeoman</a>, <a href=\"http://css3please.com/\">CSS3 Please</a> and <a href=\"http://html5boilerplate.com/\">HTML5 Boilerplate</a>, <strong>curated</strong> <a href=\"http://html5rocks.com/\">HTML5 Rocks</a>, and <strong>co-created</strong> projects like <a href=\"http://html5please.com/\">HTML5 Please</a>, <a href=\"http://mothereffingtextshadow.com/\">mothereffingtextshadow</a>, <a href=\"http://mothereffinghsl.com/\">mothereffinghsl</a>, <a href=\"http://movethewebforward.org/\">Move the Web Forward</a>, <a href=\"http://mothereffinganimatedgif.com/\">Mothereffing Animated GIF</a>, <a href=\"http://w3fools.com/\">W3Fools</a>, <a href=\"http://chromestatus.com/\">chromestatus.com</a>, <a href=\"http://html5readiness.com/\">HTML5 Readiness</a>, <a href=\"http://na.isobar.com/standards/\">Front-end Coding Standards</a>, <a href=\"http://typerendering.com/\">Type Rendering Project</a>. Oh and I used to host the amazing <a href=\"http://yayquery.com/\" title=\"yayQuery Podcast - It's about jQuery, duh. :)\">yayQuery Podcast</a>. I’ve long loved music and kept the <a href=\"http://aurgasm.us/\">Aurgasm</a> music blog up for 10 years.</p>",
+      "isFeatured" : false,
+      "name" : "Paul Irish",
+      "org" : "Google",
+      "pictureId" : "cc826e99-35b7-4fef-80ff-8f1452200a28",
+      "pictureUrl" : "https://firebasestorage.googleapis.com/v0/b/slidesup-test.appspot.com/o/confs%2Fdetail%2Fsample-conference%2Fspeakers%2Fcc826e99-35b7-4fef-80ff-8f1452200a28.png?alt=media&token=c6e46e79-933a-4820-8ee2-83dfa09c8a53",
+      "socialProfiles" : {
+        "github" : "paulirish",
+        "linkedIn" : "paulirish",
+        "twitter" : "paul_irish",
+        "web" : "paulirish.com"
+      },
+      "title" : "Performance Engineer",
+      "updatedAt" : 1516823432978,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dlTYjoDUJrXrrPMDS" : {
+      "bio" : "<p>Katie Dill is the VP of Design of Lyft. She used to be the director of experience design of Airbnb.</p>\n<p>Katie joined AirBnB from Greenstart Venture Design where, as a Partner and Creative Director, she worked with early stage startups to design their user experience and brand strategy.</p>\n<p>Prior to Greenstart, as Creative Director at frog design, Katie led strategic, multidisciplinary design programs for companies including Intel, Disney, Samsung, Dolby and Chase Bank.</p>\n<p>Katie's expertise includes interaction and industrial design, business strategy and user research. Katie earned her B.S. in Industrial Design at Art Center College of Design and over the last 3 years, she taught Interaction and Industrial Design at California College of Arts.</p>",
+      "isFeatured" : false,
+      "name" : "Katie Dill",
+      "org" : "Lyft",
+      "pictureId" : "3fa64d3b-5dbf-40e9-883f-7c815bceda3a",
+      "pictureUrl" : "https://firebasestorage.googleapis.com/v0/b/slidesup-test.appspot.com/o/confs%2Fdetail%2Fsample-conference%2Fspeakers%2F3fa64d3b-5dbf-40e9-883f-7c815bceda3a.png?alt=media&token=6201be59-aba6-444e-9ecc-066e3a46438c",
+      "socialProfiles" : {
+        "linkedIn" : "katie-dill-79168b3",
+        "twitter" : "lil_dill"
+      },
+      "title" : "VP of Design",
+      "updatedAt" : 1516824290944,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3dosApLejO6jxtrLGg" : {
+      "bio" : "<p><br></p>",
+      "isFeatured" : false,
+      "name" : "Steve Wozniak",
+      "updatedAt" : 1516825182356,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    }
+  },
+  "tracks" : {
+    "-L3daEMFuTMgXRUqmPdk" : {
+      "description" : "<p>The design track.</p>",
+      "name" : "Design",
+      "sortOrder" : 0,
+      "updatedAt" : 1516821346219,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    },
+    "-L3daHLsiaLB448RhtOx" : {
+      "description" : "<p>The engineering track.</p>",
+      "name" : "Engineering",
+      "sortOrder" : 1,
+      "updatedAt" : 1516821357372,
+      "updatedBy" : "GU9CPPkIFIaRtKT93Zk2t1JdQre2"
+    }
+  }
+}
