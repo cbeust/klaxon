@@ -39,7 +39,8 @@ dependencies {
             "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
             "javax.json:javax.json-api:1.1.2"
     testCompile "org.testng:testng:6.11",
-            "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+            "org.jetbrains.kotlin:kotlin-test:$kotlinVersion",
+	    "org.assertj:assertj-core:3.5.2"
 }
 
 task sourceJar(type: Jar) {
