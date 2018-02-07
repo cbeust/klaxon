@@ -29,6 +29,7 @@ object Render {
                 val ch = s[idx]
                 when (ch) {
                     '"' -> append("\\").append(ch)
+                    '\'' -> append("\\").append(ch)
                     '\\' -> append(ch).append(ch)
                     '\n' -> append("\\n")
                     '\r' -> append("\\r")
