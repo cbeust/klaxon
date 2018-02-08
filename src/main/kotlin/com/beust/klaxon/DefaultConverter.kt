@@ -81,7 +81,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             } else if (value is Float) {
                 value.toDouble()
             } else if (value is Collection<*>) {
-                value.map {
+                val r = value.map {
                     val jt = jv.propertyClass
                     // Try to find a converter for the element type of the collection
                     val converter =
@@ -98,6 +98,9 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
 
                     converter.fromJson(JsonValue(it, jv.propertyClass, jv.propertyKClass, klaxon))
                 }
+                val rawType = (jv.propertyClass as ParameterizedType).rawType
+                val isSet = Set::class.java.isAssignableFrom(rawType as Class<*>)
+                if (isSet) r.toSet() else r
             } else if (value is JsonObject) {
                 val jt = jv.propertyClass
                 if (jt is ParameterizedType) {
