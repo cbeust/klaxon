@@ -8,7 +8,10 @@ import kotlin.reflect.full.declaredMemberProperties
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
  * constructor is guaranteed to be non null.
  */
-class JsonValue(value: Any?, val propertyClass: kotlin.reflect.KType?, private val converterFinder: ConverterFinder) {
+class JsonValue(value: Any?,
+        val propertyClass: java.lang.reflect.Type?,
+        val propertyKClass: kotlin.reflect.KType?,
+        private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null

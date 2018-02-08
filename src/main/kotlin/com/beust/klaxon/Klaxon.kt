@@ -1,20 +1,17 @@
 package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
-import com.beust.klaxon.internal.firstNotNullResult
 import java.io.*
 import java.lang.reflect.ParameterizedType
 import java.nio.charset.Charset
-import java.util.HashMap
-import kotlin.collections.ArrayList
 import kotlin.collections.set
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
+import kotlin.reflect.KTypeProjection
+import kotlin.reflect.full.createType
 import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.javaType
 
@@ -83,6 +80,7 @@ class Klaxon : ConverterFinder {
     /**
      * Parse an InputStream into a JsonArray.
      */
+    @Suppress("unused")
     inline fun <reified T> parseArray(inputStream: InputStream): List<T>? {
         return parseFromJsonArray(parser(T::class).parse(toReader(inputStream)) as JsonArray<*>)
     }
@@ -91,7 +89,7 @@ class Klaxon : ConverterFinder {
      * Parse a JsonObject into an object.
      */
     inline fun <reified T> parseFromJsonObject(map: JsonObject): T?
-            = fromJsonObject(map, T::class.java, T::class) as T?
+        = fromJsonObject(map, T::class.java, T::class) as T?
 
     inline fun <reified T> parseFromJsonArray(map: JsonArray<*>): List<T>? {
         val result = arrayListOf<Any>()
@@ -102,12 +100,13 @@ class Klaxon : ConverterFinder {
                 else throw KlaxonException("Couldn't convert $jo")
             } else if (jo != null) {
                 val converter = findConverterFromClass(T::class.java, null)
-                val convertedValue = converter.fromJson(JsonValue(jo, null, this))
+                val convertedValue = converter.fromJson(JsonValue(jo, null, null, this))
                 result.add(convertedValue!!)
             } else {
                 throw KlaxonException("Couldn't convert $jo")
             }
         }
+        @Suppress("UNCHECKED_CAST")
         return result as List<T>
     }
 
@@ -142,15 +141,7 @@ class Klaxon : ConverterFinder {
         return Parser(pathMatchers, passedLexer, streaming)
     }
 
-    private val DEFAULT_CONVERTER = DefaultConverter(this)
-    companion object {
-        val MAP_CONVERTER = object : Converter<HashMap<String, Any?>> {
-            override fun fromJson(jv: JsonValue): HashMap<String, Any?>
-                    = HashMap(jv.obj!!)
-            override fun toJson(value: HashMap<String, Any?>) = TODO("not implemented")
-        }
-    }
-
+    private val DEFAULT_CONVERTER = DefaultConverter(this, allPaths)
 
     /**
      * Type converters that convert a JsonObject into an object.
@@ -159,29 +150,11 @@ class Klaxon : ConverterFinder {
     private val converterMap = hashMapOf<java.lang.reflect.Type, Converter<*>>()
 
     fun converter(converter: Converter<*>): Klaxon {
-
-//        fun extractAnnotation(ann: KClass<out Annotation>, function: KFunction<*>): KType? {
-//            val from = function.annotations.filter { it.annotationClass == ann }
-//            val result =
-//                if (from.any()) {
-//                    function.parameters[1].type
-//                } else {
-//                    null
-//                }
-//            return result
-//        }
-
         var type: java.lang.reflect.Type? = null
         converter::class.declaredFunctions.forEach { f ->
             if (f.name == "toJson") {
                 type = f.parameters.firstOrNull { it.kind == KParameter.Kind.VALUE }?.type?.javaType
             }
-//            extractAnnotation(FromJson::class, f)?.let { fromType ->
-//                fromMap[fromType.javaType] = f
-//            }
-//            extractAnnotation(ToJson::class, f)?.let { toType ->
-//                toMap[toType.javaType] = f
-//            }
         }
         converters.add(0, converter)
         if (type != null) {
@@ -211,13 +184,7 @@ class Klaxon : ConverterFinder {
      * we need to use to convert it.
      */
     override fun findConverter(value: Any, prop: KProperty<*>?): Converter<*> {
-        val result =
-//            if (value is Collection<*> && prop != null) {
-//                val cls = (prop.returnType.javaType as ParameterizedTypeImpl).actualTypeArguments[0] as Class<*>
-//                findConverterFromClass(cls, null)
-//            } else {
-                findConverterFromClass(value::class.java, prop)
-//            }
+        val result = findConverterFromClass(value::class.java, prop)
         log("Value: $value, converter: $result")
         return result
     }
@@ -240,12 +207,6 @@ class Klaxon : ConverterFinder {
                 null
             }
 
-//        if (propConverter == null) {
-//
-//        }
-//        if (cls != null) findConverter(cls as Class<*>)
-//        val t = (if (cls != null) cls as java.lang.reflect.Type else jc as java.lang.reflect.Type)
-//        val cc = converterMap.get(t)
         val result = propConverter
                 ?: findBestConverter(jc)
                 ?: (if (cls != null) findBestConverter(cls) else null)
@@ -280,111 +241,16 @@ class Klaxon : ConverterFinder {
      * Convert a JsonObject into a real value.
      */
     fun fromJsonObject(jsonObject: JsonObject, cls: Class<*>, kc: KClass<*>): Any {
-        /**
-         * Retrieve all the properties found on the class of the object and then look up each of these
-         * properties names on `jsonObject`.
-         */
-        fun retrieveKeyValues() : Map<String, Any> {
-            val result = hashMapOf<String, Any>()
-
-            // Only keep the properties that are public and do not have @Json(ignored = true)
-            val allProperties = Annotations.findNonIgnoredProperties(kc)
-
-            allProperties.forEach { thisProp ->
-                //
-                // Check if the name of the field was overridden with a @Json annotation
-                //
-                val prop = kc.declaredMemberProperties.first { it.name == thisProp.name }
-                val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
-                val fieldName =
-                        if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
-                        else prop.name
-                val path = if (jsonAnnotation?.path != "") jsonAnnotation?.path else null
-
-                // Retrieve the value of that property and convert it from JSON
-                val jValue = jsonObject[fieldName]
-
-                if (path == null) {
-                    if (jValue != null) {
-                        val convertedValue = findConverterFromClass(cls, prop)
-                                .fromJson(JsonValue(jValue, prop.returnType, this@Klaxon))
-                        if (convertedValue != null) {
-                            result[prop.name] = convertedValue
-                        } else {
-                            throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
-                                    + "field named \"${prop.name}\"")
-                        }
-                    } else {
-                        // Didn't find any value for that property: don't do anything. If a value is missing here,
-                        // it might still be found as a default value on the constructor, and we'll find out once we
-                        // try to instantiate that object.
-//                        val conv = findConverterFromClass(cls, thisProp)
-//                        val cv = conv.fromJson(JsonValue(jsonObject, thisProp.returnType, this@Klaxon))
-//                        println("CV: $cv")
-                    }
-                } else {
-                    result[prop.name] = allPaths[path]
-                        ?: throw KlaxonException("Couldn't find path \"$path\" specified on field \"${prop.name}\"")
-
-                }
-            }
-            return result
-        }
-
-        /**
-         * Go through all the constructors found on that object and attempt to invoke them with the key values
-         * found on the object. We return the first successful instantiation, or fail with an exception if
-         * no suitable constructor was found.
-         */
-        fun instantiateAndInitializeObject() : Any {
-            val concreteClass = if (kotlin.collections.List::class.java.isAssignableFrom(kc.java)) ArrayList::class else kc
-
-            // Go through all the Kotlin constructors and associate each parameter with its value.
-            // (Kotlin constructors contain the names of their parameters).
-            // Note that this code will work for default parameters as well: values missing in the JSON map
-            // will be filled by Kotlin reflection if they can't be found.
-            var error: String? = null
-            val map = retrieveKeyValues()
-            val result = concreteClass.constructors.firstNotNullResult { constructor ->
-                val parameterMap = hashMapOf<KParameter,Any>()
-                constructor.parameters.forEach { parameter ->
-                    map[parameter.name]?.let { convertedValue ->
-                        parameterMap[parameter] = convertedValue
-                    }
-                }
-                try {
-                    if (! constructor.isAccessible) {
-                        constructor.isAccessible = true
-                    }
-                    constructor.callBy(parameterMap)
-                } catch(ex: Exception) {
-                    // Lazy way to find out of that constructor worked. Easier than trying to make sure each
-                    // parameter matches the parameter type.
-                    error = ex::class.qualifiedName + " " + ex.message
-                    null
-                }
-            }
-
-            return result ?: throw KlaxonException(
-                    "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map: $error")
-        }
-
         // If the user provided a type converter, use it, otherwise try to instantiate the object ourselves.
         val classConverter = findConverterFromClass(cls, null)
-        val result =
-            if (classConverter != DEFAULT_CONVERTER) {
-                classConverter.fromJson(JsonValue(jsonObject, null, this@Klaxon)) as Any
-            } else {
-                instantiateAndInitializeObject()
-            }
-        return result
+        val types = kc.typeParameters.map { KTypeProjection.invariant(it.createType()) }
+        val type =
+                if (kc.typeParameters.any()) kc.createType(types)
+                else kc.createType()
+        return classConverter.fromJson(JsonValue(jsonObject, cls, type, this@Klaxon)) as Any
     }
 
-    private fun log(s: String) {
+    fun log(s: String) {
         if (Debug.verbose) println(s)
-    }
-
-    init {
-        converter(MAP_CONVERTER)
     }
 }
