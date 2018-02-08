@@ -5,6 +5,10 @@ import com.beust.kobalt.plugin.packaging.assemble
 import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
 
+object Version {
+    val kotlin = "1.2.10"
+}
+
 val p = project {
     name = "klaxon"
     group = "com.beust"
@@ -12,14 +16,14 @@ val p = project {
     version = "2.1.5"
 
     dependencies {
-        compile("org.jetbrains.kotlin:kotlin-reflect:1.2.10")
-        compile("org.jetbrains.kotlin:kotlin-stdlib:1.2.10")
+        compile("org.jetbrains.kotlin:kotlin-reflect:${Version.kotlin}",
+                "org.jetbrains.kotlin:kotlin-stdlib:${Version.kotlin}")
     }
 
     dependenciesTest {
         compile("org.testng:testng:6.13.1",
                 "org.assertj:assertj-core:3.5.2",
-                "org.jetbrains.kotlin:kotlin-test:1.2.10")
+                "org.jetbrains.kotlin:kotlin-test:${Version.kotlin}")
     }
 
     assemble {
