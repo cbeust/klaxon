@@ -367,6 +367,24 @@ class KlaxonTest {
         class City(val name: String)
     }
 
+    fun arrayParse() {
+        data class Child(val id: Int, val name: String)
+        data class Parent(val children: Array<Child>)
+
+        val array = """{
+            "children":[
+                {"id": 1, "name": "foo"},
+                {"id": 2, "name": "bar"}
+            ]
+         }"""
+
+        val r = Klaxon().parse<Parent>(array)
+        with(r!!.children) {
+            assertThat(this[0]).isEqualTo(Child(1, "foo"))
+            assertThat(this[1]).isEqualTo(Child(2, "bar"))
+        }
+    }
+
     fun nested() {
         val r = Klaxon().parse<PersonWitCity>("""{
             "name": "John",
@@ -380,7 +398,6 @@ class KlaxonTest {
 
     enum class Colour { Red, Green, Blue }
 
-    @Test
     fun serializeEnum() {
         Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
     }

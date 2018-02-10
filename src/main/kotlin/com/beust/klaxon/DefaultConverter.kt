@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
+import kotlin.reflect.KType
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -98,9 +99,20 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
 
                     converter.fromJson(JsonValue(it, jv.propertyClass, jv.propertyKClass, klaxon))
                 }
-                val rawType = (jv.propertyClass as ParameterizedType).rawType
-                val isSet = Set::class.java.isAssignableFrom(rawType as Class<*>)
-                if (isSet) r.toSet() else r
+
+                val result =
+                    if (Annotations.isSet(jv.propertyClass)) {
+                        r.toSet()
+                    } else if (Annotations.isArray(jv.propertyKClass)) {
+                        val componentType = jv.propertyKClass?.jvmErasure?.java?.componentType
+                        val array = java.lang.reflect.Array.newInstance(componentType, value.size)
+                        r.indices.forEach { i ->
+                            java.lang.reflect.Array.set(array, i, r[i])
+                        }
+                        array
+                    }
+                    else r
+                result
             } else if (value is JsonObject) {
                 val jt = jv.propertyClass
                 if (jt is ParameterizedType) {
@@ -135,12 +147,17 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                                 ":\n  $value")
                     }
                 } else {
-                    return JsonObjectConverter(klaxon, allPaths).fromJson(jv.obj!!, jv.propertyKClass!!.jvmErasure)
+                    if ((jt as Class<*>).isArray) {
+                        val typeValue = jt.componentType
+                        val r = klaxon.fromJsonObject(value, typeValue, typeValue.kotlin)
+                        r
+                    } else {
+                        return JsonObjectConverter(klaxon, allPaths).fromJson(jv.obj!!, jv.propertyKClass!!.jvmErasure)
+                    }
                 }
             } else {
                 throw KlaxonException("Don't know how to convert $value")
             }
         return result
     }
-
 }
