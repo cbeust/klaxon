@@ -18,7 +18,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
      * no suitable constructor was found.
      */
     fun fromJson(jsonObject: JsonObject, kc: KClass<*>): Any {
-        val concreteClass = if (kotlin.collections.List::class.java.isAssignableFrom(kc.java)) ArrayList::class else kc
+        val concreteClass = if (Annotations.isList(kc)) ArrayList::class else kc
 
         // Go through all the Kotlin constructors and associate each parameter with its value.
         // (Kotlin constructors contain the names of their parameters).
@@ -50,20 +50,6 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         return result ?: throw KlaxonException(
                 "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map: $error")
     }
-
-//    fun fromJson(jsonObject: JsonObject, kc: KClass<*>): Any {
-//        if (jv.propertyClass is ParameterizedType) {
-//            val t = jv.propertyClass.actualTypeArguments[1]
-//            val kt = jv.propertyKClass!!.arguments[1].type
-//            jsonObject.entries.forEach() { entry ->
-//                val convertedValue = fromJson(JsonValue(entry.value, t, kt /* kclass */, klaxon))
-//                println("CONV: $convertedValue")
-//            }
-//            return HashMap(jv.obj!!)
-//        } else {
-//            return instantiateAndInitializeObject(jsonObject, kc)
-//        }
-//    }
 
     /**
      * Retrieve all the properties found on the class of the object and then look up each of these
