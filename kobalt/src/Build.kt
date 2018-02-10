@@ -6,6 +6,7 @@ import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
 
 object Version {
+    val klaxon = "2.1.6"
     val kotlin = "1.2.10"
 }
 
@@ -13,7 +14,7 @@ val p = project {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
-    version = "2.1.5"
+    version = Version.klaxon
 
     dependencies {
         compile("org.jetbrains.kotlin:kotlin-reflect:${Version.kotlin}",
