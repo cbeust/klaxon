@@ -1,8 +1,9 @@
+@file:Suppress("unused")
+
 package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
-import java.lang.reflect.ParameterizedType
 import java.util.*
 
 data class ConferenceDataModel(
@@ -104,41 +105,4 @@ class MapTest {
         assertThat(r.events.size).isEqualTo(5)
         assertThat(r.events["-L3daccTVLOcYi9hVHsD"]?.name).isEqualTo("Registration & Breakfast")
     }
-}
-
-
-open class TypeLiteral<T> {
-    val type: java.lang.reflect.Type
-        get() = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0]
-}
-
-inline fun <reified T> typeLiteral(): TypeLiteral<T> = object : TypeLiteral<T>() {} // here T is replaced with the actual type
-
-inline fun <reified T> f3() {
-    val h = hashMapOf<String, T>()
-    val cls = h::class
-    val t = T::class
-    val tl = typeLiteral<Map<String, T>>()
-    val ta = (cls.java as ParameterizedType).actualTypeArguments
-    println(cls)
-}
-
-inline fun <reified T> reified(map: T) {
-    println(T::class.java.genericInterfaces.joinToString())
-    println(T::class.java.genericSuperclass)
-}
-
-inline fun <reified T : Any?> sample() {
-    val cls = T::class
-    val tp = cls.typeParameters
-    println("Is nullable: ${isNullable<T>()}")
-}
-
-inline fun <reified T : Any?> isNullable(): Boolean {
-    return null is T
-}
-
-fun main(args: Array<String>) {
-    sample<Map<String,Int>?>()
-    sample<Map<String,Int>>()
 }

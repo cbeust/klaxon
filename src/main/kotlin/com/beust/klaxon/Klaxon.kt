@@ -3,6 +3,7 @@ package com.beust.klaxon
 import com.beust.klaxon.internal.ConverterFinder
 import java.io.*
 import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 import java.nio.charset.Charset
 import kotlin.collections.set
 import kotlin.reflect.KClass
@@ -123,6 +124,9 @@ class Klaxon : ConverterFinder {
         return this
     }
 
+    /**
+     * A map of a path to the JSON value that this path was found at.
+     */
     private val allPaths = hashMapOf<String, Any>()
 
     inner class DefaultPathMatcher(private val paths: Set<String>) : PathMatcher {
@@ -135,6 +139,9 @@ class Klaxon : ConverterFinder {
     fun parser(kc: KClass<*>? = null, passedLexer: Lexer? = null, streaming: Boolean = false): Parser {
         val result = Annotations.findJsonPaths(kc)
         if (result.any()) {
+            // If we found at least one @Json(path = ...), add the DefaultPathMatcher with a list
+            // of all these paths we need to watch for (we don't want to do that if no path
+            // matching was requested since matching these paths slows down parsing).
             pathMatchers.add(DefaultPathMatcher(result.toSet()))
         }
 
@@ -144,13 +151,19 @@ class Klaxon : ConverterFinder {
     private val DEFAULT_CONVERTER = DefaultConverter(this, allPaths)
 
     /**
-     * Type converters that convert a JsonObject into an object.
+     * TokenType converters that convert a JsonObject into an object.
      */
     private val converters = arrayListOf<Converter<*>>(DEFAULT_CONVERTER)
-    private val converterMap = hashMapOf<java.lang.reflect.Type, Converter<*>>()
+    private val converterMap = hashMapOf<Type, Converter<*>>()
 
+    /**
+     * Add a type converter. The converter is analyzed to find out which type it converts
+     * and then that info is transferred to `converterMap`. Reflection is necessary to locate
+     * the toJson() function since there is no way to define TypeConverter in a totally generic
+     * way that will compile.
+     */
     fun converter(converter: Converter<*>): Klaxon {
-        var type: java.lang.reflect.Type? = null
+        var type: Type? = null
         converter::class.declaredFunctions.forEach { f ->
             if (f.name == "toJson") {
                 type = f.parameters.firstOrNull { it.kind == KParameter.Kind.VALUE }?.type?.javaType
@@ -158,10 +171,9 @@ class Klaxon : ConverterFinder {
         }
         converters.add(0, converter)
         if (type != null) {
-            val c: java.lang.reflect.Type =
+            val c: Type =
                     if (type is ParameterizedType) (type as ParameterizedType).rawType else type!!
-            converterMap.put(c, converter)
-//            converterMap[c] = converter
+            converterMap[c] = converter
         } else {
             throw KlaxonException("Couldn't identify which type this converter converts: $converter")
         }

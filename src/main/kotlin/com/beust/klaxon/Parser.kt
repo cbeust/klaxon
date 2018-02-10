@@ -37,12 +37,12 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
         val lexer = passedLexer ?: Lexer(reader)
 
         var world = World(Status.INIT, pathMatchers)
-        if (lexer.peek().tokenType == Type.COMMA) lexer.nextToken()
+        if (lexer.peek().tokenType == TokenType.COMMA) lexer.nextToken()
         do {
             val token = lexer.nextToken()
             log("Token: $token")
             world = sm.next(world, token)
-        } while (token.tokenType != Type.RIGHT_BRACE && token.tokenType != Type.EOF)
+        } while (token.tokenType != TokenType.RIGHT_BRACE && token.tokenType != TokenType.EOF)
 
         return world.popValue()
     }
@@ -60,7 +60,7 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
             world.index = lexer.index
             world.line = lexer.line
             world = sm.next(world, token)
-        } while (token.tokenType != Type.EOF)
+        } while (token.tokenType != TokenType.EOF)
 
         return world.result
     }
@@ -72,32 +72,32 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
     private val stateMachine = StateMachine(streaming)
     init {
         with(stateMachine) {
-            put(Status.INIT, Type.VALUE, { world: World, token: Token ->
+            put(Status.INIT, TokenType.VALUE, { world: World, token: Token ->
                 world.pushAndSet(Status.IN_FINISHED_VALUE, token.value!!)
             })
-            put(Status.INIT, Type.LEFT_BRACE, { world: World, _: Token ->
+            put(Status.INIT, TokenType.LEFT_BRACE, { world: World, _: Token ->
                 world.pushAndSet(Status.IN_OBJECT, JsonObject())
             })
-            put(Status.INIT, Type.LEFT_BRACKET, { world: World, _: Token ->
+            put(Status.INIT, TokenType.LEFT_BRACKET, { world: World, _: Token ->
                 world.pushAndSet(Status.IN_ARRAY, JsonArray<Any>())
             })
             // else error
 
-            put(Status.IN_FINISHED_VALUE, Type.EOF, { world: World, _: Token ->
+            put(Status.IN_FINISHED_VALUE, TokenType.EOF, { world: World, _: Token ->
                 world.result = world.popValue()
                 world
             })
             // else error
 
 
-            put(Status.IN_OBJECT, Type.COMMA, { world: World, _: Token ->
+            put(Status.IN_OBJECT, TokenType.COMMA, { world: World, _: Token ->
                 world.foundValue()
                 world
             })
-            put(Status.IN_OBJECT, Type.VALUE, { world: World, token: Token ->
+            put(Status.IN_OBJECT, TokenType.VALUE, { world: World, token: Token ->
                 world.pushAndSet(Status.PASSED_PAIR_KEY, token.value!!)
             })
-            put(Status.IN_OBJECT, Type.RIGHT_BRACE, { world: World, _: Token ->
+            put(Status.IN_OBJECT, TokenType.RIGHT_BRACE, { world: World, _: Token ->
                 world.foundValue()
                 with(world) {
                     status = if (hasValues()) {
@@ -112,10 +112,10 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
             })
 
 
-            put(Status.PASSED_PAIR_KEY, Type.COLON, { world: World, _: Token ->
+            put(Status.PASSED_PAIR_KEY, TokenType.COLON, { world: World, _: Token ->
                 world
             })
-            put(Status.PASSED_PAIR_KEY, Type.VALUE, { world: World, token: Token ->
+            put(Status.PASSED_PAIR_KEY, TokenType.VALUE, { world: World, token: Token ->
                 with(world) {
                     popStatus()
                     val key = popValue() as String
@@ -125,7 +125,7 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
                     this
                 }
             })
-            put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACKET, { world: World, _: Token ->
+            put(Status.PASSED_PAIR_KEY, TokenType.LEFT_BRACKET, { world: World, _: Token ->
                 with(world) {
                     popStatus()
                     val key = popValue() as String
@@ -135,7 +135,7 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
                     pushAndSet(Status.IN_ARRAY, newArray)
                 }
             })
-            put(Status.PASSED_PAIR_KEY, Type.LEFT_BRACE, { world: World, _: Token ->
+            put(Status.PASSED_PAIR_KEY, TokenType.LEFT_BRACE, { world: World, _: Token ->
                 with(world) {
                     popStatus()
                     val key = popValue() as String
@@ -147,15 +147,15 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
             })
             // else error
 
-            put(Status.IN_ARRAY, Type.COMMA, { world: World, _: Token ->
+            put(Status.IN_ARRAY, TokenType.COMMA, { world: World, _: Token ->
                 world
             })
-            put(Status.IN_ARRAY, Type.VALUE, { world: World, token: Token ->
+            put(Status.IN_ARRAY, TokenType.VALUE, { world: World, token: Token ->
                 val value = world.getFirstArray()
                 value.add(token.value)
                 world
             })
-            put(Status.IN_ARRAY, Type.RIGHT_BRACKET, { world: World, _: Token ->
+            put(Status.IN_ARRAY, TokenType.RIGHT_BRACKET, { world: World, _: Token ->
                 world.foundValue()
                 with(world) {
                     status = if (hasValues()) {
@@ -168,13 +168,13 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
                     this
                 }
             })
-            put(Status.IN_ARRAY, Type.LEFT_BRACE, { world: World, _: Token ->
+            put(Status.IN_ARRAY, TokenType.LEFT_BRACE, { world: World, _: Token ->
                 val value = world.getFirstArray()
                 val newObject = JsonObject()
                 value.add(newObject)
                 world.pushAndSet(Status.IN_OBJECT, newObject)
             })
-            put(Status.IN_ARRAY, Type.LEFT_BRACKET, { world: World, _: Token ->
+            put(Status.IN_ARRAY, TokenType.LEFT_BRACKET, { world: World, _: Token ->
                 val value = world.getFirstArray()
                 val newArray = JsonArray<Any>()
                 value.add(newArray)

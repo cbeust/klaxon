@@ -3,7 +3,7 @@ package com.beust.klaxon
 import java.io.Reader
 import java.util.regex.Pattern
 
-enum class Type(val value: String) {
+enum class TokenType(val value: String) {
     VALUE("a value"),
     LEFT_BRACE("\"{\""),
     RIGHT_BRACE("\"}\""),
@@ -14,7 +14,7 @@ enum class Type(val value: String) {
     EOF("EOF")
 }
 
-data class Token(val tokenType: Type, val value: Any? = null) {
+data class Token(val tokenType: TokenType, val value: Any? = null) {
     override fun toString() : String {
         val v =
             if (value != null) {
@@ -30,7 +30,7 @@ data class Token(val tokenType: Type, val value: Any? = null) {
  * if `lenient` is true, names (the identifiers left of the colon) are allowed to not be surrounded by double quotes.
  */
 class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<Token> {
-    private val EOF = Token(Type.EOF, null)
+    private val EOF = Token(TokenType.EOF, null)
     var index = 0
     var line = 1
 
@@ -110,7 +110,7 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             return EOF
         }
 
-        val tokenType: Type
+        val tokenType: TokenType
         var c = nextChar()
         val currentValue = StringBuilder()
         var jsonValue: Any? = null
@@ -123,7 +123,7 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             if (lenient) {
                 currentValue.append(c)
             }
-            tokenType = Type.VALUE
+            tokenType = TokenType.VALUE
             loop@
             do {
                 if (isDone()) {
@@ -180,22 +180,22 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
 
             jsonValue = currentValue.toString()
         } else if ('{' == c) {
-            tokenType = Type.LEFT_BRACE
+            tokenType = TokenType.LEFT_BRACE
             expectName = true
         } else if ('}' == c) {
-            tokenType = Type.RIGHT_BRACE
+            tokenType = TokenType.RIGHT_BRACE
             expectName = false
         } else if ('[' == c) {
-            tokenType = Type.LEFT_BRACKET
+            tokenType = TokenType.LEFT_BRACKET
             expectName = false
         } else if (']' == c) {
-            tokenType = Type.RIGHT_BRACKET
+            tokenType = TokenType.RIGHT_BRACKET
             expectName = false
         } else if (':' == c) {
-            tokenType = Type.COLON
+            tokenType = TokenType.COLON
             expectName = false
         } else if (',' == c) {
-            tokenType = Type.COMMA
+            tokenType = TokenType.COMMA
             expectName = true
         } else if (! isDone()) {
             while (isValueLetter(c)) {
@@ -230,9 +230,9 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
                     + ": '$c' (ASCII: ${c.toInt()})'")
             }
 
-            tokenType = Type.VALUE
+            tokenType = TokenType.VALUE
         } else {
-            tokenType = Type.EOF
+            tokenType = TokenType.EOF
         }
 
         return Token(tokenType, jsonValue)

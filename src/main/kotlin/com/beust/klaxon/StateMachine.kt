@@ -1,11 +1,11 @@
 package com.beust.klaxon
 
-private data class TokenStatus(val status: Status, val tokenType: Type)
+private data class TokenStatus(val status: Status, val tokenType: TokenType)
 
 class StateMachine(private val streaming: Boolean) {
     private val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
 
-    fun put(status: Status, tokenType: Type, processor: (world: World, token: Token) -> World) {
+    fun put(status: Status, tokenType: TokenType, processor: (world: World, token: Token) -> World) {
         map[TokenStatus(status, tokenType)] = processor
     }
 

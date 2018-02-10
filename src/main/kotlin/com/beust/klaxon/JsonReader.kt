@@ -64,7 +64,7 @@ class JsonReader(val reader: Reader) : Reader() {
     fun nextName(): String {
         skip()
         val next = lexer.nextToken()
-        if (next.tokenType == Type.VALUE) {
+        if (next.tokenType == TokenType.VALUE) {
             return next.value.toString()
         } else {
             throw KlaxonException("Expected a name but got $next")
@@ -96,7 +96,7 @@ class JsonReader(val reader: Reader) : Reader() {
     /**
      * @return true if this reader has more tokens to read before finishing the current object/array.
      */
-    fun hasNext(): Boolean = lexer.peek().tokenType.let { it != Type.RIGHT_BRACKET && it != Type.RIGHT_BRACE }
+    fun hasNext(): Boolean = lexer.peek().tokenType.let { it != TokenType.RIGHT_BRACKET && it != TokenType.RIGHT_BRACE }
 
     override fun close() {
         reader.close()
@@ -108,20 +108,20 @@ class JsonReader(val reader: Reader) : Reader() {
 
     val lexer = Lexer(reader)
 
-    private fun consumeToken(type: Type, expected: String) {
+    private fun consumeToken(type: TokenType, expected: String) {
         val next = lexer.nextToken()
         if (next.tokenType != type) {
             throw KlaxonException("Expected a $expected but read $next")
         }
     }
 
-    private fun privateBeginArray() = consumeToken(Type.LEFT_BRACKET, "[")
-    private fun privateEndArray() = consumeToken(Type.RIGHT_BRACKET, "]")
+    private fun privateBeginArray() = consumeToken(TokenType.LEFT_BRACKET, "[")
+    private fun privateEndArray() = consumeToken(TokenType.RIGHT_BRACKET, "]")
 
-    private fun privateBeginObject() = consumeToken(Type.LEFT_BRACE, "{")
-    private fun privateEndObject() = consumeToken(Type.RIGHT_BRACE, "}")
+    private fun privateBeginObject() = consumeToken(TokenType.LEFT_BRACE, "{")
+    private fun privateEndObject() = consumeToken(TokenType.RIGHT_BRACE, "}")
 
-    private val SKIPS = setOf(Type.COLON, Type.COMMA)
+    private val SKIPS = setOf(TokenType.COLON, TokenType.COMMA)
     private fun skip() {
         while (SKIPS.contains(lexer.peek().tokenType)) lexer.nextToken()
     }
@@ -130,7 +130,7 @@ class JsonReader(val reader: Reader) : Reader() {
         skip()
 
         val next = lexer.nextToken()
-        if (next.tokenType == Type.VALUE) {
+        if (next.tokenType == TokenType.VALUE) {
             return convert(next.value)
         } else {
             throw KlaxonException("Expected a name but got $next")

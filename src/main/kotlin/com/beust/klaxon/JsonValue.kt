@@ -1,15 +1,16 @@
 package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
-import kotlin.reflect.KProperty
+import java.lang.reflect.Type
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.KProperty
 
 /**
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
  * constructor is guaranteed to be non null.
  */
 class JsonValue(value: Any?,
-        val propertyClass: java.lang.reflect.Type?,
+        val propertyClass: Type?,
         val propertyKClass: kotlin.reflect.KType?,
         private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null

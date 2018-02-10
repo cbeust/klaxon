@@ -8,13 +8,13 @@ import java.io.StringReader
 class LexerTest {
 
     val expected = listOf(
-            Token(Type.LEFT_BRACE),
+            Token(TokenType.LEFT_BRACE),
             *value("a", 1),
-            Token(Type.COMMA),
+            Token(TokenType.COMMA),
             *value("ab", 1),
-            Token(Type.COMMA),
+            Token(TokenType.COMMA),
             *value("ab", 12),
-            Token(Type.RIGHT_BRACE))
+            Token(TokenType.RIGHT_BRACE))
 
     fun basic() {
         val s = """{
@@ -41,5 +41,5 @@ class LexerTest {
     }
 
     private fun value(name: String, value: Any): Array<Token>
-        = arrayOf(Token(Type.VALUE, name), Token(Type.COLON), Token(Type.VALUE, value))
+        = arrayOf(Token(TokenType.VALUE, name), Token(TokenType.COLON), Token(TokenType.VALUE, value))
 }

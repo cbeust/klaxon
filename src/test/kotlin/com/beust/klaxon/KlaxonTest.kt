@@ -22,10 +22,8 @@ class KlaxonTest {
     }
 
     fun generated() {
+        @Suppress("UNCHECKED_CAST")
         val j = read("/generated.json") as JsonArray<JsonObject>
-        val expected = json {
-            array(1, "abc", 2.34, false)
-        }
         Assert.assertEquals((j[0]["name"] as JsonObject)["last"], "Olson")
     }
 
@@ -360,7 +358,7 @@ class KlaxonTest {
           }
         ]
         """
-        val data = Klaxon().parseArray<StockEntry>(json)
+        Klaxon().parseArray<StockEntry>(json)
     }
 
     class PersonWitCity(val name: String, val city: City) {
