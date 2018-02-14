@@ -25,7 +25,6 @@ class JsonReader(val reader: Reader) : Reader() {
      * @return the next object, making sure the current token is an open brace and the last token is a closing brace.
      */
     fun nextObject() : JsonObject {
-        skip()
         return beginObject {
             JsonObject().let { result ->
                 while (hasNext()) {
@@ -42,7 +41,6 @@ class JsonReader(val reader: Reader) : Reader() {
      * @return the next array, making sure the current token is an open bracket and the last token is a closing bracket.
      */
     fun nextArray() : List<Any> {
-        skip()
         return beginArray {
             arrayListOf<Any>().let { result ->
                 while (hasNext()) {
@@ -76,6 +74,7 @@ class JsonReader(val reader: Reader) : Reader() {
      * consume it, run the closure and then make sure the object is closed (closed brace).
      */
     fun <T> beginObject(closure: () -> T) : T {
+        skip()
         privateBeginObject()
         val result = closure()
         privateEndObject()
@@ -87,6 +86,7 @@ class JsonReader(val reader: Reader) : Reader() {
      * consume it, run the closure and then make sure the array is closed (closed bracket).
      */
     fun <T> beginArray(closure: () -> T) : T {
+        skip()
         privateBeginArray()
         val result = closure()
         privateEndArray()
