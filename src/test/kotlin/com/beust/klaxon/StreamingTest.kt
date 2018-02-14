@@ -72,6 +72,29 @@ class StreamingTest {
         }
     }
 
+    val arrayInObject = """{ "array": [
+            { "name": "Joe", "age": 23 },
+            { "name": "Jill", "age": 35 }
+        ] }"""
+
+    fun streamingArrayInObject() {
+        val klaxon = Klaxon()
+        JsonReader(StringReader(arrayInObject)).use { reader ->
+            val result = arrayListOf<Person1>()
+            reader.beginObject {
+                val name = reader.nextName()
+                Assert.assertEquals(name, "array")
+                reader.beginArray {
+                    while (reader.hasNext()) {
+                        val person = klaxon.parse<Person1>(reader)
+                        result.add(person!!)
+                    }
+                    Assert.assertEquals(result, listOf(Person1("Joe", 23), Person1("Jill", 35)))
+                }
+            }
+        }
+    }
+
 //    fun streaming1() {
 //        val reader = JsonReader(StringReader(array))//FileReader("src/test/resources/generated.json"))
 //        reader.beginArray()
