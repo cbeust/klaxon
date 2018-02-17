@@ -233,7 +233,7 @@ val result = Klaxon()
 """)
 
 assert(result?.date == LocalDateTime.of(2017, 5, 10, 16, 30))
-``` 
+```
 
 ## <a name="streamingApi">Streaming API</a>
 
@@ -362,7 +362,7 @@ val pathMatcher = object : PathMatcher {
 }
 
 Klaxon()
-    .pathMatcher(patchMatcher)
+    .pathMatcher(pathMatcher)
     .parseJsonObject(document)
 ```
 
@@ -657,12 +657,9 @@ Caused by: java.lang.NoSuchMethodException: com.beust.klaxon.BindingAdapterTest$
 
 This is typically caused by your object class being defined inside a function (which makes its constructor require an
  additional parameter that Klaxon doesn't know how to fill).
- 
+
 Solution: move that class definition outside of the function.
 
 ## Limitations
 
 * Error handling is primitive
-
-
-
