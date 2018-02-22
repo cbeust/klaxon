@@ -244,7 +244,10 @@ The streaming API is useful in a few scenarios:
 to be parsed.
 
 This second point is especially important to make mobile apps as responsive as possible and make them less reliant
-on network speed.
+on network speed.  
+
+Note that the streaming API requires that each value in the document is handled by the reader.  Because of this,
+JSON documents with many fields may not be concisely handled by the streaming API.
 
 ### Writing JSON with the streaming API
 
