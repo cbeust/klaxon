@@ -246,7 +246,7 @@ to be parsed.
 This second point is especially important to make mobile apps as responsive as possible and make them less reliant
 on network speed.  
 
-Note: the streaming API requires that each value in the document is handled by the reader.  If you are simply
+Note: the streaming API requires that each value in the document be  handled by the reader.  If you are simply
 looking to extract a single value the [`PathMatcher API`](#jsonPath) may be a better fit.
 
 ### Writing JSON with the streaming API
