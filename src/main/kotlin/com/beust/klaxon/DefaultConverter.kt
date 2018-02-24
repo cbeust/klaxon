@@ -1,7 +1,7 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
-import kotlin.reflect.KType
+import java.math.BigDecimal
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -77,10 +77,20 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 val propertyType = jv.propertyClass
                 val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
                 if (isLong) value.toLong() else value
-            } else if (value is Boolean || value is String || value is Double || value is Long) {
+            } else if (value is Double) {
+                if (jv.propertyClass == BigDecimal::class.java) {
+                    BigDecimal(value)
+                } else {
+                    value
+                }
+            } else if (value is Boolean || value is String || value is Long) {
                 value
             } else if (value is Float) {
-                value.toDouble()
+                if (jv.propertyClass == BigDecimal::class.java) {
+                    BigDecimal(value.toDouble())
+                } else {
+                    value.toDouble()
+                }
             } else if (value is Collection<*>) {
                 val r = value.map {
                     val jt = jv.propertyClass

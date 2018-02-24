@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.testng.Assert
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
+import java.math.BigDecimal
 import java.util.Collections.emptyMap
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
@@ -392,6 +393,14 @@ class KlaxonTest {
         }""")
         Assert.assertEquals(r?.name, "John")
         Assert.assertEquals(r?.city?.name, "San Francisco")
+    }
+
+    fun bigDecimal() {
+        data class A(val data: BigDecimal)
+        val something = Klaxon().parse<A>("""
+            {"data": 0.00000001}
+            """)
+        assertThat(BigDecimal(0.00000001).compareTo(BigDecimal(something!!.data.toDouble()))).isEqualTo(0)
     }
 
     enum class Colour { Red, Green, Blue }
