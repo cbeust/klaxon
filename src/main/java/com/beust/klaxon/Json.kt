@@ -12,6 +12,8 @@ annotation class Json(
      */
     val ignored: Boolean = false,
 
-
+    /**
+     * Work in progress
+     */
     val path: String = ""
 )
