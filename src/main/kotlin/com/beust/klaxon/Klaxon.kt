@@ -215,7 +215,7 @@ class Klaxon : ConverterFinder {
             if (prop != null) {
                 propertyClass = (prop.returnType.classifier as KClass<*>).java
                 val dc = prop.getter.javaMethod?.declaringClass ?: prop.javaField?.declaringClass
-                annotationsForProp(prop, dc).mapNotNull {
+                annotationsForProp(prop, dc!!).mapNotNull {
                     fieldTypeMap[it.annotationClass]
                 }.firstOrNull()
             } else {
