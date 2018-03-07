@@ -7,26 +7,31 @@ import org.testng.annotations.Test
 @Test
 class JsonAnnotationTest {
     private val jsonString: String = json { obj(
-            "name" to "John"
-    ) }.toJsonString()!!
+            "name" to "John",
+            "change" to 1
+    ) }.toJsonString()
 
     fun ignoredWithAnnotation() {
-        class IgnoredWithAnnotation(val name: String) {
-            @Json(ignored = true)
-            val change get(): Int = 0
-        }
+        class IgnoredWithAnnotation(
+                val name: String,
+                @Json(ignored = true)
+                val change: Int = 0)
 
         val result = Klaxon().parse<IgnoredWithAnnotation>(jsonString)
         Assert.assertEquals(result?.name, "John")
+        Assert.assertEquals(result?.change, 0)
     }
 
     fun ignoredWithPrivate() {
-        class IgnoredWithPrivate(val name: String) {
-            private val change get(): Int = 0
+        class IgnoredWithPrivate(
+                val name: String,
+                private val change: Int = 0){
+            fun changed(): Boolean = change != 0
         }
 
         val result = Klaxon().parse<IgnoredWithPrivate>(jsonString)
         Assert.assertEquals(result?.name, "John")
+        Assert.assertEquals(result?.changed(), false)
     }
 
     @Test
