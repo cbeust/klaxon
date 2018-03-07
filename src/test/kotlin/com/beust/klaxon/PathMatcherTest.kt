@@ -154,19 +154,4 @@ class PathMatcherTest {
         println("Result: $result")
 //        assertThat(result).isEqualTo(Library(Book("Hyperion", Author("Simmons"))))
     }
-
-    @Test
-    fun privateNotIgnored() {
-        data class Config(
-                val version: String,
-                @Json(ignored = false)
-                private val projects: Set<String>) {
-            fun contains(name: String) = projects.contains(name)
-        }
-
-        val jsonString = """{"version": "v1", "projects": ["abc"]}"""
-        val r = Klaxon().parse<Config>(jsonString)
-        assertThat(r).isEqualTo(Config("v1", setOf("abc")))
-
-    }
 }
