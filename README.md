@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:2.1.7'
+    compile 'com.beust:klaxon:2.1.9'
 }
 ```
 
@@ -235,7 +235,7 @@ val result = Klaxon()
 """)
 
 assert(result?.date == LocalDateTime.of(2017, 5, 10, 16, 30))
-``` 
+```
 
 ## <a name="streamingApi">Streaming API</a>
 
@@ -246,7 +246,10 @@ The streaming API is useful in a few scenarios:
 to be parsed.
 
 This second point is especially important to make mobile apps as responsive as possible and make them less reliant
-on network speed.
+on network speed.  
+
+Note: the streaming API requires that each value in the document be handled by the reader.  If you are simply
+looking to extract a single value the [`PathMatcher API`](#jsonPath) may be a better fit.
 
 ### Writing JSON with the streaming API
 
@@ -364,7 +367,7 @@ val pathMatcher = object : PathMatcher {
 }
 
 Klaxon()
-    .pathMatcher(patchMatcher)
+    .pathMatcher(pathMatcher)
     .parseJsonObject(document)
 ```
 
@@ -659,12 +662,9 @@ Caused by: java.lang.NoSuchMethodException: com.beust.klaxon.BindingAdapterTest$
 
 This is typically caused by your object class being defined inside a function (which makes its constructor require an
  additional parameter that Klaxon doesn't know how to fill).
- 
+
 Solution: move that class definition outside of the function.
 
 ## Limitations
 
 * Error handling is primitive
-
-
-

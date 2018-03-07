@@ -155,7 +155,9 @@ class Klaxon : ConverterFinder {
      * TokenType converters that convert a JsonObject into an object.
      */
     private val converters = arrayListOf<Converter<*>>(DEFAULT_CONVERTER)
-    private val converterMap = hashMapOf<Type, Converter<*>>()
+    private val converterMap = hashMapOf<Type, Converter<*>>().apply {
+        this[Object::class.java] = DEFAULT_CONVERTER
+    }
 
     /**
      * Add a type converter. The converter is analyzed to find out which type it converts
@@ -202,38 +204,46 @@ class Klaxon : ConverterFinder {
         return result
     }
 
-    fun findConverterFromClass(jc: Class<*>, prop: KProperty<*>?) : Converter<*> {
+    fun findConverterFromClass(cls: Class<*>, prop: KProperty<*>?) : Converter<*> {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
             val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
             return result
         }
 
-        var cls: Class<*>? = null
+        var propertyClass: Class<*>? = null
         val propConverter =
             if (prop != null) {
-                cls = (prop.returnType.classifier as KClass<*>).java
+                propertyClass = (prop.returnType.classifier as KClass<*>).java
                 val dc = prop.getter.javaMethod?.declaringClass ?: prop.javaField?.declaringClass
-                annotationsForProp(prop, dc!!).mapNotNull {
+                annotationsForProp(prop, dc).mapNotNull {
                     fieldTypeMap[it.annotationClass]
                 }.firstOrNull()
             } else {
                 null
             }
 
-        val result = propConverter
-                ?: findBestConverter(jc)
-                ?: (if (cls != null) findBestConverter(cls) else null)
+        var result = propConverter
+                ?: findBestConverter(cls, prop)
+                ?: (if (propertyClass != null) findBestConverter(propertyClass, prop) else null)
                 ?: DEFAULT_CONVERTER
-        log("findConverterFromClass $jc returning $result")
+        // That last DEFAULT_CONVERTER is not necessary since the default converter is part of the
+        // list of converters by default and if all other converters fail, that one will apply
+        // (since it is associated to the Object type), however, Kotlin doesn't know that and
+        // will assume the result is nullable without it
+        log("findConverterFromClass $cls returning $result")
         return result
     }
 
-    private fun findBestConverter(cls: Class<*>) : Converter<*>? {
-        val result = converterMap.entries.firstOrNull { entry ->
-            val type = entry.key as Class<*>
-            cls.isAssignableFrom(type)
+    private fun findBestConverter(cls: Class<*>, prop: KProperty<*>?) : Converter<*>? {
+        val all = converterMap.entries.filter { entry ->
+            cls.isAssignableFrom(entry.key as Class<*>)
         }
-        return result?.value
+        if (all.size > 1) {
+            warn("Found more than one converter for the property \"${prop?.name}: ${cls.name}\"," +
+                    " picking the first one:")
+            all.forEach { println("    ${it.value}") }
+        }
+        return all.firstOrNull()?.value
     }
 
     fun toJsonString(value: Any): String {
@@ -262,6 +272,8 @@ class Klaxon : ConverterFinder {
                 else kc.createType()
         return classConverter.fromJson(JsonValue(jsonObject, cls, type, this@Klaxon)) as Any
     }
+
+    fun warn(s: String) = println("Warning: $s")
 
     fun log(s: String) {
         if (Debug.verbose) println(s)
