@@ -31,6 +31,7 @@ class JsonAnnotationTest {
 
         val result = Klaxon().parse<IgnoredWithPrivate>(jsonString)
         Assert.assertEquals(result?.name, "John")
+        Assert.assertEquals(result?.changed(), false)
     }
 
     @Test
