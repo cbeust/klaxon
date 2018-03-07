@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:klaxon:2.1.6'
+    compile 'com.beust:klaxon:2.1.7'
 }
 ```
 
@@ -128,6 +128,8 @@ class Ignored(val name: String) {
 }
 ```
 
+Additionally, if you want to declare a property `private` but still want that property to be visible to
+Klaxon, you can annotate it with `@Json(ignored = false)`.
 
 ### Custom types
 

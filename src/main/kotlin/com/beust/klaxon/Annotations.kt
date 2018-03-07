@@ -46,7 +46,8 @@ class Annotations {
         fun findNonIgnoredProperties(kc: KClass<*>?): List<KProperty1<out Any, Any?>> {
             val result = findProperties(kc).filter {
                 val ignored = it.findAnnotation<Json>()?.ignored
-                it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false)
+                it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false) ||
+                        it.visibility == KVisibility.PRIVATE && (ignored != null || ignored == false)
             }
             return result
         }

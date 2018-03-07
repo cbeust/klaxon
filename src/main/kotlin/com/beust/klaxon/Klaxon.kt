@@ -13,6 +13,7 @@ import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.functions
+import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.javaType
 
@@ -210,9 +211,9 @@ class Klaxon : ConverterFinder {
         var cls: Class<*>? = null
         val propConverter =
             if (prop != null) {
-                cls = prop.getter.javaMethod!!.returnType
-                val dc = prop.getter.javaMethod!!.declaringClass
-                annotationsForProp(prop, dc).mapNotNull {
+                cls = (prop.returnType.classifier as KClass<*>).java
+                val dc = prop.getter.javaMethod?.declaringClass ?: prop.javaField?.declaringClass
+                annotationsForProp(prop, dc!!).mapNotNull {
                     fieldTypeMap[it.annotationClass]
                 }.firstOrNull()
             } else {
