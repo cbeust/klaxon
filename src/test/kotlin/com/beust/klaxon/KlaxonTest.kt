@@ -384,6 +384,17 @@ class KlaxonTest {
         }
     }
 
+    fun nestedCollections() {
+        data class Root (val lists: List<List<String>>)
+
+        val result = Klaxon().parse<Root>("""
+        {
+            "lists": [["red", "green", "blue"]]
+        }
+        """)
+        assertThat(result).isEqualTo(Root(listOf(listOf("red", "green", "blue"))))
+    }
+
     fun nested() {
         val r = Klaxon().parse<PersonWitCity>("""{
             "name": "John",
