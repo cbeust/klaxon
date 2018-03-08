@@ -97,22 +97,22 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
         val r = value.map {
             // Try to find a converter for the element type of the collection
             val converter =
-                    if (jt is ParameterizedType) {
-                        val typeArgument = jt.actualTypeArguments[0]
-                        if (typeArgument is Class<*>) {
-                            klaxon.findConverterFromClass(typeArgument, null)
-                        } else if (typeArgument is ParameterizedType) {
-                            klaxon.findConverterFromClass(typeArgument.actualTypeArguments[0] as Class<*>, null)
-                        } else {
-                            throw IllegalArgumentException("Should never happen")
-                        }
+                if (jt is ParameterizedType) {
+                    val typeArgument = jt.actualTypeArguments[0]
+                    if (typeArgument is Class<*>) {
+                        klaxon.findConverterFromClass(typeArgument, null)
+                    } else if (typeArgument is ParameterizedType) {
+                        klaxon.findConverterFromClass(typeArgument.actualTypeArguments[0] as Class<*>, null)
                     } else {
-                        if (it != null) {
-                            klaxon.findConverter(it)
-                        } else {
-                            throw KlaxonException("Don't know how to convert null value in array $jv")
-                        }
+                        throw IllegalArgumentException("Should never happen")
                     }
+                } else {
+                    if (it != null) {
+                        klaxon.findConverter(it)
+                    } else {
+                        throw KlaxonException("Don't know how to convert null value in array $jv")
+                    }
+                }
 
             converter.fromJson(JsonValue(it, jt, kt, klaxon))
         }
