@@ -37,22 +37,25 @@ publishing {
 
 task install(dependsOn: publishToMavenLocal)
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def localProperties = project.rootProject.file('local.properties')
+if (localProperties.exists()) {
+    Properties properties = new Properties()
+    properties.load(localProperties.newDataInputStream())
 
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    publications = ['mavenCustom']
-    pkg {
-        repo = 'maven'
-        name = 'klaxon'
-        desc = 'JSON parsing for Kotlin'
-        licenses = ['Apache-2.0']
-        labels = ['kotlin']
+    bintray {
+        user = properties.getProperty("bintray.user")
+        key = properties.getProperty("bintray.apikey")
+        publications = ['mavenCustom']
+        pkg {
+            repo = 'maven'
+            name = 'klaxon'
+            desc = 'JSON parsing for Kotlin'
+            licenses = ['Apache-2.0']
+            labels = ['kotlin']
 
-        version {
-            name = project.version //Bintray logical version name
+            version {
+                name = project.version //Bintray logical version name
+            }
         }
     }
 }
