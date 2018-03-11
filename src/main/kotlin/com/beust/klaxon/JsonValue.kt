@@ -141,15 +141,16 @@ class JsonValue(value: Any?,
     }
 
     override fun toString() : String {
-        return if (obj != null) "{object: $obj}"
-            else if (array != null) "{array: $array}"
-            else if (string != null) "{string: $string}"
-            else if (int != null) "{int: $int}"
-            else if (float != null) "{float: $float}"
-            else if (double != null) "{double: $double}"
-            else if (char != null) "{char: $char}"
-            else if (boolean != null) "{boolean: $boolean}"
+        val result = if (obj != null) "{object: $obj"
+            else if (array != null) "{array: $array"
+            else if (string != null) "{string: $string"
+            else if (int != null) "{int: $int"
+            else if (float != null) "{float: $float"
+            else if (double != null) "{double: $double"
+            else if (char != null) "{char: $char"
+            else if (boolean != null) "{boolean: $boolean"
             else throw KlaxonException("Should never happen")
+        return result + ", property: " + propertyKClass + "}"
 
     }
 
