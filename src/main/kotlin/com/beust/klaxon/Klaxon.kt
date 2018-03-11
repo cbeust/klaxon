@@ -226,7 +226,7 @@ class Klaxon : ConverterFinder {
                 ?: findBestConverter(cls, prop)
                 ?: (if (propertyClass != null) findBestConverter(propertyClass, prop) else null)
                 ?: DEFAULT_CONVERTER
-        // That last DEFAULT_CONVERTER is not necessary since the default converter is part of the
+        // That last DEFAULT_CONVERTER above is not necessary since the default converter is part of the
         // list of converters by default and if all other converters fail, that one will apply
         // (since it is associated to the Object type), however, Kotlin doesn't know that and
         // will assume the result is nullable without it
