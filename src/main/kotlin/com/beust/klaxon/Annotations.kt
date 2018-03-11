@@ -8,6 +8,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
 class Annotations {
@@ -37,7 +38,7 @@ class Annotations {
         }
 
         fun findProperties(kc: KClass<*>?): Collection<KProperty1<out Any, Any?>> = try {
-            if (kc != null) kc.declaredMemberProperties else emptyList()
+            if (kc != null) kc.memberProperties else emptyList()
         } catch (ex: Throwable) {
             // https://youtrack.jetbrains.com/issue/KT-16616
             emptyList()

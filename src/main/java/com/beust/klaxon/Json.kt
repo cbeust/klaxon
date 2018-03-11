@@ -1,6 +1,6 @@
 package com.beust.klaxon
 
-@Target(AnnotationTarget.FIELD, AnnotationTarget.PROPERTY)
+@Target(AnnotationTarget.FIELD, AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER)
 annotation class Json(
     /**
      * Used to map Kotlin properties and JSON fields that have different names.

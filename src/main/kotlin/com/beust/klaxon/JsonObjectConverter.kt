@@ -65,7 +65,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             //
             // Check if the name of the field was overridden with a @Json annotation
             //
-            val prop = kc.declaredMemberProperties.first { it.name == thisProp.name }
+            val prop = kc.memberProperties.first { it.name == thisProp.name }
             val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
             val fieldName =
                     if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
