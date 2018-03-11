@@ -4,7 +4,7 @@ import com.beust.klaxon.internal.firstNotNullResult
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
-import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaType
 

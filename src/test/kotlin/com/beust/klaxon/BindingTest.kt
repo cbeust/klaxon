@@ -187,7 +187,7 @@ class BindingTest {
         Assert.assertTrue(s.contains("theName"))
     }
 
-    @Test(expectedExceptions = arrayOf(KlaxonException::class))
+    @Test(expectedExceptions = [(KlaxonException::class)])
     fun badFieldMapping() {
         Klaxon().parse<Mapping>("""
         {
