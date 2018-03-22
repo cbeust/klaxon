@@ -190,8 +190,13 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             when(value) {
                 is Boolean, is String, is Long -> value
                 is Int -> fromInt(value, propertyType)
-                is Double -> fromDouble(value, propertyType)
-                is Float -> fromFloat(value, propertyType)
+                is Double ->
+                    if (jv.propertyKClass?.classifier == kotlin.Float::class) fromFloat(value.toFloat(), propertyType)
+                    else fromDouble(value, propertyType)
+                is Float ->
+                    if (jv.propertyKClass?.classifier == kotlin.Double::class) fromDouble(value.toDouble(),
+                            propertyType)
+                    else fromFloat(value, propertyType)
                 is Collection<*> -> fromCollection(value, jv)
                 is JsonObject -> fromJsonObject(value, jv)
                 else -> {

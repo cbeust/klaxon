@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Percentage
 import org.testng.Assert
 import org.testng.annotations.Test
 
@@ -52,6 +53,13 @@ class BindingTest {
         listOf("\"CLUBS\"", "\"suit\"", "\"value\"", "13", "\"cardCount\"", "1").forEach {
             Asserts.assertContains(s, it)
         }
+    }
+
+    fun doubleTest() {
+        class C(val f: Float)
+        val json = """ { "f": 1.23 } """
+        val r = Klaxon().parse<C>(json)
+        assertThat(r?.f).isCloseTo(1.23f, Percentage.withPercentage(1.0))
     }
 
     //
