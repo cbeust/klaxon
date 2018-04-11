@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.beust:klaxon:2.1.14'
+    implementation 'com.beust:klaxon:3.0.0'
 }
 ```
 
