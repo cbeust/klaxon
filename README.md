@@ -139,9 +139,10 @@ of this mapping yourself by defining type converters.
 The converter interface is as follows:
 
 ```kotlin
-interface Converter<T> {
-    fun toJson(value: T): String?
-    fun fromJson(jv: JsonValue) : T
+interface Converter {
+    fun canConvert(cls: Class<*>) : Boolean
+    fun toJson(value: Any): String
+    fun fromJson(jv: JsonValue) : Any
 }
 ```
 
@@ -152,7 +153,10 @@ convert that field into your own type that's initialized with a boolean:
 ```kotlin
 class BooleanHolder(val flag: Boolean)
 
-val myConverter = object: Converter<BooleanHolder> {
+val myConverter = object: Converter {
+    override fun canConvert(cls: Class<*>)
+        = cls == BooleanHolder::class.java
+
     override fun toJson(value: BooleanHolder): String?
         = """{"flag" : "${if (value.flag == true) 1 else 0}"""
 
@@ -210,7 +214,10 @@ Define your type converter (which has the same type as the converters defined pr
 are converting a `String` from JSON into a `LocalDateTime`:
 
 ```kotlin
-val dateConverter = object: Converter<LocalDateTime> {
+val dateConverter = object: Converter {
+    override fun canConvert(cls: Class<*>)
+        = cls == LocalDateTime::class.java
+
     override fun fromJson(jv: JsonValue) =
         if (jv.string != null) {
             LocalDateTime.parse(jv.string, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
@@ -218,7 +225,7 @@ val dateConverter = object: Converter<LocalDateTime> {
             throw KlaxonException("Couldn't parse date: ${jv.string}")
         }
 
-    override fun toJson(o: LocalDateTime)
+    override fun toJson(o: Any)
             = """ { "date" : $o } """
 }
 ```
@@ -227,7 +234,7 @@ Finally, declare the association between that converter and your annotation in y
 
 ```kotlin
 val result = Klaxon()
-    .fieldConverter(KlaxonDate::class,dateConverter)
+    .fieldConverter(KlaxonDate::class, dateConverter)
     .parse<WithDate>("""
     {
       "theDate": "2017-05-10 16:30"
