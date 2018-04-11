@@ -1,7 +1,9 @@
 package com.beust.klaxon
 
-val convertTuple = object: Converter<Tuple> {
-    override fun toJson(value: Tuple): String? {
+val convertTuple = object: Converter {
+    override fun canConvert(cls: Class<*>) = cls == Tuple::class.java
+
+    override fun toJson(value: Any): String {
         return ""
     }
 

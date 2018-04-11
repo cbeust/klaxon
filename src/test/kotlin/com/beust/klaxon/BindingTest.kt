@@ -36,13 +36,17 @@ class BindingTest {
         }
     }
 
-    val CARD_CONVERTER = object: Converter<Card> {
+    val CARD_CONVERTER = object: Converter {
+        override fun canConvert(cls: Class<*>) = cls == Card::class.java
+
         override fun fromJson(jv: JsonValue) = Card(jv.objInt("value"), jv.objString("suit"))
 
-        override fun toJson(value: Card) = """
+        override fun toJson(v: Any) = (v as Card).let { value ->
+            """
                     "value" : ${value.value},
                     "suit": "${value.suit.toUpperCase()}"
                 """
+        }
     }
 
     fun objectsToJson() {

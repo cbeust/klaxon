@@ -26,4 +26,13 @@ class Issue125 {
 //        assertThat(child?.bar).isEqualTo("baba")
     }
 
+    @Test(enabled = false, description = "List of maps not supported yet")
+    fun objectWithListOfMaps() {
+        val mapper = Klaxon()
+        data class Data(val data: List<Map<String, String>>)
+
+        val data = Data(listOf(mapOf("name" to "john")))
+        val json = mapper.toJsonString(data)
+        assertThat(mapper.parse<Data>(json)).isEqualTo(data)
+    }
 }

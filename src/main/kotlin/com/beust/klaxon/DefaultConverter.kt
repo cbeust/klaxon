@@ -2,17 +2,41 @@ package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
 import java.math.BigDecimal
+import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmErasure
 
 /**
  * The default Klaxon converter, which attempts to convert the given value as an enum first and if this fails,
  * using reflection to enumerate the fields of the passed object and assign them values.
  */
-class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap<String, Any>) : Converter<Any> {
-    override fun fromJson(jv: JsonValue): Any
-            = maybeConvertEnum(jv) ?: convertValue(jv)
+class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap<String, Any>) : Converter {
+    override fun canConvert(cls: Class<*>) = true
 
-    override fun toJson(value: Any): String? {
+    override fun fromJson(jv: JsonValue): Any {
+        val value = jv.inside
+        val propertyType = jv.propertyClass
+        val result =
+            when(value) {
+                is Boolean, is String, is Long -> value
+                is Int -> fromInt(value, propertyType)
+                is Double ->
+                    if (jv.propertyKClass?.classifier == kotlin.Float::class) fromFloat(value.toFloat(), propertyType)
+                    else fromDouble(value, propertyType)
+                is Float ->
+                    if (jv.propertyKClass?.classifier == kotlin.Double::class) fromDouble(value.toDouble(),
+                            propertyType)
+                    else fromFloat(value, propertyType)
+                is Collection<*> -> fromCollection(value, jv)
+                is JsonObject -> fromJsonObject(value, jv)
+                else -> {
+                    throw KlaxonException("Don't know how to convert $value")
+                }
+            }
+        return result
+
+    }
+
+    override fun toJson(value: Any): String {
         fun joinToString(list: Collection<*>, open: String, close: String)
             = open + list.joinToString(", ") + close
 
@@ -55,20 +79,6 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
         return result
     }
 
-    private fun maybeConvertEnum(jv: JsonValue): Any? {
-        var result: Any? = null
-//        jv.property?.let { property ->
-//            val cls = property.returnType.javaType
-            val javaClass = jv.propertyClass
-            if (javaClass is Class<*> && javaClass.isEnum) {
-                val valueOf = javaClass.getMethod("valueOf", String::class.java)
-                result = valueOf.invoke(null, jv.inside)
-            }
-//        }
-
-        return result
-    }
-
     private fun fromInt(value: Int, propertyType: java.lang.reflect.Type?): Any {
         // If the value is an Int and the property is a Long, widen it
         val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
@@ -94,11 +104,11 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
     private fun fromCollection(value: Collection<*>, jv: JsonValue): Any {
         val kt = jv.propertyKClass
         val jt = jv.propertyClass
-        val r = value.map {
+        val convertedCollection = value.map {
             // Try to find a converter for the element type of the collection
-            val converter =
-                if (jt is ParameterizedType) {
-                    val typeArgument = jt.actualTypeArguments[0]
+            if (jt is ParameterizedType) {
+                val typeArgument = jt.actualTypeArguments[0]
+                val converter =
                     if (typeArgument is Class<*>) {
                         klaxon.findConverterFromClass(typeArgument, null)
                     } else if (typeArgument is ParameterizedType) {
@@ -106,29 +116,32 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                     } else {
                         throw IllegalArgumentException("Should never happen")
                     }
+                val kTypeArgument = kt?.arguments!![0].type
+                converter.fromJson(JsonValue(it, typeArgument, kTypeArgument, klaxon))
+            } else {
+                if (it != null) {
+                    val converter = klaxon.findConverter(it)
+                    converter.fromJson(JsonValue(it, jt, kt, klaxon))
                 } else {
-                    if (it != null) {
-                        klaxon.findConverter(it)
-                    } else {
-                        throw KlaxonException("Don't know how to convert null value in array $jv")
-                    }
+                    throw KlaxonException("Don't know how to convert null value in array $jv")
                 }
+            }
 
-            converter.fromJson(JsonValue(it, jt, kt, klaxon))
         }
 
         val result =
-                if (Annotations.isSet(jt)) {
-                    r.toSet()
-                } else if (Annotations.isArray(kt)) {
-                    val componentType = kt?.jvmErasure?.java?.componentType
-                    val array = java.lang.reflect.Array.newInstance(componentType, value.size)
-                    r.indices.forEach { i ->
-                        java.lang.reflect.Array.set(array, i, r[i])
-                    }
-                    array
+            if (Annotations.isSet(jt)) {
+                convertedCollection.toSet()
+            } else if (Annotations.isArray(kt)) {
+                val componentType = kt?.jvmErasure?.java?.componentType
+                val array = java.lang.reflect.Array.newInstance(componentType, value.size)
+                convertedCollection.indices.forEach { i ->
+                    java.lang.reflect.Array.set(array, i, convertedCollection[i])
                 }
-                else r
+                array
+            } else {
+                convertedCollection
+            }
         return result
     }
 
@@ -152,16 +165,28 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                                 val convertedValue = converter.fromJson(
                                         JsonValue(mv, typeValue, jv.propertyKClass!!.arguments[1].type,
                                                 klaxon))
-                                if (convertedValue != null) {
-                                    result[key] = convertedValue
-                                }
+                                result[key] = convertedValue
                             }
                         }
                         result
                     }
                     isCollection -> {
-                        val cls = jt.actualTypeArguments[0] as Class<*>
-                        klaxon.fromJsonObject(value, cls, cls.kotlin)
+                        val type =jt.actualTypeArguments[0]
+                        when(type) {
+                            is Class<*> -> {
+                                val cls = jt.actualTypeArguments[0] as Class<*>
+                                klaxon.fromJsonObject(value, cls, cls.kotlin)
+                            }
+                            is ParameterizedType -> {
+                                val result2 = JsonObjectConverter(klaxon, HashMap<String, Any>()).fromJson(value,
+                                        jv.propertyKClass!!.jvmErasure)
+                                result2
+
+                            }
+                            else -> {
+                                throw IllegalArgumentException("Couldn't interpret type $type")
+                            }
+                        }
                     }
                     else -> throw KlaxonException("Don't know how to convert the JsonObject with the following keys" +
                             ":\n  $value")
@@ -178,31 +203,4 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
         return result
     }
 
-//    val map = hashMapOf< KClass<*>, (Any, java.lang.reflect.Type) -> Any>(
-//            Int::class to ::fromInt,
-//            Double::class to ::fromDouble
-//    )
-
-    private fun convertValue(jv: JsonValue) : Any {
-        val value = jv.inside
-        val propertyType = jv.propertyClass
-        val result =
-            when(value) {
-                is Boolean, is String, is Long -> value
-                is Int -> fromInt(value, propertyType)
-                is Double ->
-                    if (jv.propertyKClass?.classifier == kotlin.Float::class) fromFloat(value.toFloat(), propertyType)
-                    else fromDouble(value, propertyType)
-                is Float ->
-                    if (jv.propertyKClass?.classifier == kotlin.Double::class) fromDouble(value.toDouble(),
-                            propertyType)
-                    else fromFloat(value, propertyType)
-                is Collection<*> -> fromCollection(value, jv)
-                is JsonObject -> fromJsonObject(value, jv)
-                else -> {
-                    throw KlaxonException("Don't know how to convert $value")
-                }
-            }
-        return result
-    }
 }

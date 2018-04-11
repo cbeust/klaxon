@@ -35,9 +35,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 }
             }
             try {
-                if (! constructor.isAccessible) {
-                    constructor.isAccessible = true
-                }
+                constructor.isAccessible = true
                 constructor.callBy(parameterMap)
             } catch(ex: Exception) {
                 // Lazy way to find out of that constructor worked. Easier than trying to make sure each

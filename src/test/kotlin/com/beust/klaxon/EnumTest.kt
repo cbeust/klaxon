@@ -6,12 +6,14 @@ import org.testng.annotations.Test
 @Test
 class EnumTest {
 
-    val convertColor = object: Converter<Color> {
-        override fun toJson(value: Color): String? = when(value) {
+    val convertColor = object: Converter {
+        override fun canConvert(cls: Class<*>) = cls == Color::class.java
+
+        override fun toJson(value: Any): String = when(value as Color) {
             Color.R -> "red"
             Color.G -> "green"
             Color.B -> "blue"
-            else -> null
+            else -> throw IllegalArgumentException("Unknown color")
         }
 
         override fun fromJson(jv: JsonValue): Color = when(jv.inside) {

@@ -32,8 +32,9 @@ class Issue95 {
     @Test
     fun serializeStringArrayToObjectArray() {
         data class Person(val id: String, val name: String)
-        class PersonConverter: Converter<Person> {
-            override fun toJson(value: Person) = "\"${value.id}:${value.name}\""
+        class PersonConverter: Converter {
+            override fun canConvert(cls: Class<*>) = cls == Person::class.java
+            override fun toJson(value: Any) = (value as Person).let { value -> "\"${value.id}:${value.name}\"" }
             override fun fromJson(jv: JsonValue): Person {
                 val (id, name) = jv.string!!.split(":")
                 return Person(id, name)
