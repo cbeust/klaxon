@@ -671,7 +671,3 @@ This is typically caused by your object class being defined inside a function (w
  additional parameter that Klaxon doesn't know how to fill).
 
 Solution: move that class definition outside of the function.
-
-## Limitations
-
-* Error handling is primitive
