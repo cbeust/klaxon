@@ -53,7 +53,9 @@ class Annotations {
             return result
         }
 
-        fun findJsonPaths(kc: KClass<*>?): Set<String> {
+        fun findJsonPaths(kc: KClass<*>?) = findJsonPaths(kc, HashSet())
+
+        private fun findJsonPaths(kc: KClass<*>?, seen: HashSet<KClass<*>>): Set<String> {
             val result = hashSetOf<String>()
             val others = arrayListOf<KClass<*>>()
             val thesePaths = findProperties(kc)
@@ -63,7 +65,14 @@ class Annotations {
                         it.findAnnotation<Json>()
                     }
                     .map { it.path }
-            val recursive = others.flatMap { findJsonPaths(it) }
+            val recursive = others.flatMap {
+                if (! seen.contains(it)) {
+                    seen.add(it)
+                    findJsonPaths(it, seen)
+                } else {
+                    emptySet()
+                }
+            }
             result.addAll(thesePaths)
             result.addAll(recursive)
 //            println("JSON PATHS FOR $kc: $result")
