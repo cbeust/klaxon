@@ -1,3 +1,4 @@
+
 <img src="doc/klaxon.png" alt="Klaxon logo" height="101" width="220" />
 
 Klaxon is a library to parse JSON in Kotlin.
@@ -157,8 +158,8 @@ val myConverter = object: Converter {
     override fun canConvert(cls: Class<*>)
         = cls == BooleanHolder::class.java
 
-    override fun toJson(value: BooleanHolder): String?
-        = """{"flag" : "${if (value.flag == true) 1 else 0}"""
+    override fun toJson(value: Any): String?
+        = """{"flag" : "${if ((value as BooleanHolder).flag == true) 1 else 0}"""
 
     override fun fromJson(jv: JsonValue)
         = BooleanHolder(jv.objInt("flag") != 0)
