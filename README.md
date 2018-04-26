@@ -245,6 +245,30 @@ val result = Klaxon()
 assert(result?.date == LocalDateTime.of(2017, 5, 10, 16, 30))
 ```
 
+### Property strategy
+
+You can instruct Klaxon to dynamically ignore properties with the `PropertyStrategy` interface:
+
+```kotlin
+interface PropertyStrategy {
+    /**
+     * @return true if this property should be mapped.
+     */
+    fun accept(property: KProperty<*>): Boolean
+}
+```
+
+This is a dynamic version of `@Json(ignored = true)`, which you can register with your `Klaxon` instance with the function `propertyStrategy()`:
+
+```kotlin
+val ps = object: PropertyStrategy {
+    override fun accept(property: KProperty<*>) = property.name != "something"
+}
+val klaxon = Klaxon().propertyStrategy(ps)
+```
+
+You can define multiple `PropertyStrategy` instances, and in such a case, they all need to return `true` for a property to be included.
+
 ## <a name="streamingApi">Streaming API</a>
 
 The streaming API is useful in a few scenarios:

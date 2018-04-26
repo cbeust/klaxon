@@ -125,6 +125,12 @@ class Klaxon : ConverterFinder {
         return this
     }
 
+    val propertyStrategies = arrayListOf<PropertyStrategy>()
+
+    fun propertyStrategy(ps: PropertyStrategy): Klaxon {
+        propertyStrategies.add(ps)
+        return this
+    }
     /**
      * A map of a path to the JSON value that this path was found at.
      */

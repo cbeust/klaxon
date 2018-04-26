@@ -2,7 +2,6 @@ package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
 import java.math.BigDecimal
-import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -57,7 +56,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             }
             else -> {
                 val valueList = arrayListOf<String>()
-                val properties = Annotations.findNonIgnoredProperties(value::class)
+                val properties = Annotations.findNonIgnoredProperties(value::class, klaxon.propertyStrategies)
                 if (properties.isNotEmpty()) {
                     properties.forEach { prop ->
                         prop.getter.call(value)?.let { getValue ->

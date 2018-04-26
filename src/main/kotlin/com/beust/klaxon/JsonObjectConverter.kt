@@ -57,7 +57,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         val result = hashMapOf<String, Any>()
 
         // Only keep the properties that are public and do not have @Json(ignored = true)
-        val allProperties = Annotations.findNonIgnoredProperties(kc)
+        val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
 
         allProperties.forEach { thisProp ->
             //
