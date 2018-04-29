@@ -17,6 +17,17 @@ class JsonReader(val reader: Reader) : Reader() {
     fun nextInt() = consumeValue { value -> value as Int }
 
     /**
+     * @return the next Double.
+     */
+    fun nextDouble() = consumeValue { value ->
+        when (value) {
+            is Int -> value.toDouble()
+            is Double -> value
+            else -> throw IllegalStateException("Next token is not a double: $value")
+        }
+    }
+
+    /**
      * @return the next boolean.
      */
     fun nextBoolean() = consumeValue { value -> value as Boolean }

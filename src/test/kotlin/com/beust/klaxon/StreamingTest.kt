@@ -16,7 +16,7 @@ class StreamingTest {
 
     fun streamingObject() {
         val objectString = """{
-             "name": "Joe", "age": 23, "flag": true, "array": [1, 3],
+             "name": "Joe", "age": 23, "height": 1.85, "flag": true, "array": [1, 3],
              "obj1": { "a":1, "b":2 }
         }"""
 
@@ -24,6 +24,7 @@ class StreamingTest {
             reader.beginObject() {
                 var name: String? = null
                 var age: Int? = null
+                var height: Double? = null
                 var flag: Boolean? = null
                 var array: List<Any> = arrayListOf<Any>()
                 var obj1: JsonObject? = null
@@ -36,6 +37,7 @@ class StreamingTest {
                     when (readName) {
                         "name" -> name = reader.nextString()
                         "age" -> age = reader.nextInt()
+                        "height" -> height = reader.nextDouble()
                         "flag" -> flag = reader.nextBoolean()
                         "array" -> array = reader.nextArray()
                         "obj1" -> obj1 = reader.nextObject()
@@ -44,6 +46,7 @@ class StreamingTest {
                 }
                 Assert.assertEquals(name, "Joe")
                 Assert.assertEquals(age, 23)
+                Assert.assertEquals(height, 1.85)
                 Assert.assertTrue(flag!!)
                 Assert.assertEquals(array, listOf(1, 3))
                 Assert.assertEquals(obj1, expectedObj1)
@@ -93,6 +96,40 @@ class StreamingTest {
                 }
             }
         }
+    }
+
+    fun testNextDouble() {
+
+        // Integer values should be autoconverted
+        JsonReader(StringReader("[0]")).use { reader ->
+            val actual = reader.beginArray { reader.nextDouble() }
+            Assert.assertEquals(actual, 0.0)
+        }
+
+        // Native doubles
+        JsonReader(StringReader("[0.123]")).use { reader ->
+            val actual = reader.beginArray { reader.nextDouble() }
+            Assert.assertEquals(actual, 0.123)
+        }
+
+        // NAN is not really specified
+        JsonReader(StringReader("[\"NAN\"]")).use { reader ->
+            reader.beginArray {
+                Assert.assertThrows {
+                    reader.nextDouble()
+                }
+            }
+        }
+
+        // Something entirely different from a double
+        JsonReader(StringReader("[null]")).use { reader ->
+            reader.beginArray {
+                Assert.assertThrows {
+                    reader.nextDouble()
+                }
+            }
+        }
+
     }
 
 //    fun streaming1() {
