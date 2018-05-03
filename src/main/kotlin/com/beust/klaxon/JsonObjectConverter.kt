@@ -89,12 +89,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     val convertedValue = klaxon.findConverterFromClass(kc.java, prop)
                             .fromJson(JsonValue(jValue, prop.returnType.javaType,
                                     prop.returnType, klaxon))
-                    if (convertedValue != null) {
-                        result[prop.name] = convertedValue
-                    } else {
-                        throw KlaxonException("Don't know how to convert \"$jValue\" into ${prop::class} for "
-                                + "field named \"${prop.name}\"")
-                    }
+                    result[prop.name] = convertedValue
                 } else {
                     // Didn't find any value for that property: don't do anything. If a value is missing here,
                     // it might still be found as a default value on the constructor, and we'll find out once we
