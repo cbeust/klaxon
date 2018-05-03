@@ -3,9 +3,11 @@ package com.beust.klaxon
 import com.beust.klaxon.internal.firstNotNullResult
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaSetter
 import kotlin.reflect.jvm.javaType
 
 /**
@@ -45,6 +47,15 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             }
         }
 
+        // Now that we have an initialized object, find all the other non constructor properties
+        // and if we have a value from JSON for them, initialize them as well
+        val properties = Annotations.findNonIgnoredProperties(kc)
+        properties.filterIsInstance<KMutableProperty<*>>().forEach {
+            val value = map[it.name]
+            if (value != null) {
+                it.javaSetter!!.invoke(result, value)
+            }
+        }
         return result ?: throw KlaxonException(
                 "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map: $error")
     }

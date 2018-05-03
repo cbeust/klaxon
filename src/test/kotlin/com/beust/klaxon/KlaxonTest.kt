@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
+import org.intellij.lang.annotations.Language
 import org.testng.Assert
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
@@ -419,5 +420,24 @@ class KlaxonTest {
     fun serializeEnum() {
         Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
     }
+
+    @Test
+    fun nonConstructorProperties() {
+        val result = Klaxon().parse<Registry>(someString)
+        val vendors = result?.vendor!!
+        assertThat("example").isEqualTo(result.name)
+        assertThat("example").isEqualTo(vendors[0].vendorName)
+    }
+
+    private class Registry(val vendor : List<Vendor> = ArrayList()) {
+        var name : String = ""
+    }
+    private class Vendor {
+        var vendorName : String = ""
+    }
+
+    @Language("json")
+    private val someString = "{\n  \"name\" : \"example\",\n  \"vendor\": [\n    {\n      \"vendorName\": " +
+            "\"example\"\n    }\n  ]\n}"
 
 }
