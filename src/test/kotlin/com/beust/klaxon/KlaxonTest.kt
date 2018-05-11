@@ -429,9 +429,6 @@ class KlaxonTest {
         assertThat("example").isEqualTo(vendors[0].vendorName)
     }
 
-    private class Registry(val vendor : List<Vendor> = ArrayList()) {
-        var name : String = ""
-    }
     private class Vendor {
         var vendorName : String = ""
     }
@@ -439,8 +436,26 @@ class KlaxonTest {
     @Language("json")
     private val someString = """{
         "name": "example",
+        "foo": "cool",
+        "boo": "stuff",
         "vendor": [
           { "vendorName": "example"}
         ]
     }"""
+
+
+    @Test
+    fun testParseRegistry() {
+        val result = Klaxon().parse<Registry>(someString)
+        val vendors = result?.vendor!!
+        assertEquals("example", result!!.name)
+        assertEquals("cool", result.foo)
+        assertEquals("stuff", result.boo)
+        assertEquals("example", vendors[0].vendorName)
+    }
+    private class Registry(val name : String,
+            val vendor : List<Vendor> = ArrayList()) {
+        var foo : String = ""
+        var boo : String = ""
+    }
 }
