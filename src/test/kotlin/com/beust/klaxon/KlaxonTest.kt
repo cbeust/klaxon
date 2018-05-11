@@ -437,7 +437,10 @@ class KlaxonTest {
     }
 
     @Language("json")
-    private val someString = "{\n  \"name\" : \"example\",\n  \"vendor\": [\n    {\n      \"vendorName\": " +
-            "\"example\"\n    }\n  ]\n}"
-
+    private val someString = """{
+        "name": "example",
+        "vendor": [
+          { "vendorName": "example"}
+        ]
+    }"""
 }
