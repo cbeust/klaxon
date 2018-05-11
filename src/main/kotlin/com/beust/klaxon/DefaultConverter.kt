@@ -1,7 +1,9 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.Reflection.Companion.isAssignableFromAny
 import java.lang.reflect.ParameterizedType
 import java.math.BigDecimal
+import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -148,9 +150,8 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
         val jt = jv.propertyClass
         val result =
             if (jt is ParameterizedType) {
-                val rawType = jt.rawType
-                val isMap = (rawType as Class<*>).isAssignableFrom(AbstractMap::class.java)
-                val isCollection = Collection::class.java.isAssignableFrom(rawType)
+                val isMap = Reflection.isAssignableFromAny(AbstractMap::class.java, HashMap::class)
+                val isCollection = Reflection.isAssignableFromAny(Collection::class.java)
                 when {
                     isMap -> {
                         // Map
