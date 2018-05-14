@@ -50,12 +50,17 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         // Now that we have an initialized object, find all the other non constructor properties
         // and if we have a value from JSON for them, initialize them as well
         val properties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
-        properties.filterIsInstance<KMutableProperty<*>>().forEach {
-            val value = map[it.name]
-            if (value != null) {
-                it.javaSetter!!.invoke(result, value)
+        properties.forEach {
+            if (it is KMutableProperty<*>) {
+                val value = map[it.name]
+                if (value != null) {
+                    it.javaSetter!!.invoke(result, value)
+                }
+            } else {
+                klaxon.log("Ignoring read-only property $it")
             }
         }
+
         return result ?: throw KlaxonException(
                 "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map: $error")
     }
