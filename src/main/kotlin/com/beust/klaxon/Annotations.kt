@@ -37,7 +37,7 @@ class Annotations {
             }
         }
 
-        fun findProperties(kc: KClass<*>?): Collection<KProperty1<out Any, Any?>> = try {
+        private fun findProperties(kc: KClass<*>?): Collection<KProperty1<out Any, Any?>> = try {
             if (kc != null) kc.memberProperties else emptyList()
         } catch (ex: Throwable) {
             // https://youtrack.jetbrains.com/issue/KT-16616
