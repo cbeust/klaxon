@@ -4,7 +4,7 @@ import org.testng.annotations.Test
 import kotlin.test.assertEquals
 
 @Test
-class Serialization {
+class SerializationTest {
     enum class Sause { ONION }
     val klaxon = Klaxon()
 
