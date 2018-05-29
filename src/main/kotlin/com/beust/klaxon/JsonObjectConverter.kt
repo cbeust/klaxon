@@ -7,6 +7,7 @@ import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaSetter
 import kotlin.reflect.jvm.javaType
 
@@ -57,7 +58,15 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     it.javaSetter!!.invoke(result, value)
                 }
             } else {
-                klaxon.log("Ignoring read-only property $it")
+                // Mutable property
+                val field = it.javaField
+                if (field != null && result != null) {
+                    val value = map[it.name]
+                    field.isAccessible = true
+                    field.set(result, value)
+                } else {
+                    klaxon.log("Ignoring read-only property $it")
+                }
             }
         }
 

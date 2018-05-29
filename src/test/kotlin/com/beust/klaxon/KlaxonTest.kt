@@ -458,4 +458,26 @@ class KlaxonTest {
         var foo : String = ""
         var boo : String = ""
     }
+
+    fun issue153() {
+        abstract class FooBase(
+                val id: String? = null
+        )
+
+        class BarImpl(
+                val barValue: String? = null
+        ): FooBase()
+
+
+        val barImpl = Klaxon()
+                .parse<BarImpl>("""
+                {
+                    "id": "id123",
+                    "barValue" : "value123"
+                }
+                """)
+
+        assertThat(barImpl?.barValue).isEqualTo("value123")
+        assertThat(barImpl?.id).isEqualTo("id123")
+    }
 }
