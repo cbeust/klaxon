@@ -1,3 +1,4 @@
 package com.beust.klaxon
 
-class KlaxonException(s: String) : RuntimeException(s)
+open class KlaxonException(s: String) : RuntimeException(s)
+class JsonParsingException(s: String) : KlaxonException(s)
