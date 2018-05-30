@@ -9,7 +9,7 @@ class JsonReader(val reader: Reader) : Reader() {
     /**
      * @return the next String.
      */
-    fun nextString() = consumeValue { value -> value.toString() }
+    fun nextString() = consumeValue { value -> value as String }
 
     /**
      * @return the next Int.
