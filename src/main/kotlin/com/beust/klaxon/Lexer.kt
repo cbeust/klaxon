@@ -127,14 +127,14 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             loop@
             do {
                 if (isDone()) {
-                    throw RuntimeException("Unterminated string")
+                    throw KlaxonException("Unterminated string")
                 }
 
                 c = if (lenient) peekChar() else nextChar()
                 when (c) {
                     '\\' -> {
                         if (isDone()) {
-                            throw RuntimeException("Unterminated string")
+                            throw KlaxonException("Unterminated string")
                         }
 
                         c = nextChar()
@@ -226,7 +226,7 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             } else if (v == "null") {
                 jsonValue = null
             } else {
-                throw RuntimeException("Unexpected character at position ${index-1}"
+                throw KlaxonException("Unexpected character at position ${index-1}"
                     + ": '$c' (ASCII: ${c.toInt()})'")
             }
 
