@@ -8,29 +8,39 @@ import java.io.Reader
 class JsonReader(val reader: Reader) : Reader() {
     /**
      * @return the next String.
+     * @throws JsonParsingException the next value is not a String.
      */
-    fun nextString() = consumeValue { value -> value.toString() }
+    fun nextString() = consumeValue { value ->
+        value as? String ?: throw JsonParsingException("Next token is not a string: $value")
+    }
 
     /**
      * @return the next Int.
+     * @throws JsonParsingException the next value is not an Int.
      */
-    fun nextInt() = consumeValue { value -> value as Int }
+    fun nextInt() = consumeValue { value ->
+        value as? Int ?: throw JsonParsingException("Next token is not a int: $value")
+    }
 
     /**
      * @return the next Double.
+     * @throws JsonParsingException the next value is not a Double.
      */
     fun nextDouble() = consumeValue { value ->
         when (value) {
             is Int -> value.toDouble()
             is Double -> value
-            else -> throw IllegalStateException("Next token is not a double: $value")
+            else -> throw JsonParsingException("Next token is not a double: $value")
         }
     }
 
     /**
      * @return the next boolean.
+     * @throws JsonParsingException the next value is not a Boolean.
      */
-    fun nextBoolean() = consumeValue { value -> value as Boolean }
+    fun nextBoolean() = consumeValue { value ->
+        value as? Boolean ?: throw JsonParsingException("Next token is not a boolean: $value")
+    }
 
     /**
      * @return the next object, making sure the current token is an open brace and the last token is a closing brace.
