@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlinVersion = '1.1.51'
+    ext.kotlinVersion = '1.2.10'
 
     repositories {
         mavenCentral()
@@ -17,7 +17,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version = '3.0.1'
+version = '3.0.5'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
@@ -36,11 +36,10 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
-            "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-            "javax.json:javax.json-api:1.1.2"
-    testCompile "org.testng:testng:6.11",
+            "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    testCompile "org.testng:testng:6.13.1",
             "org.jetbrains.kotlin:kotlin-test:$kotlinVersion",
-	    "org.assertj:assertj-core:3.5.2"
+            "org.assertj:assertj-core:3.5.2"
 }
 
 task sourceJar(type: Jar) {
