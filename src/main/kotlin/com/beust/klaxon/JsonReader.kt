@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import java.io.Reader
+import java.math.BigInteger
 
 /**
  * Manages JSON streaming.
@@ -23,7 +24,32 @@ class JsonReader(val reader: Reader) : Reader() {
     }
 
     /**
-     * @return the next Double.
+     * @return the next Long (upscaling as needed).
+     * @throws JsonParsingException the next value is not an Long.
+     */
+    fun nextLong() = consumeValue { value ->
+        when (value) {
+            is Int -> value.toLong()
+            is Long -> value
+            else -> throw JsonParsingException("Next token is not a long: $value")
+        }
+    }
+
+    /**
+     * @return the next BigInteger (upscaling as needed).
+     * @throws JsonParsingException the next value is not an BigInteger.
+     */
+    fun nextBigInteger() = consumeValue { value ->
+        when (value) {
+            is Int -> value.toBigInteger()
+            is Long -> value.toBigInteger()
+            is BigInteger -> value
+            else -> throw JsonParsingException("Next token is not a big integer: $value")
+        }
+    }
+
+    /**
+     * @return the next Double (upscaling as needed).
      * @throws JsonParsingException the next value is not a Double.
      */
     fun nextDouble() = consumeValue { value ->
