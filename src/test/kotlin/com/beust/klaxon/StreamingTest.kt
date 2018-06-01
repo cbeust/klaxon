@@ -2,6 +2,7 @@ package com.beust.klaxon
 
 //import com.google.gson.stream.JsonReader
 import org.testng.Assert
+import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import java.io.StringReader
 
@@ -99,63 +100,55 @@ class StreamingTest {
     }
 
     fun testNextString() {
-
         // String read normally
         JsonReader(StringReader("[\"text\"]")).use { reader ->
             val actual = reader.beginArray { reader.nextString() }
             Assert.assertEquals(actual, "text")
         }
+    }
 
-        // null is not string
-        assertParsingExceptionFromArray("[null]") {reader ->
+    @DataProvider(name="invalid-strings")
+    fun createinvalidStringData() = arrayOf(
+            arrayOf("[null]"), // null
+            arrayOf("[true]"), // Boolean
+            arrayOf("[123]"), // Int
+            arrayOf("[9223372036854775807]"), // Long
+            arrayOf("[0.123]") // Double
+    )
+
+    @Test(dataProvider = "invalid-strings")
+    fun testNextStringInvalidInput(nonStringValue : String) {
+        assertParsingExceptionFromArray(nonStringValue) { reader ->
             reader.nextString()
         }
-
-        // Boolean is not string
-        assertParsingExceptionFromArray("[true]") {reader ->
-            reader.nextString()
-        }
-
-        // Int is not string
-        assertParsingExceptionFromArray("[123]") {reader ->
-            reader.nextString()
-        }
-
-        // Double is not string
-        assertParsingExceptionFromArray("[0.123]") {reader ->
-            reader.nextString()
-        }
-
     }
 
     fun testNextInt() {
-
         // Int read normally
         JsonReader(StringReader("[0]")).use { reader ->
             val actual = reader.beginArray { reader.nextInt() }
             Assert.assertEquals(actual, 0)
         }
+    }
 
-        // Double is not int
-        assertParsingExceptionFromArray("[0.123]") {reader ->
+    @DataProvider(name="invalid-ints")
+    fun createinvalidIntData() = arrayOf(
+            arrayOf("[null]"), // null
+            arrayOf("[true]"), // Boolean
+            arrayOf("[\"123\"]"), // String
+            arrayOf("[9223372036854775807]"), // Long
+            arrayOf("[0.123]") // Double
+    )
+
+    @Test(dataProvider = "invalid-ints")
+    fun testNextIntInvalidInput(nonIntValue : String) {
+        assertParsingExceptionFromArray(nonIntValue) { reader ->
             reader.nextInt()
         }
-
-        // null is not int
-        assertParsingExceptionFromArray("[null]") {reader ->
-            reader.nextInt()
-        }
-
-        // String is not int
-        assertParsingExceptionFromArray("[\"123\"]") {reader ->
-            reader.nextInt()
-        }
-
     }
 
     fun testNextDouble() {
-
-        // Integer values should be autoconverted
+        // Integer values should be auto-converted
         JsonReader(StringReader("[0]")).use { reader ->
             val actual = reader.beginArray { reader.nextDouble() }
             Assert.assertEquals(actual, 0.0)
@@ -166,21 +159,25 @@ class StreamingTest {
             val actual = reader.beginArray { reader.nextDouble() }
             Assert.assertEquals(actual, 0.123)
         }
+    }
 
-        // NAN is not really specified
-        assertParsingExceptionFromArray("[\"NAN\"]") {reader ->
+    @DataProvider(name="invalid-doubles")
+    fun createinvalidDoubleData() = arrayOf(
+            arrayOf("[null]"), // null
+            arrayOf("[true]"), // Boolean
+            arrayOf("[\"123\"]"), // String
+            arrayOf("[\"NAN\"]"), // NAN is not really specified
+            arrayOf("[9223372036854775807]") // Long
+    )
+
+    @Test(dataProvider = "invalid-doubles")
+    fun testNextDoubleInvalidInput(nonDoubleValue : String) {
+        assertParsingExceptionFromArray(nonDoubleValue) { reader ->
             reader.nextDouble()
         }
-
-        // Something entirely different from a double
-        assertParsingExceptionFromArray("[null]") {reader ->
-            reader.nextDouble()
-        }
-
     }
 
     fun testNextBoolean() {
-
         // true read normally
         JsonReader(StringReader("[true]")).use { reader ->
             val actual = reader.beginArray { reader.nextBoolean() }
@@ -192,27 +189,24 @@ class StreamingTest {
             val actual = reader.beginArray { reader.nextBoolean() }
             Assert.assertEquals(actual, false)
         }
+    }
 
-        // Int is not boolean
-        assertParsingExceptionFromArray("[123]") {reader ->
+    @DataProvider(name="invalid-booleans")
+    fun createinvalidBooleanData() = arrayOf(
+            arrayOf("[null]"), // null
+            arrayOf("[\"123\"]"), // String
+            arrayOf("[\"true\"]"), // true as a String
+            arrayOf("[\"false\"]"), // false as a String
+            arrayOf("[123]"), // Int
+            arrayOf("[9223372036854775807]"), // Long
+            arrayOf("[0.123]") // Double
+    )
+
+    @Test(dataProvider = "invalid-booleans")
+    fun testNextBooleanInvalidInput(nonBooleanValue : String) {
+        assertParsingExceptionFromArray(nonBooleanValue) { reader ->
             reader.nextBoolean()
         }
-
-        // Double is not boolean
-        assertParsingExceptionFromArray("[0.123]") {reader ->
-            reader.nextBoolean()
-        }
-
-        // null is not boolean
-        assertParsingExceptionFromArray("[null]") {reader ->
-            reader.nextBoolean()
-        }
-
-        // String is not boolean
-        assertParsingExceptionFromArray("[\"text\"]") {reader ->
-            reader.nextBoolean()
-        }
-
     }
 
     private fun assertParsingExceptionFromArray(json: String, nextValue: (JsonReader) -> Unit) {
