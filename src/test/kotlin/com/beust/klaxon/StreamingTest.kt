@@ -147,6 +147,70 @@ class StreamingTest {
         }
     }
 
+    fun testNextLong() {
+        // Integer values should be auto-converted
+        JsonReader(StringReader("[0]")).use { reader ->
+            val actual = reader.beginArray { reader.nextLong() }
+            Assert.assertEquals(actual, 0L)
+        }
+
+        // Long read normally
+        JsonReader(StringReader("[9223372036854775807]")).use { reader ->
+            val actual = reader.beginArray { reader.nextLong() }
+            Assert.assertEquals(actual, Long.MAX_VALUE)
+        }
+    }
+
+    @DataProvider(name="invalid-longs")
+    fun createinvalidLongData() = arrayOf(
+            arrayOf("[null]"), // null
+            arrayOf("[true]"), // Boolean
+            arrayOf("[\"123\"]"), // String
+            arrayOf("[0.123]") // Double
+    )
+
+    @Test(dataProvider = "invalid-longs")
+    fun testNextLongInvalidInput(nonLongValue : String) {
+        assertParsingExceptionFromArray(nonLongValue) { reader ->
+            reader.nextLong()
+        }
+    }
+
+    fun testNextBigInteger() {
+        // Integer values should be auto-converted
+        JsonReader(StringReader("[0]")).use { reader ->
+            val actual = reader.beginArray { reader.nextBigInteger() }
+            Assert.assertEquals(actual, 0.toBigInteger())
+        }
+
+        // Long values should be auto-converted
+        JsonReader(StringReader("[9223372036854775807]")).use { reader ->
+            val actual = reader.beginArray { reader.nextBigInteger() }
+            Assert.assertEquals(actual, Long.MAX_VALUE.toBigInteger())
+        }
+
+        // Long read normally
+        JsonReader(StringReader("[9223372036854775808]")).use { reader ->
+            val actual = reader.beginArray { reader.nextBigInteger() }
+            Assert.assertEquals(actual, Long.MAX_VALUE.toBigInteger() + 1.toBigInteger())
+        }
+    }
+
+    @DataProvider(name="invalid-biginteger")
+    fun createinvalidBigIntegerData() = arrayOf(
+            arrayOf("[null]"), // null
+            arrayOf("[true]"), // Boolean
+            arrayOf("[\"123\"]"), // String
+            arrayOf("[0.123]") // Double
+    )
+
+    @Test(dataProvider = "invalid-biginteger")
+    fun testNextBigIntegerInvalidInput(nonBigIntegerValue : String) {
+        assertParsingExceptionFromArray(nonBigIntegerValue) { reader ->
+            reader.nextBigInteger()
+        }
+    }
+
     fun testNextDouble() {
         // Integer values should be auto-converted
         JsonReader(StringReader("[0]")).use { reader ->
