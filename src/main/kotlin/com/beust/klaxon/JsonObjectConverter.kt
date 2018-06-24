@@ -91,7 +91,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             val prop = kc.memberProperties.first { it.name == thisProp.name }
             val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
             val fieldName =
-                    if (jsonAnnotation != null && jsonAnnotation.name != "") jsonAnnotation.name
+                    if (jsonAnnotation != null && jsonAnnotation.nameInitialized()) jsonAnnotation.name
                     else prop.name
             val path = if (jsonAnnotation?.path != "") jsonAnnotation?.path else null
 
