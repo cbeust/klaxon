@@ -59,4 +59,13 @@ class SerializationTest {
         val map = mapOf(1 to "uno", 2 to "dos", 3 to "tres")
         serializationTest("{\"1\": \"uno\", \"2\": \"dos\", \"3\": \"tres\"}", map)
     }
+
+    @Test
+    fun array() {
+        val arrStrings = arrayOf("uno", "dos", "tres")
+        serializationTest("[\"uno\", \"dos\", \"tres\"]", arrStrings)
+
+        val arrPairs = arrayOf(Pair(1, "uno"), Pair(2, "dos"), Pair(3, "tres"))
+        serializationTest("[{\"first\" : 1, \"second\" : \"uno\"}, {\"first\" : 2, \"second\" : \"dos\"}, {\"first\" : 3, \"second\" : \"tres\"}]", arrPairs)
+    }
 }
