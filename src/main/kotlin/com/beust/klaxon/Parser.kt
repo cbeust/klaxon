@@ -31,7 +31,7 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
     }
 
     /**
-     * A loop that ends either on an EOF or a closing brace or backet (used in streaming mode).
+     * A loop that ends either on an EOF or a closing brace or bracket (used in streaming mode).
      */
     private fun partialParseLoop(sm: StateMachine, reader: Reader): Any? {
         val lexer = passedLexer ?: Lexer(reader)
@@ -42,7 +42,10 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
             val token = lexer.nextToken()
             log("Token: $token")
             world = sm.next(world, token)
-        } while (token.tokenType != TokenType.RIGHT_BRACE && token.tokenType != TokenType.EOF)
+        } while (token.tokenType != TokenType.RIGHT_BRACE
+                && token.tokenType != TokenType.RIGHT_BRACKET
+                && token.tokenType != TokenType.EOF
+        )
 
         return world.popValue()
     }

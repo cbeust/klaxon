@@ -19,7 +19,7 @@ import kotlin.reflect.jvm.javaType
 
 class Klaxon : ConverterFinder {
     /**
-     * Parse a Reader into a JsonObject.
+     * Parse a JsonReader into a JsonObject.
      */
     @Suppress("unused")
     fun parseJsonObject(reader: JsonReader)
@@ -42,49 +42,78 @@ class Klaxon : ConverterFinder {
     /**
      * Parse a JSON string into an object.
      */
+    @Suppress("unused")
     inline fun <reified T> parse(json: String): T?
             = maybeParse(parser(T::class).parse(StringReader(json)) as JsonObject)
 
     /**
-     * Parse a JSON string into a JsonArray.
+     * Parse a JSON string into a List.
      */
+    @Suppress("unused")
     inline fun <reified T> parseArray(json: String): List<T>?
             = parseFromJsonArray(parser(T::class).parse(StringReader(json)) as JsonArray<*>)
 
     /**
      * Parse a JSON file into an object.
      */
+    @Suppress("unused")
     inline fun <reified T> parse(file: File): T?
             = maybeParse(parser(T::class).parse(FileReader(file)) as JsonObject)
 
     /**
+     * Parse a JSON file into a List.
+     */
+    @Suppress("unused")
+    inline fun <reified T> parseArray(file: File): List<T>?
+            = parseFromJsonArray(parser(T::class).parse(FileReader(file)) as JsonArray<*>)
+
+    /**
      * Parse an InputStream into an object.
      */
+    @Suppress("unused")
     inline fun <reified T> parse(inputStream: InputStream): T? {
         return maybeParse(parser(T::class).parse(toReader(inputStream)) as JsonObject)
     }
 
     /**
-     * Parse a JsonReader into an array.
+     * Parse an InputStream into a List.
      */
+    @Suppress("unused")
+    inline fun <reified T> parseArray(inputStream: InputStream): List<T>?
+            = parseFromJsonArray(parser(T::class).parse(toReader(inputStream)) as JsonArray<*>)
+
+    /**
+     * Parse a JsonReader into an object.
+     */
+    @Suppress("unused")
     inline fun <reified T> parse(jsonReader: JsonReader): T? {
         val p = parser(T::class, jsonReader.lexer, streaming = true)
         return maybeParse(p.parse(jsonReader) as JsonObject)
     }
 
     /**
+     * Parse a JsonReader into a List.
+     */
+    @Suppress("unused")
+    inline fun <reified T> parseArray(jsonReader: JsonReader): List<T>? {
+        val p = parser(T::class, jsonReader.lexer, streaming = true)
+        return parseFromJsonArray(p.parse(jsonReader) as JsonArray<*>)
+    }
+
+    /**
      * Parse a Reader into an object.
      */
+    @Suppress("unused")
     inline fun <reified T> parse(reader: Reader): T? {
         return maybeParse(parser(T::class).parse(reader) as JsonObject)
     }
 
     /**
-     * Parse an InputStream into a JsonArray.
+     * Parse a Reader into a List.
      */
     @Suppress("unused")
-    inline fun <reified T> parseArray(inputStream: InputStream): List<T>? {
-        return parseFromJsonArray(parser(T::class).parse(toReader(inputStream)) as JsonArray<*>)
+    inline fun <reified T> parseArray(reader: Reader): List<T>? {
+        return parseFromJsonArray(parser(T::class).parse(reader) as JsonArray<*>)
     }
 
     /**
