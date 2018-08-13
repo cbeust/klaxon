@@ -37,14 +37,17 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
         val lexer = passedLexer ?: Lexer(reader)
 
         var world = World(Status.INIT, pathMatchers)
+        var wasNested: Boolean
         if (lexer.peek().tokenType == TokenType.COMMA) lexer.nextToken()
         do {
             val token = lexer.nextToken()
             log("Token: $token")
+            wasNested = world.isNestedStatus()
             world = sm.next(world, token)
-        } while (token.tokenType != TokenType.RIGHT_BRACE
-                && token.tokenType != TokenType.RIGHT_BRACKET
-                && token.tokenType != TokenType.EOF
+        } while (wasNested || (token.tokenType != TokenType.RIGHT_BRACE
+                        && token.tokenType != TokenType.RIGHT_BRACKET
+                        && token.tokenType != TokenType.EOF
+                        )
         )
 
         return world.popValue()

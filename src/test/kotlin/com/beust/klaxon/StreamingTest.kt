@@ -76,6 +76,26 @@ class StreamingTest {
         }
     }
 
+    data class Address(val street: String)
+    data class Person2(val name: String, val address:Address)
+    fun nestedObjects() {
+        val objectString = """[
+            { "name": "Joe", "address": { "street": "Klaxon Road" }}
+        ]""".trimIndent()
+
+        val klaxon = Klaxon()
+        JsonReader(StringReader(objectString)).use { reader ->
+            val result = arrayListOf<Person2>()
+            reader.beginArray {
+                while (reader.hasNext()){
+                    val person = klaxon.parse<Person2>(reader)
+                    result.add(person!!)
+                }
+            }
+            Assert.assertEquals(result.get(0), Person2("Joe", Address("Klaxon Road")))
+        }
+    }
+
     val arrayInObject = """{ "array": [
             { "name": "Joe", "age": 23 },
             { "name": "Jill", "age": 35 }
