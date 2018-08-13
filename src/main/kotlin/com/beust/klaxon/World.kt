@@ -80,6 +80,10 @@ class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList
         return statusStack[0]
     }
 
+    fun isNestedStatus() : Boolean {
+        return statusStack.size > 1
+    }
+
     fun hasValues() : Boolean {
         return valueStack.size > 1
     }
