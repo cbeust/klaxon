@@ -69,8 +69,11 @@ class Annotations {
             val others = arrayListOf<KClass<*>>()
             val thesePaths = findProperties(kc)
                     .mapNotNull {
-                        val c = it.returnType.classifier as KClass<*>
-                        others.add(c)
+                        val classifier = it.returnType.classifier
+                        if (classifier is KClass<*>) others.add(classifier)
+                        else {
+                            // Generic type, ignore
+                        }
                         it.findAnnotation<Json>()
                     }
                     .map { it.path }
