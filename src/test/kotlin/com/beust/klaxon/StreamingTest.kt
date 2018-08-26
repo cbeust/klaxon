@@ -5,6 +5,7 @@ import org.testng.Assert
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import java.io.StringReader
+import java.math.BigInteger
 
 
 @Test
@@ -200,19 +201,19 @@ class StreamingTest {
         // Integer values should be auto-converted
         JsonReader(StringReader("[0]")).use { reader ->
             val actual = reader.beginArray { reader.nextBigInteger() }
-            Assert.assertEquals(actual, 0.toBigInteger())
+            Assert.assertEquals(actual, BigInteger.valueOf(0))
         }
 
         // Long values should be auto-converted
         JsonReader(StringReader("[9223372036854775807]")).use { reader ->
             val actual = reader.beginArray { reader.nextBigInteger() }
-            Assert.assertEquals(actual, Long.MAX_VALUE.toBigInteger())
+            Assert.assertEquals(actual, BigInteger.valueOf(Long.MAX_VALUE))
         }
 
         // Long read normally
         JsonReader(StringReader("[9223372036854775808]")).use { reader ->
             val actual = reader.beginArray { reader.nextBigInteger() }
-            Assert.assertEquals(actual, Long.MAX_VALUE.toBigInteger() + 1.toBigInteger())
+            Assert.assertEquals(actual, BigInteger.valueOf(Long.MAX_VALUE) + BigInteger.valueOf(1))
         }
     }
 

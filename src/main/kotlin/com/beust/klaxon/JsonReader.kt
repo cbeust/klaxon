@@ -41,8 +41,8 @@ class JsonReader(val reader: Reader) : Reader() {
      */
     fun nextBigInteger() = consumeValue { value ->
         when (value) {
-            is Int -> value.toBigInteger()
-            is Long -> value.toBigInteger()
+            is Int -> BigInteger.valueOf(value.toLong())
+            is Long -> BigInteger.valueOf(value)
             is BigInteger -> value
             else -> throw JsonParsingException("Next token is not a big integer: $value")
         }
