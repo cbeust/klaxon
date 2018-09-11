@@ -25,20 +25,11 @@ interface KlaxonJson {
         internal val theKlaxonJson = object : KlaxonJson { }
 
         private fun convert(value: Any?): Any? = when (value) {
-            is Int -> value
-            is Long -> value
-            is String -> value
-            is Boolean -> value
             is Float -> value.toDouble()
-            is Double -> value
-            is BigInteger -> value
-            is JsonObject -> value
-            is JsonArray<*> -> value
             is Short -> value.toInt()
             is Byte -> value.toInt()
             null -> null
-            else ->
-                throw IllegalArgumentException("Unrecognized type `${value::class}` with value `$value`")
+            else -> value
         }
     }
 
