@@ -35,7 +35,7 @@ allprojects {
 // Projects that contain source code.
 val sourceProjects = setOf(
     project(":klaxon")
-)
+) + project(":plugins").subprojects
 
 
 configure(sourceProjects) {
