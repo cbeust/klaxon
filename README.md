@@ -687,7 +687,7 @@ Here are a few common errors and how to resolve them.
 You might see the following exception:
 
 ```kotlin
-Caused by: java.lang.NoSuchMethodException: com.beust.klaxon.BindingAdapterTest$personMappingTest$Person.<init>()
+Caused by: java.lang.NoSuchMethodException: BindingAdapterTest$personMappingTest$Person.<init>()
 	at java.lang.Class.getConstructor0(Class.java:3082)
 	at java.lang.Class.newInstance(Class.java:412)
 ```

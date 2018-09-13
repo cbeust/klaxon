@@ -53,7 +53,7 @@ fun parse(name: String) : Any {
 }
 
 fun example3() {
-    val obj = parse("/object.json") as JsonObject
+    val obj = parse("/src/test/resources/object.json") as JsonObject
 
     val firstName = obj.string("firstName")
     val lastName = obj.string("lastName")
@@ -61,7 +61,7 @@ fun example3() {
 }
 
 fun example2() {
-    val array = parse("/e.json") as JsonArray<*>
+    val array = parse("/src/test/resources/e.json") as JsonArray<*>
 
     val ages = array.long("age")
     println("Ages: ${ages}")
@@ -73,7 +73,7 @@ fun example2() {
 }
 
 fun example1() {
-    val array = parse("/d.json") as JsonArray<*>
+    val array = parse("/src/test/resources/d.json") as JsonArray<*>
 
     println("=== Finding Jack:")
     val jack = array.first {

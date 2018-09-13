@@ -4,4 +4,4 @@ jdk:
 
 install: true
 
-script: ./kobaltw test
+script: ./gradlew check
