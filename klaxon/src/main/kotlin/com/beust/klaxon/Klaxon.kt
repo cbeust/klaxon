@@ -1,17 +1,17 @@
 package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
-import java.io.*
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
+import java.io.File
+import java.io.FileReader
+import java.io.InputStream
+import java.io.Reader
+import java.io.StringReader
 import java.nio.charset.Charset
 import kotlin.collections.set
 import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
-import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
@@ -22,50 +22,50 @@ class Klaxon : ConverterFinder {
      * Parse a JsonReader into a JsonObject.
      */
     @Suppress("unused")
-    fun parseJsonObject(reader: JsonReader)
-            = parser().parse(reader) as JsonObject
+    fun parseJsonObject(reader: JsonReader) =
+            parser().parse(reader) as JsonObject
 
     /**
      * Parse a Reader into a JsonObject.
      */
     @Suppress("unused")
-    fun parseJsonObject(reader: Reader)
-            = parser().parse(reader) as JsonObject
+    fun parseJsonObject(reader: Reader) =
+            parser().parse(reader) as JsonObject
 
     /**
      * Parse a Reader into a JsonArray.
      */
     @Suppress("unused")
-    fun parseJsonArray(reader: Reader)
-            = parser().parse(reader) as JsonArray<*>
+    fun parseJsonArray(reader: Reader) =
+            parser().parse(reader) as JsonArray<*>
 
     /**
      * Parse a JSON string into an object.
      */
     @Suppress("unused")
-    inline fun <reified T> parse(json: String): T?
-            = maybeParse(parser(T::class).parse(StringReader(json)) as JsonObject)
+    inline fun <reified T> parse(json: String): T? =
+            maybeParse(parser(T::class).parse(StringReader(json)) as JsonObject)
 
     /**
      * Parse a JSON string into a List.
      */
     @Suppress("unused")
-    inline fun <reified T> parseArray(json: String): List<T>?
-            = parseFromJsonArray(parser(T::class).parse(StringReader(json)) as JsonArray<*>)
+    inline fun <reified T> parseArray(json: String): List<T>? =
+            parseFromJsonArray(parser(T::class).parse(StringReader(json)) as JsonArray<*>)
 
     /**
      * Parse a JSON file into an object.
      */
     @Suppress("unused")
-    inline fun <reified T> parse(file: File): T?
-            = maybeParse(parser(T::class).parse(FileReader(file)) as JsonObject)
+    inline fun <reified T> parse(file: File): T? =
+            maybeParse(parser(T::class).parse(FileReader(file)) as JsonObject)
 
     /**
      * Parse a JSON file into a List.
      */
     @Suppress("unused")
-    inline fun <reified T> parseArray(file: File): List<T>?
-            = parseFromJsonArray(parser(T::class).parse(FileReader(file)) as JsonArray<*>)
+    inline fun <reified T> parseArray(file: File): List<T>? =
+            parseFromJsonArray(parser(T::class).parse(FileReader(file)) as JsonArray<*>)
 
     /**
      * Parse an InputStream into an object.
@@ -79,8 +79,8 @@ class Klaxon : ConverterFinder {
      * Parse an InputStream into a List.
      */
     @Suppress("unused")
-    inline fun <reified T> parseArray(inputStream: InputStream): List<T>?
-            = parseFromJsonArray(parser(T::class).parse(toReader(inputStream)) as JsonArray<*>)
+    inline fun <reified T> parseArray(inputStream: InputStream): List<T>? =
+            parseFromJsonArray(parser(T::class).parse(toReader(inputStream)) as JsonArray<*>)
 
     /**
      * Parse a JsonReader into an object.
@@ -119,8 +119,8 @@ class Klaxon : ConverterFinder {
     /**
      * Parse a JsonObject into an object.
      */
-    inline fun <reified T> parseFromJsonObject(map: JsonObject): T?
-        = fromJsonObject(map, T::class.java, T::class) as T?
+    inline fun <reified T> parseFromJsonObject(map: JsonObject): T? =
+        fromJsonObject(map, T::class.java, T::class) as T?
 
     inline fun <reified T> parseFromJsonArray(map: JsonArray<*>): List<T>? {
         val result = arrayListOf<Any>()
@@ -143,8 +143,8 @@ class Klaxon : ConverterFinder {
 
     inline fun <reified T> maybeParse(map: JsonObject): T? = parseFromJsonObject(map)
 
-    fun toReader(inputStream: InputStream, charset: Charset = Charsets.UTF_8)
-            = inputStream.reader(charset)
+    fun toReader(inputStream: InputStream, charset: Charset = Charsets.UTF_8) =
+            inputStream.reader(charset)
 
     @Suppress("MemberVisibilityCanBePrivate")
     val pathMatchers = arrayListOf<PathMatcher>()
@@ -166,7 +166,7 @@ class Klaxon : ConverterFinder {
     private val allPaths = hashMapOf<String, Any>()
 
     inner class DefaultPathMatcher(private val paths: Set<String>) : PathMatcher {
-        override fun pathMatches(path: String) : Boolean {
+        override fun pathMatches(path: String): Boolean {
             return paths.contains(path)
         }
         override fun onMatch(path: String, value: Any) { allPaths[path] = value }
@@ -220,14 +220,14 @@ class Klaxon : ConverterFinder {
         return result
     }
 
-    fun findConverterFromClass(cls: Class<*>, prop: KProperty<*>?) : Converter {
+    fun findConverterFromClass(cls: Class<*>, prop: KProperty<*>?): Converter {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
             val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
             return result
         }
 
         var propertyClass: Class<*>? = null
-        val propConverter : Converter? =
+        val propConverter: Converter? =
             if (prop != null) {
                 propertyClass = (prop.returnType.classifier as KClass<*>).java
                 val dc = prop.getter.javaMethod?.declaringClass ?: prop.javaField?.declaringClass
@@ -250,13 +250,13 @@ class Klaxon : ConverterFinder {
         return result
     }
 
-    private fun findBestConverter(cls: Class<*>, prop: KProperty<*>?) : Converter? {
+    private fun findBestConverter(cls: Class<*>, prop: KProperty<*>?): Converter? {
         val toConvert = prop?.returnType?.javaType as? Class<*> ?: cls
         return converters.firstOrNull { it.canConvert(toConvert) }
     }
 
     fun toJsonString(value: Any): String = toJsonString(value, findConverter(value))
-    fun toJsonString(value: Any, converter: Any /* can be Converter or Converter */) : String {
+    fun toJsonString(value: Any, converter: Any /* can be Converter or Converter */): String {
         // It's not possible to safely call converter.toJson(value) since its parameter is generic,
         // so use reflection
         val toJsonMethod = converter::class.functions.firstOrNull { it.name == "toJson" }

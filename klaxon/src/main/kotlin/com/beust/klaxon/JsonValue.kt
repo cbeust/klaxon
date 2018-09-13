@@ -9,10 +9,12 @@ import kotlin.reflect.KProperty
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
  * constructor is guaranteed to be non null.
  */
-class JsonValue(value: Any?,
-        val propertyClass: Type?,
-        val propertyKClass: kotlin.reflect.KType?,
-        private val converterFinder: ConverterFinder) {
+class JsonValue(
+    value: Any?,
+    val propertyClass: Type?,
+    val propertyKClass: kotlin.reflect.KType?,
+    private val converterFinder: ConverterFinder
+) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
@@ -33,12 +35,12 @@ class JsonValue(value: Any?,
     /**
      * Convenience function to retrieve an Int value from the underlying `obj` field.
      */
-    fun objInt(name: String) : Int  = obj?.int(name) ?: error("Int", name)
+    fun objInt(name: String): Int = obj?.int(name) ?: error("Int", name)
 
     /**
      * Convenience function to retrieve a String value from the underlying `obj` field.
      */
-    fun objString(name: String) : String = obj?.string(name) ?: error("String", name)
+    fun objString(name: String): String = obj?.string(name) ?: error("String", name)
 
     /**
      * @return the raw value inside this object.
@@ -62,9 +64,8 @@ class JsonValue(value: Any?,
             return result!!
         }
 
-
     init {
-        when(value) {
+        when (value) {
             is JsonValue -> {
                 type = String::class.java
             }
@@ -140,7 +141,7 @@ class JsonValue(value: Any?,
         return result
     }
 
-    override fun toString() : String {
+    override fun toString(): String {
         val result = if (obj != null) "{object: $obj"
             else if (array != null) "{array: $array"
             else if (string != null) "{string: $string"
@@ -151,7 +152,6 @@ class JsonValue(value: Any?,
             else if (boolean != null) "{boolean: $boolean"
             else throw KlaxonException("Should never happen")
         return result + ", property: " + propertyKClass + "}"
-
     }
 
     companion object {
@@ -168,7 +168,7 @@ class JsonValue(value: Any?,
         }
     }
 
-    private fun error(type: String, name: String) : Nothing {
+    private fun error(type: String, name: String): Nothing {
         throw KlaxonException("Couldn't find $type on object named $name")
     }
 }

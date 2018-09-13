@@ -6,17 +6,17 @@ import org.testng.annotations.Test
 @Test
 class EnumTest {
 
-    val convertColor = object: Converter {
+    val convertColor = object : Converter {
         override fun canConvert(cls: Class<*>) = cls == Color::class.java
 
-        override fun toJson(value: Any): String = when(value as Color) {
+        override fun toJson(value: Any): String = when (value as Color) {
             Color.R -> "red"
             Color.G -> "green"
             Color.B -> "blue"
             else -> throw IllegalArgumentException("Unknown color")
         }
 
-        override fun fromJson(jv: JsonValue): Color = when(jv.inside) {
+        override fun fromJson(jv: JsonValue): Color = when (jv.inside) {
             "red" -> Color.R
             "green" -> Color.G
             "blue" -> Color.B
@@ -25,7 +25,7 @@ class EnumTest {
     }
 
     enum class Color { R, G, B }
-    data class Root (val colors: List<Color>)
+    data class Root(val colors: List<Color>)
 
     fun listOfEnums() {
         val klaxon = Klaxon().converter(convertColor)
@@ -45,6 +45,4 @@ class EnumTest {
         )
         Assert.assertEquals(result?.cardinal, Cardinal.NORTH)
     }
-
-
 }

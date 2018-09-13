@@ -1,6 +1,6 @@
 package com.beust.klaxon
 
-val convertTuple = object: Converter {
+val convertTuple = object : Converter {
     override fun canConvert(cls: Class<*>) = cls == Tuple::class.java
 
     override fun toJson(value: Any): String {
@@ -21,13 +21,11 @@ class Tuple : ArrayList<TupleValue>()
 
 sealed class TupleValue {
     class IntegerValue(val value: Int) : TupleValue()
-    class StringValue(val value: String): TupleValue()
-
+    class StringValue(val value: String) : TupleValue()
 }
 
-//fun main(args: Array<String>) {
+// fun main(args: Array<String>) {
 //    val klaxon = Klaxon().converter(convertTuple)
 //    val result = klaxon.parse<TopLevel>("""[0, "zero"]""")
 //    println(result)
-//}
-
+// }

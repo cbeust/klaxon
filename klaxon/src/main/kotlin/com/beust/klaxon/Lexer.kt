@@ -15,7 +15,7 @@ enum class TokenType(val value: String) {
 }
 
 data class Token(val tokenType: TokenType, val value: Any? = null) {
-    override fun toString() : String {
+    override fun toString(): String {
         val v =
             if (value != null) {
                 " ($value)"
@@ -29,7 +29,7 @@ data class Token(val tokenType: TokenType, val value: Any? = null) {
 /**
  * if `lenient` is true, names (the identifiers left of the colon) are allowed to not be surrounded by double quotes.
  */
-class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<Token> {
+class Lexer(val passedReader: Reader, val lenient: Boolean = false) : Iterator<Token> {
     private val EOF = Token(TokenType.EOF, null)
     var index = 0
     var line = 1
@@ -59,28 +59,28 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
         return c
     }
 
-    private fun peekChar() : Char {
+    private fun peekChar(): Char {
         if (isDone()) throw IllegalStateException("Cannot peek next char: EOF reached")
         return next!!
     }
 
-    private fun isDone() : Boolean = next == null
+    private fun isDone(): Boolean = next == null
 
     val BOOLEAN_LETTERS = "falsetrue".toSet()
-    private fun isBooleanLetter(c: Char) : Boolean {
+    private fun isBooleanLetter(c: Char): Boolean {
         return BOOLEAN_LETTERS.contains(Character.toLowerCase(c))
     }
 
     val NULL_LETTERS = "null".toSet()
 
-    fun isValueLetter(c: Char) : Boolean {
-        return c == '-' || c == '+' || c == '.' || c.isDigit() || isBooleanLetter(c)
-                || c in NULL_LETTERS
+    fun isValueLetter(c: Char): Boolean {
+        return c == '-' || c == '+' || c == '.' || c.isDigit() || isBooleanLetter(c) ||
+                c in NULL_LETTERS
     }
 
     private var peeked: Token? = null
 
-    fun peek() : Token {
+    fun peek(): Token {
         if (peeked == null) {
             peeked = actualNextToken()
         }
@@ -104,7 +104,7 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
 
     private var expectName = false
 
-    private fun actualNextToken() : Token {
+    private fun actualNextToken(): Token {
 
         if (isDone()) {
             return EOF
@@ -210,10 +210,10 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             if (NUMERIC.matcher(v).matches()) {
                 try {
                     jsonValue = java.lang.Integer.parseInt(v)
-                } catch (e: NumberFormatException){
+                } catch (e: NumberFormatException) {
                     try {
                         jsonValue = java.lang.Long.parseLong(v)
-                    } catch(e: NumberFormatException) {
+                    } catch (e: NumberFormatException) {
                         jsonValue = java.math.BigInteger(v)
                     }
                 }
@@ -226,8 +226,8 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             } else if (v == "null") {
                 jsonValue = null
             } else {
-                throw KlaxonException("Unexpected character at position ${index-1}"
-                    + ": '$c' (ASCII: ${c.toInt()})'")
+                throw KlaxonException("Unexpected character at position ${index - 1}" +
+                    ": '$c' (ASCII: ${c.toInt()})'")
             }
 
             tokenType = TokenType.VALUE

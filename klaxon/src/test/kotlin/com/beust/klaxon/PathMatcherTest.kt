@@ -16,7 +16,7 @@ class PathMatcherTest {
     fun scatteredObject() {
         data class UserWithZipCode(val name: String, val zipCode: Int)
 
-        val pm = object: PathMatcher {
+        val pm = object : PathMatcher {
             val namePath = "$.description.person.name"
             val zipCodePath = "$.description.location.zipCode"
             val paths = setOf(namePath, zipCodePath)
@@ -26,12 +26,11 @@ class PathMatcherTest {
             override fun pathMatches(path: String) = paths.contains(path)
 
             override fun onMatch(path: String, value: Any) {
-                when(path) {
+                when (path) {
                     namePath -> name = value.toString()
                     zipCodePath -> zipCode = value as Int
                 }
             }
-
         }
         val r = Klaxon()
             .pathMatcher(pm)
@@ -122,13 +121,13 @@ class PathMatcherTest {
     data class Library(val titles: List<String>, val books: List<Book>, val people: List<Author>)
 
     data class Book(
-            @Json(path = "$.titles[1]")
-            val title: String,
-            val author: Author
+        @Json(path = "$.titles[1]")
+        val title: String,
+        val author: Author
     )
     data class Author(
-            @Json(path = "$.people[0].authorName")
-            val authorName: String
+        @Json(path = "$.people[0].authorName")
+        val authorName: String
     )
 
     @Test(enabled = false)

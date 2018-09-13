@@ -13,9 +13,10 @@ class JsonAnnotationTest {
 
     fun ignoredWithAnnotation() {
         class IgnoredWithAnnotation(
-                val name: String,
-                @Json(ignored = true)
-                val change: Int = 0)
+            val name: String,
+            @Json(ignored = true)
+            val change: Int = 0
+        )
 
         val result = Klaxon().parse<IgnoredWithAnnotation>(jsonString)
         Assert.assertEquals(result?.name, "John")
@@ -24,8 +25,9 @@ class JsonAnnotationTest {
 
     fun ignoredWithPrivate() {
         class IgnoredWithPrivate(
-                val name: String,
-                private val change: Int = 0){
+            val name: String,
+            private val change: Int = 0
+        ) {
             fun changed(): Boolean = change != 0
         }
 
@@ -37,15 +39,15 @@ class JsonAnnotationTest {
     @Test
     fun privateNotIgnored() {
         data class Config(
-                val version: String,
-                @Json(ignored = false)
-                private val projects: Set<String>) {
+            val version: String,
+            @Json(ignored = false)
+            private val projects: Set<String>
+        ) {
             fun contains(name: String) = projects.contains(name)
         }
 
         val jsonString = """{"version": "v1", "projects": ["abc"]}"""
         val r = Klaxon().parse<Config>(jsonString)
         Assertions.assertThat(r).isEqualTo(Config("v1", setOf("abc")))
-
     }
 }

@@ -7,7 +7,7 @@ interface Converter {
     /**
      * @return true if this converter can convert this class.
      */
-    fun canConvert(cls: Class<*>) : Boolean
+    fun canConvert(cls: Class<*>): Boolean
 
     /**
      * @return the JSON representation of the given value.
@@ -17,5 +17,5 @@ interface Converter {
     /**
      * Convert the given Json value into an object.
      */
-    fun fromJson(jv: JsonValue) : Any
+    fun fromJson(jv: JsonValue): Any
 }

@@ -3,7 +3,6 @@ rootProject.name = "klaxon-root"
 include(":klaxon")
 include(":plugins")
 
-
 /**
  * This configures the gradle build so we can use non-standard build file names.
  * Additionally, this project can support sub-projects who's build file is written in Kotlin.

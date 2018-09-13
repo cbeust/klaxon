@@ -7,9 +7,10 @@ import org.testng.annotations.Test
 class ParseFromEmptyNameTest {
 
     fun nameSetToEmptyString() {
-        data class EmptyName (
-                @Json(name = "")
-                val empty: String)
+        data class EmptyName(
+            @Json(name = "")
+            val empty: String
+        )
         val sampleJson = """{"":"value"}"""
         val result = Klaxon().parse<EmptyName>(sampleJson)
 
@@ -18,9 +19,10 @@ class ParseFromEmptyNameTest {
     }
 
     fun nameSetToDefaultValue() {
-        data class SpecificName (
-                @Json(name = NAME_NOT_INITIALIZED)
-                val oddName: String)
+        data class SpecificName(
+            @Json(name = NAME_NOT_INITIALIZED)
+            val oddName: String
+        )
         val sampleJson = """{"$NAME_NOT_INITIALIZED":"value"}"""
         Assert.assertThrows(KlaxonException::class.java) {
             Klaxon().parse<SpecificName>(sampleJson)

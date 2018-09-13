@@ -44,8 +44,7 @@ class Annotations {
             emptyList()
         }
 
-        fun findNonIgnoredProperties(kc: KClass<*>?, strategies: List<PropertyStrategy>)
-                : List<KProperty1<out Any, Any?>> {
+        fun findNonIgnoredProperties(kc: KClass<*>?, strategies: List<PropertyStrategy>): List<KProperty1<out Any, Any?>> {
             val result = findProperties(kc)
                 .filter {
                     // Visibility
@@ -102,6 +101,4 @@ class Annotations {
 
         fun isList(kClass: KClass<*>) = kotlin.collections.List::class.java.isAssignableFrom(kClass.java)
     }
-
-
 }

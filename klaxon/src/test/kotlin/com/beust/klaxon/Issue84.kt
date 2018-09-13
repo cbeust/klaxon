@@ -11,7 +11,7 @@ class Issue84 {
     fun serializeNestedInstant() {
         data class Person(val firstName: String, val dob: Instant)
 
-        class EpochMilliInstantConverter: Converter {
+        class EpochMilliInstantConverter : Converter {
             override fun canConvert(cls: Class<*>) = cls == Instant::class.java
             override fun toJson(value: Any) = (value as Instant).toEpochMilli().toString()
             override fun fromJson(jv: JsonValue) = throw NotImplementedError()
@@ -30,7 +30,7 @@ class Issue84 {
     fun serializeListOfInstants() {
         val dates = listOf(Instant.ofEpochMilli(9001))
 
-        class EpochMilliInstantConverter: Converter{
+        class EpochMilliInstantConverter : Converter {
             override fun canConvert(cls: Class<*>) = cls == Instant::class.java
             override fun toJson(value: Any) = (value as Instant).toEpochMilli().toString()
             override fun fromJson(jv: JsonValue) = throw NotImplementedError()

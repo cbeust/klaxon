@@ -1,12 +1,11 @@
 package com.beust.klaxon
 
-//import com.google.gson.stream.JsonReader
+// import com.google.gson.stream.JsonReader
 import org.testng.Assert
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import java.io.StringReader
 import java.math.BigInteger
-
 
 @Test
 class StreamingTest {
@@ -53,7 +52,6 @@ class StreamingTest {
                 Assert.assertEquals(array, listOf(1, 3))
                 Assert.assertEquals(obj1, expectedObj1)
             }
-
         }
     }
 
@@ -78,7 +76,7 @@ class StreamingTest {
     }
 
     data class Address(val street: String)
-    data class Person2(val name: String, val address:Address)
+    data class Person2(val name: String, val address: Address)
     fun nestedObjects() {
         val objectString = """[
             { "name": "Joe", "address": { "street": "Klaxon Road" }}
@@ -88,7 +86,7 @@ class StreamingTest {
         JsonReader(StringReader(objectString)).use { reader ->
             val result = arrayListOf<Person2>()
             reader.beginArray {
-                while (reader.hasNext()){
+                while (reader.hasNext()) {
                     val person = klaxon.parse<Person2>(reader)
                     result.add(person!!)
                 }
@@ -128,7 +126,7 @@ class StreamingTest {
         }
     }
 
-    @DataProvider(name="invalid-strings")
+    @DataProvider(name = "invalid-strings")
     fun createinvalidStringData() = arrayOf(
             arrayOf("[null]"), // null
             arrayOf("[true]"), // Boolean
@@ -138,7 +136,7 @@ class StreamingTest {
     )
 
     @Test(dataProvider = "invalid-strings")
-    fun testNextStringInvalidInput(nonStringValue : String) {
+    fun testNextStringInvalidInput(nonStringValue: String) {
         assertParsingExceptionFromArray(nonStringValue) { reader ->
             reader.nextString()
         }
@@ -152,7 +150,7 @@ class StreamingTest {
         }
     }
 
-    @DataProvider(name="invalid-ints")
+    @DataProvider(name = "invalid-ints")
     fun createinvalidIntData() = arrayOf(
             arrayOf("[null]"), // null
             arrayOf("[true]"), // Boolean
@@ -162,7 +160,7 @@ class StreamingTest {
     )
 
     @Test(dataProvider = "invalid-ints")
-    fun testNextIntInvalidInput(nonIntValue : String) {
+    fun testNextIntInvalidInput(nonIntValue: String) {
         assertParsingExceptionFromArray(nonIntValue) { reader ->
             reader.nextInt()
         }
@@ -182,7 +180,7 @@ class StreamingTest {
         }
     }
 
-    @DataProvider(name="invalid-longs")
+    @DataProvider(name = "invalid-longs")
     fun createinvalidLongData() = arrayOf(
             arrayOf("[null]"), // null
             arrayOf("[true]"), // Boolean
@@ -191,7 +189,7 @@ class StreamingTest {
     )
 
     @Test(dataProvider = "invalid-longs")
-    fun testNextLongInvalidInput(nonLongValue : String) {
+    fun testNextLongInvalidInput(nonLongValue: String) {
         assertParsingExceptionFromArray(nonLongValue) { reader ->
             reader.nextLong()
         }
@@ -217,7 +215,7 @@ class StreamingTest {
         }
     }
 
-    @DataProvider(name="invalid-biginteger")
+    @DataProvider(name = "invalid-biginteger")
     fun createinvalidBigIntegerData() = arrayOf(
             arrayOf("[null]"), // null
             arrayOf("[true]"), // Boolean
@@ -226,7 +224,7 @@ class StreamingTest {
     )
 
     @Test(dataProvider = "invalid-biginteger")
-    fun testNextBigIntegerInvalidInput(nonBigIntegerValue : String) {
+    fun testNextBigIntegerInvalidInput(nonBigIntegerValue: String) {
         assertParsingExceptionFromArray(nonBigIntegerValue) { reader ->
             reader.nextBigInteger()
         }
@@ -246,7 +244,7 @@ class StreamingTest {
         }
     }
 
-    @DataProvider(name="invalid-doubles")
+    @DataProvider(name = "invalid-doubles")
     fun createinvalidDoubleData() = arrayOf(
             arrayOf("[null]"), // null
             arrayOf("[true]"), // Boolean
@@ -256,7 +254,7 @@ class StreamingTest {
     )
 
     @Test(dataProvider = "invalid-doubles")
-    fun testNextDoubleInvalidInput(nonDoubleValue : String) {
+    fun testNextDoubleInvalidInput(nonDoubleValue: String) {
         assertParsingExceptionFromArray(nonDoubleValue) { reader ->
             reader.nextDouble()
         }
@@ -276,7 +274,7 @@ class StreamingTest {
         }
     }
 
-    @DataProvider(name="invalid-booleans")
+    @DataProvider(name = "invalid-booleans")
     fun createinvalidBooleanData() = arrayOf(
             arrayOf("[null]"), // null
             arrayOf("[\"123\"]"), // String
@@ -288,7 +286,7 @@ class StreamingTest {
     )
 
     @Test(dataProvider = "invalid-booleans")
-    fun testNextBooleanInvalidInput(nonBooleanValue : String) {
+    fun testNextBooleanInvalidInput(nonBooleanValue: String) {
         assertParsingExceptionFromArray(nonBooleanValue) { reader ->
             reader.nextBoolean()
         }
@@ -302,14 +300,13 @@ class StreamingTest {
                 }
             }
         }
-
     }
 
 //    fun streaming1() {
 //        val reader = JsonReader(StringReader(array))//FileReader("src/test/resources/generated.json"))
 //        reader.beginArray()
 //        val gson = Gson()
-////        gson.fromJson<>()
+// //        gson.fromJson<>()
 //        while (reader.hasNext()) {
 //            val person = gson.fromJson<Person>(reader, Person::class.java)
 //            println("Person:" + person)

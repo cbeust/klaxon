@@ -28,7 +28,7 @@ class BindingAdapterTest {
                 }
             """)
             Assert.fail("Should have been unable to convert")
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             Assert.assertTrue(ex.message?.contains("ouldn't parse date") ?: false)
         }
     }
@@ -42,9 +42,9 @@ class BindingAdapterTest {
         var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
-    private fun createKlaxon()
-        = Klaxon()
-            .fieldConverter(KlaxonDate::class, object: Converter {
+    private fun createKlaxon() =
+        Klaxon()
+            .fieldConverter(KlaxonDate::class, object : Converter {
                 override fun canConvert(cls: Class<*>) = cls == LocalDateTime::class.java
 
                 override fun fromJson(jv: JsonValue) =
@@ -54,14 +54,14 @@ class BindingAdapterTest {
                         throw KlaxonException("Couldn't parse date: ${jv.string}")
                     }
 
-                override fun toJson(o: Any)
-                        = """ { "date" : $o } """
+                override fun toJson(o: Any) =
+                        """ { "date" : $o } """
             })
 
-            .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter {
+            .fieldConverter(KlaxonDayOfTheWeek::class, object : Converter {
                 override fun canConvert(cls: Class<*>) = cls == String::class.java
-                override fun fromJson(jv: JsonValue) : String {
-                    return when(jv.int) {
+                override fun fromJson(jv: JsonValue): String {
+                    return when (jv.int) {
                         0 -> "Sunday"
                         1 -> "Monday"
                         2 -> "Tuesday"
@@ -69,8 +69,8 @@ class BindingAdapterTest {
                     }
                 }
 
-                override fun toJson(o: Any) : String {
-                    return when(o.toString()) {
+                override fun toJson(o: Any): String {
+                    return when (o.toString()) {
                         "Sunday" -> "0"
                         "Monday" -> "1"
                         "Tuesday" -> "2"
@@ -148,15 +148,14 @@ class BindingAdapterTest {
     fun personMappingTest() {
 
         val result = Klaxon()
-            .converter(object: Converter {
+            .converter(object : Converter {
                 override fun canConvert(cls: Class<*>) = cls == Person::class.java
                 override fun toJson(value: Any): String {
                     return """{"fullName" : "${(value as Person).fullName}""""
                 }
 
-                override fun fromJson(jv: JsonValue)
-                        = Person(jv.objString("firstName") + " " + jv.objString("lastName"))
-
+                override fun fromJson(jv: JsonValue) =
+                        Person(jv.objString("firstName") + " " + jv.objString("lastName"))
             })
             .parse<Person>("""
             {
@@ -170,16 +169,15 @@ class BindingAdapterTest {
     class BooleanHolder(var flag: Boolean? = null)
     fun booleanConverter() {
         val result = Klaxon()
-            .converter(object: Converter {
+            .converter(object : Converter {
                 override fun canConvert(cls: Class<*>) = cls == BooleanHolder::class.java
 
                 override fun toJson(value: Any): String {
                     return """{"flag" : "${if ((value as BooleanHolder).flag == true) 1 else 0}""""
                 }
 
-                override fun fromJson(jv: JsonValue)
-                    = BooleanHolder(jv.objInt("flag") != 0)
-
+                override fun fromJson(jv: JsonValue) =
+                    BooleanHolder(jv.objInt("flag") != 0)
             })
             .parseArray<BooleanHolder>("""[
             { "flag": 1 }, { "flag": 0 }

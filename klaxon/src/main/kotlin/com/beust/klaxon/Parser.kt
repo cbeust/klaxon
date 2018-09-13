@@ -1,6 +1,10 @@
 package com.beust.klaxon
 
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
+import java.io.Reader
+import java.io.StringReader
 import java.nio.charset.Charset
 
 /**
@@ -9,14 +13,17 @@ import java.nio.charset.Charset
  * If {streaming} is true, the parser doesn't expect to finish on an EOF token. This is used for streaming, when
  * the user requests to read a subset of the entire JSON document.
  */
-class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
-        private val passedLexer: Lexer? = null, val streaming: Boolean = false) {
+class Parser(
+    private val pathMatchers: List<PathMatcher> = emptyList(),
+    private val passedLexer: Lexer? = null,
+    val streaming: Boolean = false
+) {
     fun parse(rawValue: StringBuilder): Any? =
         StringReader(rawValue.toString()).use {
             parse(it)
         }
 
-    fun parse(fileName: String) : Any? =
+    fun parse(fileName: String): Any? =
         FileInputStream(File(fileName)).use {
             parse(it)
         }
@@ -44,9 +51,9 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
             log("Token: $token")
             wasNested = world.isNestedStatus()
             world = sm.next(world, token)
-        } while (wasNested || (token.tokenType != TokenType.RIGHT_BRACE
-                        && token.tokenType != TokenType.RIGHT_BRACKET
-                        && token.tokenType != TokenType.EOF
+        } while (wasNested || (token.tokenType != TokenType.RIGHT_BRACE &&
+                        token.tokenType != TokenType.RIGHT_BRACKET &&
+                        token.tokenType != TokenType.EOF
                         )
         )
 
@@ -95,7 +102,6 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
             })
             // else error
 
-
             put(Status.IN_OBJECT, TokenType.COMMA, { world: World, _: Token ->
                 world.foundValue()
                 world
@@ -116,7 +122,6 @@ class Parser(private val pathMatchers: List<PathMatcher> = emptyList(),
                     this
                 }
             })
-
 
             put(Status.PASSED_PAIR_KEY, TokenType.COLON, { world: World, _: Token ->
                 world

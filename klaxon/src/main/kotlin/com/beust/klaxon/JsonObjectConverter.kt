@@ -1,7 +1,6 @@
 package com.beust.klaxon
 
 import com.beust.klaxon.internal.firstNotNullResult
-import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KParameter
@@ -30,7 +29,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         var error: String? = null
         val map = retrieveKeyValues(jsonObject, kc)
         val result = concreteClass.constructors.firstNotNullResult { constructor ->
-            val parameterMap = hashMapOf<KParameter,Any>()
+            val parameterMap = hashMapOf<KParameter, Any>()
             constructor.parameters.forEach { parameter ->
                 map[parameter.name]?.let { convertedValue ->
                     parameterMap[parameter] = convertedValue
@@ -40,7 +39,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             try {
                 constructor.isAccessible = true
                 constructor.callBy(parameterMap)
-            } catch(ex: Exception) {
+            } catch (ex: Exception) {
                 // Lazy way to find out of that constructor worked. Easier than trying to make sure each
                 // parameter matches the parameter type.
                 error = ex::class.qualifiedName + " " + ex.message
@@ -80,7 +79,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
      * Retrieve all the properties found on the class of the object and then look up each of these
      * properties names on `jsonObject`.
      */
-    private fun retrieveKeyValues(jsonObject: JsonObject, kc: KClass<*>) : Map<String, Any> {
+    private fun retrieveKeyValues(jsonObject: JsonObject, kc: KClass<*>): Map<String, Any> {
         val result = hashMapOf<String, Any>()
 
         // Only keep the properties that are public and do not have @Json(ignored = true)
@@ -114,7 +113,6 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             } else {
                 result[prop.name] = allPaths[path]
                         ?: throw KlaxonException("Couldn't find path \"$path\" specified on field \"${prop.name}\"")
-
             }
         }
         return result

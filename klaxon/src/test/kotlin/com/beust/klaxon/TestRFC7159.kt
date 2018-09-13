@@ -1,4 +1,4 @@
-package com.beust.klaxon;
+package com.beust.klaxon
 
 import org.testng.annotations.Test
 import java.io.ByteArrayInputStream
@@ -8,19 +8,18 @@ import kotlin.test.fail
 @Test
 class TestRFC7159 {
 
-    private fun fromJsonString(jsonData: String) : Any? =
+    private fun fromJsonString(jsonData: String): Any? =
         Parser().parse(ByteArrayInputStream(jsonData.toByteArray(Charsets.UTF_8)))
-
 
     private fun jsonEquals(testData: String, expectedData: String) {
         val j = fromJsonString(testData)
-        when(j) {
+        when (j) {
             is JsonObject -> assertEquals(expectedData, j.toJsonString())
             is JsonArray<*> -> assertEquals(expectedData, j.toJsonString())
             else -> fail("not an object or array")
         }
     }
-    
+
     fun objectEmpty() {
         jsonEquals("{}", "{}")
     }
@@ -97,13 +96,19 @@ class TestRFC7159 {
         jsonEquals("{ \"v\":${Double.MAX_VALUE}}", "{\"v\":${Double.MAX_VALUE}}")
     }
 
-    @Test(expectedExceptions = arrayOf(RuntimeException::class), expectedExceptionsMessageRegExp = "Unterminated string")
+    @Test(
+        expectedExceptions = arrayOf(RuntimeException::class),
+        expectedExceptionsMessageRegExp = "Unterminated string"
+    )
     fun truncatedValue() {
-         fromJsonString("{\"X\":\"s")
+        fromJsonString("{\"X\":\"s")
     }
 
-    @Test(expectedExceptions = arrayOf(RuntimeException::class), expectedExceptionsMessageRegExp = "Unterminated string")
+    @Test(
+        expectedExceptions = arrayOf(RuntimeException::class),
+        expectedExceptionsMessageRegExp = "Unterminated string"
+    )
     fun truncatedKey() {
-         fromJsonString("{\"X")
+        fromJsonString("{\"X")
     }
 }

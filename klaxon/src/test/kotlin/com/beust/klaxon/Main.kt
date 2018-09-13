@@ -1,9 +1,11 @@
 package com.beust.klaxon.test
 
-import java.util.ArrayList
-import com.beust.klaxon.*
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
+import com.beust.klaxon.json
 
-fun main(args : Array<String>) {
+fun main(args: Array<String>) {
 //    val a1 = json {
 //        obj("a", 1.1, "b", "value", "c", array(1))
 //    }
@@ -28,7 +30,7 @@ fun main(args : Array<String>) {
     println("Json array: ${anArray.toJsonString()}")
 
     val aMix = json {
-        obj (
+        obj(
                 "theArray" to anArray,
                 "theObject" to anObject,
                 "anInt" to 4
@@ -43,10 +45,9 @@ fun main(args : Array<String>) {
         })
     }
     println("Result: ${logic.toJsonString()}")
-
 }
 
-fun parse(name: String) : Any {
+fun parse(name: String): Any {
     val cls = Parser::class.java
     val inputStream = cls.getResourceAsStream(name)!!
     return Parser().parse(inputStream)!!
@@ -57,19 +58,19 @@ fun example3() {
 
     val firstName = obj.string("firstName")
     val lastName = obj.string("lastName")
-    println("Name: ${firstName} ${lastName}")
+    println("Name: $firstName $lastName")
 }
 
 fun example2() {
     val array = parse("/src/test/resources/e.json") as JsonArray<*>
 
     val ages = array.long("age")
-    println("Ages: ${ages}")
+    println("Ages: $ages")
 
     val oldPeople = array.filter {
         it is JsonObject && it.long("age")?.let { it > 30 } ?: false
     }
-    println("Old people: ${oldPeople}")
+    println("Old people: $oldPeople")
 }
 
 fun example1() {
@@ -79,7 +80,7 @@ fun example1() {
     val jack = array.first {
         it is JsonObject && it.string("first") == "Jack"
     }
-    println("Jack: ${jack}")
+    println("Jack: $jack")
 
     println("=== Everyone who studied in Berkeley:")
     val berkeley = array.filterIsInstance<JsonObject>().filter {
@@ -87,11 +88,11 @@ fun example1() {
     }.map {
         it.string("last")
     }
-    println("${berkeley}")
+    println("$berkeley")
 
     println("=== All last names:")
     val lastNames = array.string("last")
-    println("${lastNames}")
+    println("$lastNames")
 
     println("=== All grades bigger than 75")
     val result = array.filterIsInstance<JsonObject>().map {
@@ -100,5 +101,5 @@ fun example1() {
                     it.long("grade")!! > 75
                 }!!
     }
-    println("Result: ${result}")
+    println("Result: $result")
 }

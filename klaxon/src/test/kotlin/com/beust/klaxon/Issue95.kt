@@ -15,7 +15,7 @@ class Issue95 {
     @Test
     fun deserializeIntArray() {
         val mapper = Klaxon()
-        val data = listOf(1,2,3)
+        val data = listOf(1, 2, 3)
         val json = mapper.toJsonString(data)
         assertThat(mapper.parseArray<Int>(json)).isEqualTo(data)
     }
@@ -32,7 +32,7 @@ class Issue95 {
     @Test
     fun serializeStringArrayToObjectArray() {
         data class Person(val id: String, val name: String)
-        class PersonConverter: Converter {
+        class PersonConverter : Converter {
             override fun canConvert(cls: Class<*>) = cls == Person::class.java
             override fun toJson(value: Any) = (value as Person).let { value -> "\"${value.id}:${value.name}\"" }
             override fun fromJson(jv: JsonValue): Person {

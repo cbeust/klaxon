@@ -7,7 +7,7 @@ interface PathMatcher {
     /**
      * @return true if we want to observe this path.
      */
-    fun pathMatches(path: String) : Boolean
+    fun pathMatches(path: String): Boolean
 
     /**
      * Note that the value can only be a basic type (Int, String, ...) and never JsonObject or JsonArray.

@@ -13,13 +13,20 @@ buildscript {
 }
 
 plugins {
+    // https://github.com/diffplug/spotless/tree/master/plugin-gradle
+    id("com.diffplug.gradle.spotless") version "3.14.0"
     id("com.jfrog.bintray") version "1.2"
     `maven-publish`
 }
 
 val kotlinVersion = property("kotlin.version").toString()
+val ktlintVersion = "0.28.0"
 
 allprojects {
+    apply {
+        plugin("com.diffplug.gradle.spotless")
+    }
+
     version = "3.0.8"
     group = "com.beust"
 
@@ -30,13 +37,23 @@ allprojects {
             setUrl("http://oss.sonatype.org/content/repositories/snapshots")
         }
     }
+
+    spotless {
+        /*
+         * We use spotless to lint the Gradle Kotlin DSL files that make up the build.
+         * These checks are dependencies of the `check` task.
+         */
+        kotlinGradle {
+            ktlint(ktlintVersion)
+            trimTrailingWhitespace()
+        }
+    }
 }
 
 // Projects that contain source code.
 val sourceProjects = setOf(
     project(":klaxon")
 ) + project(":plugins").subprojects
-
 
 configure(sourceProjects) {
     apply {
@@ -64,6 +81,14 @@ configure(sourceProjects) {
     tasks.withType<Test>().configureEach {
         useTestNG()
     }
+
+    spotless {
+        kotlin {
+            ktlint(ktlintVersion)
+            trimTrailingWhitespace()
+            endWithNewline()
+        }
+    }
 }
 
 tasks.withType<Wrapper>().configureEach {
@@ -76,5 +101,3 @@ tasks.withType<Wrapper>().configureEach {
  */
 val Project.java: org.gradle.api.plugins.JavaPluginConvention
     get() = convention.getPluginByName("java")
-
-

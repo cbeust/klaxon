@@ -26,11 +26,10 @@ class Issue149 {
                 }
         }}
         """
-        data class Node(val x:Float, val y:Float)
-        data class Floor (val nodes:HashMap<String, Node>)
+        data class Node(val x: Float, val y: Float)
+        data class Floor(val nodes: HashMap<String, Node>)
         val r = Klaxon().parse<Floor>(nodes)
         assertThat(r!!.nodes["1"]).isEqualTo(
                 Node(123.3236517713532f, 12.932982478667043f))
     }
-
 }
