@@ -4,7 +4,7 @@ package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
-import java.util.*
+import java.util.HashMap
 
 data class ConferenceDataModel(
         val events: Map<String, EventModel>,
