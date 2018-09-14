@@ -2,6 +2,10 @@ rootProject.name = "klaxon-root"
 
 include(":klaxon")
 include(":plugins")
+include(":plugins:klaxon-jackson")
+include(":testing")
+include(":testing:tests")
+include(":testing:test-resources")
 
 
 /**

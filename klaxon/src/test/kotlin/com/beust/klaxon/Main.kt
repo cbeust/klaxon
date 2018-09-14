@@ -49,7 +49,7 @@ fun main(args : Array<String>) {
 fun parse(name: String) : Any {
     val cls = Parser::class.java
     val inputStream = cls.getResourceAsStream(name)!!
-    return Parser().parse(inputStream)!!
+    return Parser.default().parse(inputStream)!!
 }
 
 fun example3() {

@@ -181,7 +181,7 @@ class Klaxon : ConverterFinder {
             pathMatchers.add(DefaultPathMatcher(result.toSet()))
         }
 
-        return Parser(pathMatchers, passedLexer, streaming)
+        return Parser.default(pathMatchers, passedLexer, streaming)
     }
 
     private val DEFAULT_CONVERTER = DefaultConverter(this, allPaths)

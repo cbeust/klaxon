@@ -9,7 +9,7 @@ import kotlin.test.fail
 class TestRFC7159 {
 
     private fun fromJsonString(jsonData: String) : Any? =
-        Parser().parse(ByteArrayInputStream(jsonData.toByteArray(Charsets.UTF_8)))
+        Parser.default().parse(ByteArrayInputStream(jsonData.toByteArray(Charsets.UTF_8)))
 
 
     private fun jsonEquals(testData: String, expectedData: String) {
@@ -20,7 +20,7 @@ class TestRFC7159 {
             else -> fail("not an object or array")
         }
     }
-    
+
     fun objectEmpty() {
         jsonEquals("{}", "{}")
     }
