@@ -17,7 +17,7 @@ class Issue82 {
      * Test fails.  Serialized output is actually "{\"firstName\" : \"John\", \"id\" : \"1\"}"
      */
     fun serializeIgnoredVal() {
-        data class Person(@Json(ignored=true) val id: String, val firstName: String)
+        data class Person(@Json(ignored = true) val id: String, val firstName: String)
         val obj = Person("1", "John")
         assertTest(Klaxon().toJsonString(obj))
     }

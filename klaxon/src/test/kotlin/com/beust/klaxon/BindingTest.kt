@@ -15,10 +15,14 @@ class BindingTest {
     // Tests objects -> JSON string
     //
 
-    data class ArrayHolder(var listOfInts: List<Int> = emptyList(),
-            var listOfStrings : List<String> = emptyList(),
-            var listOfBooleans: List<Boolean> = emptyList(),
-            var string: String = "foo", var isTrue: Boolean = true, var isFalse: Boolean = false)
+    data class ArrayHolder(
+        var listOfInts: List<Int> = emptyList(),
+        var listOfStrings: List<String> = emptyList(),
+        var listOfBooleans: List<Boolean> = emptyList(),
+        var string: String = "foo",
+        var isTrue: Boolean = true,
+        var isFalse: Boolean = false
+    )
 
     fun arrayToJson() {
         val klaxon = Klaxon()
@@ -36,7 +40,7 @@ class BindingTest {
         }
     }
 
-    val CARD_CONVERTER = object: Converter {
+    val CARD_CONVERTER = object : Converter {
         override fun canConvert(cls: Class<*>) = cls == Card::class.java
 
         override fun fromJson(jv: JsonValue) = Card(jv.objInt("value"), jv.objString("suit"))
@@ -70,12 +74,14 @@ class BindingTest {
     // Tests parsing
     //
 
-    data class AllTypes constructor(var int: Int? = null,
-            var string: String? = null,
-            var isTrue: Boolean? = null,
-            var isFalse: Boolean? = null,
-            val balanceDouble: Double,
-            var array: List<Int> = emptyList())
+    data class AllTypes constructor(
+        var int: Int? = null,
+        var string: String? = null,
+        var isTrue: Boolean? = null,
+        var isFalse: Boolean? = null,
+        val balanceDouble: Double,
+        var array: List<Int> = emptyList()
+    )
     fun allTypes() {
         val expectedDouble = Double.MAX_VALUE - 1
         val result = Klaxon().parse<AllTypes>("""
@@ -129,8 +135,8 @@ class BindingTest {
     }
 
     data class Deck2(
-            var cards: List<Card> = emptyList(),
-            var cardCount: Int? = null
+        var cards: List<Card> = emptyList(),
+        var cardCount: Int? = null
     )
 
     fun compoundObjectWithArray() {
@@ -160,8 +166,8 @@ class BindingTest {
             }"""
 
         data class Person(
-                val preferences: List<Int>,
-                val properties: Map<String, String> = sortedMapOf("a" to "b")
+            val preferences: List<Int>,
+            val properties: Map<String, String> = sortedMapOf("a" to "b")
         )
 
         val p: Person = Klaxon().parse(json)!!
@@ -250,7 +256,7 @@ class BindingTest {
     }
 
     sealed class Dir(val name: String) {
-        class Left(val n: Int): Dir("Left")
+        class Left(val n: Int) : Dir("Left")
     }
 
     fun sealedClass() {

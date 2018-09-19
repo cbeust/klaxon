@@ -16,7 +16,7 @@ interface Parser {
     /**
      * Parse the json from a file with the given [fileName].
      */
-    fun parse(fileName: String) : Any? =
+    fun parse(fileName: String): Any? =
         FileInputStream(File(fileName)).use {
             parse(it)
         }

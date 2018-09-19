@@ -36,10 +36,10 @@ class LexerTest {
     }
 
     private fun testLexer(lexer: Lexer) {
-        val result = Sequence{ -> lexer }.map { it }.toList()
+        val result = Sequence { -> lexer }.map { it }.toList()
         Assert.assertEquals(result, expected)
     }
 
-    private fun value(name: String, value: Any): Array<Token>
-        = arrayOf(Token(TokenType.VALUE, name), Token(TokenType.COLON), Token(TokenType.VALUE, value))
+    private fun value(name: String, value: Any): Array<Token> =
+        arrayOf(Token(TokenType.VALUE, name), Token(TokenType.COLON), Token(TokenType.VALUE, value))
 }

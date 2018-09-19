@@ -9,7 +9,7 @@ class StateMachine(private val streaming: Boolean) {
         map[TokenStatus(status, tokenType)] = processor
     }
 
-    fun next(world: World, token: Token) : World {
+    fun next(world: World, token: Token): World {
         val pair = TokenStatus(world.status, token.tokenType)
         val processor = map[pair]
 
@@ -17,7 +17,7 @@ class StateMachine(private val streaming: Boolean) {
             processor(world, token)
         } else {
             if (!streaming) {
-                fun formatList(l: List<String>) : String {
+                fun formatList(l: List<String>): String {
                     val result = StringBuilder()
                     l.withIndex().forEach { iv ->
                         if (iv.index == l.size - 1) result.append(" or ")

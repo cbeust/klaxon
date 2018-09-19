@@ -22,6 +22,5 @@ class Issue132 {
         }
 
         Klaxon().converter(converter).parse<KNode>("{}")
-
     }
 }

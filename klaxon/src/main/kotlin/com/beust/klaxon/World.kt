@@ -1,11 +1,11 @@
 package com.beust.klaxon
 
-import java.util.*
+import java.util.LinkedList
 
-class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList()) {
+class World(var status: Status, val pathMatchers: List<PathMatcher> = emptyList()) {
     private val statusStack = LinkedList<Status>()
     private val valueStack = LinkedList<Any>()
-    var result : Any? = null
+    var result: Any? = null
     var parent = JsonObject()
 
     /**
@@ -15,7 +15,7 @@ class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList
     val path: String get() {
         val result = arrayListOf("$")
         valueStack.reversed().forEach { value ->
-            when(value) {
+            when (value) {
                 is JsonObject -> {
                     if (value.any()) {
                         result.add("." + value.keys.last().toString())
@@ -32,19 +32,19 @@ class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList
         return result.joinToString("")
     }
 
-    fun pushAndSet(status: Status, value: Any) : World {
+    fun pushAndSet(status: Status, value: Any): World {
         pushStatus(status)
         pushValue(value)
         this.status = status
         return this
     }
 
-    private fun pushStatus(status: Status) : World {
+    private fun pushStatus(status: Status): World {
         statusStack.addFirst(status)
         return this
     }
 
-    private fun pushValue(value: Any) : World {
+    private fun pushValue(value: Any): World {
         valueStack.addFirst(value)
         return this
     }
@@ -59,32 +59,32 @@ class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList
      */
     var line: Int = 0
 
-    fun popValue() : Any {
+    fun popValue(): Any {
         return valueStack.removeFirst()
     }
 
-    fun popStatus() : Status {
+    fun popStatus(): Status {
         return statusStack.removeFirst()
     }
 
-    fun getFirstObject() : JsonObject {
+    fun getFirstObject(): JsonObject {
         return valueStack.first as JsonObject
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun getFirstArray() : JsonArray<Any?> {
+    fun getFirstArray(): JsonArray<Any?> {
         return valueStack.first as JsonArray<Any?>
     }
 
-    fun peekStatus() : Status {
+    fun peekStatus(): Status {
         return statusStack[0]
     }
 
-    fun isNestedStatus() : Boolean {
+    fun isNestedStatus(): Boolean {
         return statusStack.size > 1
     }
 
-    fun hasValues() : Boolean {
+    fun hasValues(): Boolean {
         return valueStack.size > 1
     }
 
@@ -101,5 +101,4 @@ class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList
             }
         }
     }
-
 }

@@ -123,8 +123,8 @@ abstract class KlaxonBaseTest {
         assertEquals(trim(actual), trim(expected))
     }
 
-	fun canonicalJsonObject() {
-		val j = json {
+    fun canonicalJsonObject() {
+        val j = json {
             obj(
                     "c" to 1,
                     "a" to 2,
@@ -133,12 +133,12 @@ abstract class KlaxonBaseTest {
                             "d" to 2
                     )
             )
-		}.toJsonString(canonical = true)
+        }.toJsonString(canonical = true)
 
-		val expected = """{"a":2,"b":{"d":2,"e":1},"c":1}"""
+        val expected = """{"a":2,"b":{"d":2,"e":1},"c":1}"""
 
-		assertEquals(j, expected)
-	}
+        assertEquals(j, expected)
+    }
 
     fun canonicalJsonNumber() {
         val j = json {
@@ -288,7 +288,7 @@ abstract class KlaxonBaseTest {
 
     fun lookupNestedArrays() {
         val j = json {
-            array (
+            array(
                     array(
                             array(
                                     "yo", obj("a" to 1)
@@ -310,7 +310,7 @@ abstract class KlaxonBaseTest {
 
     fun mapChildren() {
         val j = json {
-            array(1,2,3)
+            array(1, 2, 3)
         }
 
         val result = j.mapChildrenObjectsOnly { fail("should never reach here") }
@@ -319,14 +319,14 @@ abstract class KlaxonBaseTest {
 
     fun mapChildrenWithNulls() {
         val j = json {
-            array(1,2,3)
+            array(1, 2, 3)
         }
 
         val result = j.mapChildren { fail("should never reach here") }
         assertKlaxonEquals(listOf(null, null, null), result)
     }
 
-    private fun valueToString(v: Any?, prettyPrint: Boolean = false, canonical : Boolean = false) : String =
+    private fun valueToString(v: Any?, prettyPrint: Boolean = false, canonical: Boolean = false): String =
         StringBuilder().apply {
             Render.renderValue(v, this, prettyPrint, canonical, 0)
         }.toString()
@@ -347,15 +347,13 @@ abstract class KlaxonBaseTest {
         assertEquals(valueToString(list), "[null,1,true,false,\"a\"]")
     }
 
-
-
     data class StockEntry(
-            val date: String,
-            val close: Double,
-            val volume: Int,
-            val open: Double,
-            val high: Double,
-            val low: Double
+        val date: String,
+        val close: Double,
+        val volume: Int,
+        val open: Double,
+        val high: Double,
+        val low: Double
     )
 
     fun issue77() {
@@ -397,7 +395,7 @@ abstract class KlaxonBaseTest {
     }
 
     fun nestedCollections() {
-        data class Root (val lists: List<List<String>>)
+        data class Root(val lists: List<List<String>>)
 
         val result = Klaxon().parse<Root>("""
         {
@@ -441,7 +439,7 @@ abstract class KlaxonBaseTest {
     }
 
     private class Vendor {
-        var vendorName : String = ""
+        var vendorName: String = ""
     }
 
     @Language("json")
@@ -454,7 +452,6 @@ abstract class KlaxonBaseTest {
         ]
     }"""
 
-
     @Test
     fun testParseRegistry() {
         val result = Klaxon().parse<Registry>(someString)
@@ -464,21 +461,22 @@ abstract class KlaxonBaseTest {
         assertEquals("stuff", result.boo)
         assertEquals("example", vendors[0].vendorName)
     }
-    private class Registry(val name : String,
-            val vendor : List<Vendor> = ArrayList()) {
-        var foo : String = ""
-        var boo : String = ""
+    private class Registry(
+        val name: String,
+        val vendor: List<Vendor> = ArrayList()
+    ) {
+        var foo: String = ""
+        var boo: String = ""
     }
 
     fun issue153() {
         abstract class FooBase(
-                val id: String? = null
+            val id: String? = null
         )
 
         class BarImpl(
-                val barValue: String? = null
-        ): FooBase()
-
+            val barValue: String? = null
+        ) : FooBase()
 
         val barImpl = Klaxon()
                 .parse<BarImpl>("""

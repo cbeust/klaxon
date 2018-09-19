@@ -13,8 +13,7 @@ class Issue180 {
     }
 }
 
-
-class CharacterPlayer(val id: Int){
+class CharacterPlayer(val id: Int) {
 
     var characters = listOf<CharacterPlayer>()
 
@@ -24,14 +23,13 @@ class CharacterPlayer(val id: Int){
     })
     @Json(ignored = true)
     val visibleChars: List<CharacterPlayer> by visibleDelegate
-
 }
 
 private object UNINITIALIZED_VALUE
 class InvalidatableLazyImpl<T>(private val initializer: () -> T, lock: Any? = null) : Lazy<T> {
     @Volatile private var _value: Any? = UNINITIALIZED_VALUE
     private val lock = lock ?: this
-    fun invalidate(){
+    fun invalidate() {
         _value = UNINITIALIZED_VALUE
     }
 
@@ -46,15 +44,13 @@ class InvalidatableLazyImpl<T>(private val initializer: () -> T, lock: Any? = nu
                 val _v2 = _value
                 if (_v2 !== UNINITIALIZED_VALUE) {
                     _v2 as T
-                }
-                else {
+                } else {
                     val typedValue = initializer()
                     _value = typedValue
                     typedValue
                 }
             }
         }
-
 
     override fun isInitialized(): Boolean = _value !== UNINITIALIZED_VALUE
 

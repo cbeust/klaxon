@@ -12,6 +12,5 @@ class PrettyPrintTest {
         )) }
         val string = test2.toJsonString(true)
         Assert.assertTrue(string.contains(" 22"), "22 should be displayed as an Int, not a String: $string")
-
     }
 }

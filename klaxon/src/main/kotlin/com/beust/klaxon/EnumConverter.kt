@@ -3,7 +3,7 @@ package com.beust.klaxon
 /**
  * Convert an enum to and from JSON.
  */
-class EnumConverter: Converter {
+class EnumConverter : Converter {
     override fun toJson(value: Any): String {
         return "\"" + value.toString() + "\""
     }
@@ -14,7 +14,7 @@ class EnumConverter: Converter {
 
     override fun fromJson(jv: JsonValue): Enum<*> {
         val javaClass = jv.propertyClass
-        val result : Enum<*> =
+        val result: Enum<*> =
             if (javaClass is Class<*> && javaClass.isEnum) {
                 val valueOf = javaClass.getMethod("valueOf", String::class.java)
                 valueOf.invoke(null, jv.inside) as Enum<*>

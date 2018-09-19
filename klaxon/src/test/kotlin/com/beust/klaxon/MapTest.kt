@@ -7,64 +7,64 @@ import org.testng.annotations.Test
 import java.util.HashMap
 
 data class ConferenceDataModel(
-        val events: Map<String, EventModel>,
-        val rooms: Map<String, RoomModel>,
-        val sections: Map<String, SectionModel>,
-        val speakers: Map<String, SpeakerModel>,
-        val tracks: Map<String, TrackModel>
+    val events: Map<String, EventModel>,
+    val rooms: Map<String, RoomModel>,
+    val sections: Map<String, SectionModel>,
+    val speakers: Map<String, SpeakerModel>,
+    val tracks: Map<String, TrackModel>
 )
 
 data class EventModel(
-        val name: String,
-        val description: String,
-        val duration: String,
-        val isGeneralEvent: Boolean,
-        val isPublished: Boolean,
-        val startTime: String, //Date,
-        val roomIds: Map<String, Boolean>? = emptyMap(),
-        val speakerIds: Map<String, Boolean>? = emptyMap(),
-        val trackId: String? = null,
-        var roomNames: Map<String, Boolean>? = emptyMap(),
-        var speakerNames: Map<String, Boolean>? = emptyMap(),
-        var trackName: String? = null,
-        val updatedAt: Long,
-        val updatedBy: String
+    val name: String,
+    val description: String,
+    val duration: String,
+    val isGeneralEvent: Boolean,
+    val isPublished: Boolean,
+    val startTime: String, // Date,
+    val roomIds: Map<String, Boolean>? = emptyMap(),
+    val speakerIds: Map<String, Boolean>? = emptyMap(),
+    val trackId: String? = null,
+    var roomNames: Map<String, Boolean>? = emptyMap(),
+    var speakerNames: Map<String, Boolean>? = emptyMap(),
+    var trackName: String? = null,
+    val updatedAt: Long,
+    val updatedBy: String
 )
 
 data class RoomModel(
-        val name: String,
-        val updatedAt: Long,
-        val updatedBy: String
+    val name: String,
+    val updatedAt: Long,
+    val updatedBy: String
 )
 
 data class SectionModel(
-        val name: String,
-        val title: String,
-        val startTime: String,//Date,
-        val endTime: String,//Date,
-        val updatedAt: Long,
-        val updatedBy: String
+    val name: String,
+    val title: String,
+    val startTime: String, // Date,
+    val endTime: String, // Date,
+    val updatedAt: Long,
+    val updatedBy: String
 )
 
 data class SpeakerModel(
-        val name: String,
-        val title: String? = null,
-        val org: String? = null,
-        val bio: String,
-        val pictureId: String? = null,
-        val pictureUrl: String? = null,
-        val isFeatured: Boolean,
-        val socialProfiles: Map<String,String>? = emptyMap(),
-        val updatedAt: Long,
-        val updatedBy: String
+    val name: String,
+    val title: String? = null,
+    val org: String? = null,
+    val bio: String,
+    val pictureId: String? = null,
+    val pictureUrl: String? = null,
+    val isFeatured: Boolean,
+    val socialProfiles: Map<String, String>? = emptyMap(),
+    val updatedAt: Long,
+    val updatedBy: String
 )
 
 data class TrackModel(
-        val name: String,
-        val description: String,
-        val sortOrder: Int,
-        val updatedAt: Long,
-        val updatedBy: String
+    val name: String,
+    val description: String,
+    val sortOrder: Int,
+    val updatedAt: Long,
+    val updatedBy: String
 )
 
 data class Node(val nodeName: String)

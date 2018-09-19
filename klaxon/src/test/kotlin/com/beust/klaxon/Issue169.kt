@@ -6,14 +6,17 @@ import org.testng.annotations.Test
 @Test
 class Issue169 {
 
-    data class Person(val id: Int,
-                      val name: String,
-                      val isEUResident: Boolean = false,
-                      val city: String = "Paris"
-                     )
+    data class Person(
+        val id: Int,
+        val name: String,
+        val isEUResident: Boolean = false,
+        val city: String = "Paris"
+    )
 
-    private val expected = Person(id = 2,
-                                  name = "Arthur")
+    private val expected = Person(
+        id = 2,
+        name = "Arthur"
+    )
 
     fun test() {
 
@@ -28,8 +31,8 @@ class Issue169 {
         val toTest = Klaxon().parse<Person>(jsonToTest)!!
 
         assertThat(toTest.city)
-                .isNotNull()
+            .isNotNull()
         assertThat(toTest)
-                .isEqualTo(expected)
+            .isEqualTo(expected)
     }
 }

@@ -3,7 +3,6 @@ package com.beust.klaxon
 import com.beust.klaxon.Reflection.Companion.isAssignableFromAny
 import java.lang.reflect.ParameterizedType
 import java.math.BigDecimal
-import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -17,7 +16,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
         val value = jv.inside
         val propertyType = jv.propertyClass
         val result =
-            when(value) {
+            when (value) {
                 is Boolean, is String, is Long -> value
                 is Int -> fromInt(value, propertyType)
                 is Double ->
@@ -34,12 +33,11 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 }
             }
         return result
-
     }
 
     override fun toJson(value: Any): String {
-        fun joinToString(list: Collection<*>, open: String, close: String)
-            = open + list.joinToString(", ") + close
+        fun joinToString(list: Collection<*>, open: String, close: String) =
+            open + list.joinToString(", ") + close
 
         val result = when (value) {
             is String, is Enum<*> -> "\"" + Render.escapeString(value.toString()) + "\""
@@ -79,7 +77,6 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                     """"$value""""
                 }
             }
-
         }
         return result
     }
@@ -131,7 +128,6 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                     throw KlaxonException("Don't know how to convert null value in array $jv")
                 }
             }
-
         }
 
         val result =
@@ -175,8 +171,8 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                         result
                     }
                     isCollection -> {
-                        val type =jt.actualTypeArguments[0]
-                        when(type) {
+                        val type = jt.actualTypeArguments[0]
+                        when (type) {
                             is Class<*> -> {
                                 val cls = jt.actualTypeArguments[0] as Class<*>
                                 klaxon.fromJsonObject(value, cls, cls.kotlin)
@@ -185,7 +181,6 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                                 val result2 = JsonObjectConverter(klaxon, HashMap<String, Any>()).fromJson(value,
                                         jv.propertyKClass!!.jvmErasure)
                                 result2
-
                             }
                             else -> {
                                 throw IllegalArgumentException("Couldn't interpret type $type")
@@ -206,5 +201,4 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             }
         return result
     }
-
 }
