@@ -1,9 +1,9 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.jackson.jackson
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.testng.Assert
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 import java.math.BigDecimal
 import java.util.Collections.emptyMap
@@ -13,14 +13,25 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 @Test
-class KlaxonTest {
-    @BeforeClass
-    fun bc() {
-    }
+class DefaultParserTest : KlaxonBaseTest() {
+    override fun provideParser(): Parser =
+        Parser.default()
+}
+
+@Test
+class JacksonParserTest : KlaxonBaseTest() {
+    override fun provideParser(): Parser =
+        Parser.jackson()
+}
+
+@Test
+abstract class KlaxonBaseTest {
+
+    protected abstract fun provideParser(): Parser
 
     private fun read(name: String): Any? {
-        val cls = KlaxonTest::class.java
-        return Parser().parse(cls.getResourceAsStream(name)!!)
+        val cls = KlaxonBaseTest::class.java
+        return provideParser().parse(cls.getResourceAsStream(name)!!)
     }
 
     fun generated() {
@@ -123,12 +134,12 @@ class KlaxonTest {
                     )
             )
 		}.toJsonString(canonical = true)
-		
+
 		val expected = """{"a":2,"b":{"d":2,"e":1},"c":1}"""
-		
+
 		assertEquals(j, expected)
 	}
-    
+
     fun canonicalJsonNumber() {
         val j = json {
             obj(
@@ -136,10 +147,10 @@ class KlaxonTest {
                     "f" to 123456789.123456789f
             )
         }.toJsonString(canonical = true)
-        
+
         assert(Pattern.matches("\\{(\"[a-z]+\":\\d\\.\\d+E\\d+(,|}\$))+", j))
     }
-    
+
     private fun trim(s: String) = s.replace("\n", "").replace("\r", "")
 
     fun renderStringEscapes() {
@@ -216,7 +227,7 @@ class KlaxonTest {
             assertEquals(expected.get(i), actual.get(i))
         }
     }
-    
+
     fun objectLookup() {
         val j = json {
             obj(

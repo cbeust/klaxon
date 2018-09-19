@@ -444,7 +444,7 @@ Since this is a JSON object, we parse it as follows:
 fun parse(name: String) : Any? {
     val cls = Parser::class.java
     return cls.getResourceAsStream(name)?.let { inputStream ->
-        return Parser().parse(inputStream)
+        return Parser.default().parse(inputStream)
     }
 }
 
@@ -455,7 +455,7 @@ val obj = parse("/object.json") as JsonObject
 
 Parse from String value :
 ```kotlin
-val parser: Parser = Parser()
+val parser: Parser = Parser.default()
 val stringBuilder: StringBuilder = StringBuilder("{\"name\":\"Cedric Beust\", \"age\":23}")
 val json: JsonObject = parser.parse(stringBuilder) as JsonObject
 println("Name : ${json.string("name")}, Age : ${json.int("age")}")
@@ -664,9 +664,21 @@ We can find all emails by
 (parse("my.json") as JsonObject).lookup<String?>("users.email")
 ```
 
-## Implementation
+## Parsers
 
-The Parser is implemented as a mutable state machine supported by a simplistic `State` monad, making the main loop very simple:
+There are two parser implementations with official support. The first is written in Kotlin and is accessed by calling
+`Parser.default()`.
+
+The second is a parser implemented using the [FasterXML Jackson](https://github.com/FasterXML/jackson) mapper.
+This parser has been found to take 1/2 the time of the default Parser on large JSON payloads.
+
+The Jackson mapper can be found at the coordinates
+`com.beust:klaxon-jackson:[version]`. To use this parser, call the extension `Parser.jackson()`.
+
+### Implementation
+
+The Kotlin based Parser is implemented as a mutable state machine supported by a simplistic `State` monad,
+making the main loop very simple:
 
 ```kotlin
 val stateMachine = StateMachine()

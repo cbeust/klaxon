@@ -1,16 +1,34 @@
 package com.beust.klaxon;
 
+import com.beust.klaxon.jackson.jackson
 import org.testng.annotations.Test
 import java.math.BigInteger
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @Test
-class TestTypes {
+class KlaxonTestTypes : BaseTestTypes() {
+    override fun provideParser(): Parser =
+        Parser.default()
+}
+
+@Test
+class JacksonTestTypes : BaseTestTypes() {
+    override fun provideParser(): Parser =
+        Parser.jackson()
+}
+
+@Test
+abstract class BaseTestTypes {
+    protected abstract fun provideParser(): Parser
 
     private fun getJsonObject(): JsonObject {
-        val cls = TestTypes::class.java
-        return Parser().parse(cls.getResourceAsStream("/types.json")!!) as JsonObject
+        return read("/types.json") as JsonObject
+    }
+
+    private fun read(name: String): Any? {
+        val cls = BaseTestTypes::class.java
+        return provideParser().parse(cls.getResourceAsStream(name)!!)
     }
 
     fun typeInt() {
@@ -83,8 +101,7 @@ class TestTypes {
     }
 
     fun testEscapeRender(){
-        val cls = TestTypes::class.java
-        val j = Parser().parse(cls.getResourceAsStream("/escaped.json")!!) as JsonObject
+        val j = read("/escaped.json") as JsonObject
         assertEquals("""{"s":"text field \"s\"\nnext line\fform feed\ttab\\rev solidus/solidus\bbackspace"}""", j.toJsonString())
     }
 }
