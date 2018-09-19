@@ -9,7 +9,7 @@ import kotlin.test.fail
 class TestRFC7159 {
 
     private fun fromJsonString(jsonData: String): Any? =
-        Parser().parse(ByteArrayInputStream(jsonData.toByteArray(Charsets.UTF_8)))
+            Parser.default().parse(ByteArrayInputStream(jsonData.toByteArray(Charsets.UTF_8)))
 
     private fun jsonEquals(testData: String, expectedData: String) {
         val j = fromJsonString(testData)
@@ -96,18 +96,12 @@ class TestRFC7159 {
         jsonEquals("{ \"v\":${Double.MAX_VALUE}}", "{\"v\":${Double.MAX_VALUE}}")
     }
 
-    @Test(
-        expectedExceptions = arrayOf(RuntimeException::class),
-        expectedExceptionsMessageRegExp = "Unterminated string"
-    )
+    @Test(expectedExceptions = arrayOf(RuntimeException::class), expectedExceptionsMessageRegExp = "Unterminated string")
     fun truncatedValue() {
         fromJsonString("{\"X\":\"s")
     }
 
-    @Test(
-        expectedExceptions = arrayOf(RuntimeException::class),
-        expectedExceptionsMessageRegExp = "Unterminated string"
-    )
+    @Test(expectedExceptions = arrayOf(RuntimeException::class), expectedExceptionsMessageRegExp = "Unterminated string")
     fun truncatedKey() {
         fromJsonString("{\"X")
     }

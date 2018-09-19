@@ -50,32 +50,28 @@ allprojects {
     }
 }
 
-// Projects that contain source code.
-val sourceProjects = setOf(
+// Projects that will be published.
+val publishedProjects = setOf(
     project(":klaxon")
 ) + project(":plugins").subprojects
 
+// Projects that contain source code.
+val sourceProjects =
+    publishedProjects + project(":testing").subprojects
+
 configure(sourceProjects) {
     apply {
-        plugin("java")
+        plugin("java-library")
         plugin("kotlin")
     }
-    apply(from = rootProject.file("gradle/publishing.gradle"))
 
     dependencies {
-        "compile"("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-        "compile"("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+        "api"("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+        "api"("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
 
-        "testCompile"("org.testng:testng:6.13.1")
-        "testCompile"("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
-        "testCompile"("org.assertj:assertj-core:3.5.2")
-    }
-
-    tasks.register<Jar>("sourceJar") {
-        group = LifecycleBasePlugin.BUILD_GROUP
-        description = "An archive of the source code"
-        classifier = "sources"
-        from(java.sourceSets["main"].allSource)
+        "testImplementation"("org.testng:testng:6.13.1")
+        "testImplementation"("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
+        "testImplementation"("org.assertj:assertj-core:3.5.2")
     }
 
     tasks.withType<Test>().configureEach {
@@ -86,8 +82,24 @@ configure(sourceProjects) {
         kotlin {
             ktlint(ktlintVersion)
             trimTrailingWhitespace()
+            indentWithSpaces()
             endWithNewline()
         }
+    }
+}
+
+configure(publishedProjects) {
+    apply(from = rootProject.file("gradle/publishing.gradle"))
+
+    tasks.register<Jar>("sourceJar") {
+        group = LifecycleBasePlugin.BUILD_GROUP
+        description = "An archive of the source code"
+        classifier = "sources"
+        from(java.sourceSets["main"].allSource)
+    }
+
+    tasks.withType<Test>().configureEach {
+        useTestNG()
     }
 }
 

@@ -15,6 +15,7 @@ val p = project {
     group = "com.beust"
     artifactId = name
     version = Version.klaxon
+    directory = "klaxon"
 
     dependencies {
         compile("org.jetbrains.kotlin:kotlin-reflect:${Version.kotlin}",
