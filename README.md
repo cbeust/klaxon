@@ -387,7 +387,7 @@ $.library.books[0].author
 $.library.books[1].author
 ```
 
-We'll define a [`PathMatcher`](https://github.com/cbeust/klaxon/blob/master/src/main/java/com/beust/klaxon/PathMatcher.kt) that uses a regular expression to filter only the elements we want:
+We'll define a [`PathMatcher`](https://github.com/cbeust/klaxon/blob/master/klaxon/src/main/java/com/beust/klaxon/PathMatcher.kt) that uses a regular expression to filter only the elements we want:
 
 ```kotlin
 val pathMatcher = object : PathMatcher {
