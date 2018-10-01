@@ -181,7 +181,7 @@ assert(result.flag)
 
 ### JsonValue
 
-The `Converter` type passes you an instance of the [`JsonValue`](https://github.com/cbeust/klaxon/blob/master/src/main/kotlin/com/beust/klaxon/JsonValue.kt) class.
+The `Converter` type passes you an instance of the [`JsonValue`](https://github.com/cbeust/klaxon/blob/master/klaxon/src/main/kotlin/com/beust/klaxon/JsonValue.kt) class.
 This class is a container of a Json value. It
 is guaranteed to contain one and exactly one of either a number, a string, a character, a `JsonObject` or a `JsonArray`.
 If one of these fields is set, the others are guaranteed to be `null`. Inspect that value in your converter to make
@@ -640,7 +640,7 @@ will output:
 Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
 ```
 
-Functions that you can use inside a `json {}` expression are defined in the [`KlaxonJson`](https://github.com/cbeust/klaxon/blob/master/src/main/kotlin/com/beust/klaxon/KlaxonJson.kt) class.
+Functions that you can use inside a `json {}` expression are defined in the [`KlaxonJson`](https://github.com/cbeust/klaxon/blob/master/klaxon/src/main/kotlin/com/beust/klaxon/KlaxonJson.kt) class.
 
 ## Flattening and path lookup
 
