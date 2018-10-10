@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 buildscript {
     repositories {
         mavenCentral()
@@ -58,6 +61,15 @@ configure(sourceProjects) {
 
     tasks.withType<Test>().configureEach {
         useTestNG()
+
+        testLogging {
+            events(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.STARTED)
+            displayGranularity = 0
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+            exceptionFormat = TestExceptionFormat.FULL
+        }
     }
 }
 
