@@ -2,8 +2,8 @@ package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
 import java.lang.reflect.Type
-import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
@@ -96,8 +96,21 @@ class JsonValue(value: Any?,
                 type = String::class.java
             }
             is Int -> {
-                int = value
-                type = Int::class.java
+                when(propertyKClass?.classifier) {
+                    kotlin.Float::class -> {
+                        float = value.toFloat()
+                        type = Float::class.java
+                    }
+                    kotlin.Double::class -> {
+                        double = value.toDouble()
+                        type = Double::class.java
+                    }
+                    else -> {
+                        int = value
+                        type = Int::class.java
+
+                    }
+                }
             }
             is Long -> {
                 longValue = value
