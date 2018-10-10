@@ -26,7 +26,7 @@ internal class JacksonParser
 private constructor(
     private val mapper: ObjectMapper
 ) : Parser {
-    override fun parse(rawValue: StringBuilder): JsonBase {
+    override fun parse(rawValue: StringBuilder): Any {
         return mapper.readValue(rawValue.toString(), Any::class.java)
     }
 
@@ -35,7 +35,7 @@ private constructor(
         return mapper.readValue(inputStream, Any::class.java)
     }
 
-    override fun parse(reader: Reader): JsonBase {
+    override fun parse(reader: Reader): Any {
         return mapper.readValue(reader, Any::class.java)
     }
 
