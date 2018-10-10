@@ -96,7 +96,7 @@ private fun KlaxonJson.parseJsonArray(node: JsonNode): JsonArray<*> {
     return array(sequence.toList())
 }
 
-private fun KlaxonJson.parseValue(node: JsonNode): JsonBase {
+private fun KlaxonJson.parseValue(node: JsonNode): Any {
     val nodeType = checkNotNull(node.nodeType) {
         "JsonNode.nodeType was null."
     }
