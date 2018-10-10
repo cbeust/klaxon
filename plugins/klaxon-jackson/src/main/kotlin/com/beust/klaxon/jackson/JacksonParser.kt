@@ -83,8 +83,7 @@ private fun KlaxonJson.parseJsonObject(node: JsonNode): JsonObject {
             .asSequence()
             .map { it.key to parseValue(it.value) }
             .toList()
-            .toTypedArray()
-    return obj(*pairs)
+    return obj(pairs)
 }
 
 private fun KlaxonJson.parseJsonArray(node: JsonNode): JsonArray<*> {
@@ -96,7 +95,7 @@ private fun KlaxonJson.parseJsonArray(node: JsonNode): JsonArray<*> {
     return array(sequence.toList())
 }
 
-private fun KlaxonJson.parseValue(node: JsonNode): Any {
+private fun KlaxonJson.parseValue(node: JsonNode): Any? {
     val nodeType = checkNotNull(node.nodeType) {
         "JsonNode.nodeType was null."
     }
@@ -118,7 +117,8 @@ private fun KlaxonJson.parseValue(node: JsonNode): Any {
             }
         }
         JsonNodeType.BINARY -> Base64.getEncoder().encodeToString(node.binaryValue())
-        JsonNodeType.NULL, JsonNodeType.MISSING -> throw KlaxonException("Unexpected node type: $nodeType")
+        JsonNodeType.NULL -> null
+        JsonNodeType.MISSING -> throw KlaxonException("Unexpected node type: $nodeType")
         JsonNodeType.POJO ->
             throw UnsupportedOperationException("Unsupported type ${JsonNodeType.POJO}")
     }

@@ -1,6 +1,5 @@
 package com.beust.klaxon
 
-import java.lang.IllegalArgumentException
 import java.math.BigInteger
 
 /**
@@ -15,8 +14,11 @@ interface KlaxonJson {
     // we need this as now JsonArray<T> is List<T>
     fun <T> array(subArray : JsonArray<T>) : JsonArray<JsonArray<T>> = JsonArray(listOf(subArray))
 
+    fun obj(args: Collection<Pair<String, *>>): JsonObject =
+            JsonObject(args.toMap(LinkedHashMap()).mapValues { convert(it.value) })
+
     fun obj(vararg args: Pair<String, *>): JsonObject =
-            JsonObject(linkedMapOf(*args).mapValues {convert(it.value)})
+            obj(args.toList())
 
     companion object {
 
