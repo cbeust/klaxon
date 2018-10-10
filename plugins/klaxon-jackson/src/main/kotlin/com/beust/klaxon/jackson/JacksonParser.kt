@@ -1,10 +1,6 @@
 package com.beust.klaxon.jackson
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.KlaxonJson
-import com.beust.klaxon.Parser
-import com.beust.klaxon.json
+import com.beust.klaxon.*
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
@@ -34,7 +30,7 @@ private constructor(
         return mapper.readValue(rawValue.toString(), Any::class.java)
     }
 
-    override fun parse(inputStream: InputStream, charset: Charset): Any? {
+    override fun parse(inputStream: InputStream, charset: Charset): Any {
         // charset is ignored
         return mapper.readValue(inputStream, Any::class.java)
     }
@@ -122,7 +118,7 @@ private fun KlaxonJson.parseValue(node: JsonNode): Any {
             }
         }
         JsonNodeType.BINARY -> Base64.getEncoder().encodeToString(node.binaryValue())
-        JsonNodeType.NULL, JsonNodeType.MISSING -> null
+        JsonNodeType.NULL, JsonNodeType.MISSING -> throw KlaxonException("Unexpected node type: $nodeType")
         JsonNodeType.POJO ->
             throw UnsupportedOperationException("Unsupported type ${JsonNodeType.POJO}")
     }
