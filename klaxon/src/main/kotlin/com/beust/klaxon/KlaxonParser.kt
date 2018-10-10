@@ -10,16 +10,16 @@ internal class KlaxonParser(
     private val passedLexer: Lexer?,
     private val streaming: Boolean
 ) : Parser {
-    override fun parse(rawValue: StringBuilder): Any =
+    override fun parse(rawValue: StringBuilder): JsonBase =
         StringReader(rawValue.toString()).use {
             parse(it)
         }
 
-    override fun parse(inputStream: InputStream, charset: Charset): Any {
+    override fun parse(inputStream: InputStream, charset: Charset): JsonBase {
         return parse(inputStream.reader(charset))
     }
 
-    override fun parse(reader: Reader): Any {
+    override fun parse(reader: Reader): JsonBase {
         return if (streaming) partialParseLoop(stateMachine, (reader as JsonReader).reader)
         else fullParseLoop(stateMachine, reader)
     }
@@ -27,7 +27,7 @@ internal class KlaxonParser(
     /**
      * A loop that ends either on an EOF or a closing brace or bracket (used in streaming mode).
      */
-    private fun partialParseLoop(sm: StateMachine, reader: Reader): Any {
+    private fun partialParseLoop(sm: StateMachine, reader: Reader): JsonBase {
         val lexer = passedLexer ?: Lexer(reader)
 
         var world = World(Status.INIT, pathMatchers)
@@ -50,7 +50,7 @@ internal class KlaxonParser(
     /**
      * A loop that only ends on EOF (used in non streaming mode).
      */
-    private fun fullParseLoop(sm: StateMachine, reader: Reader): Any {
+    private fun fullParseLoop(sm: StateMachine, reader: Reader): JsonBase {
         val lexer = passedLexer ?: Lexer(reader)
 
         var world = World(Status.INIT, pathMatchers)

@@ -5,7 +5,7 @@ import java.util.*
 class World(var status : Status, val pathMatchers: List<PathMatcher> = emptyList()) {
     private val statusStack = LinkedList<Status>()
     private val valueStack = LinkedList<Any>()
-    var result : Any? = null
+    var result : JsonBase? = null
     var parent = JsonObject()
 
     /**
