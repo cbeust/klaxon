@@ -10,22 +10,21 @@ interface Parser {
 
     /**
      * Parse the json from a raw string contained in the [StringBuilder].
-     * @return a JsonObject or JsonArray
      */
-    fun parse(rawValue: StringBuilder): Any
+    fun parse(rawValue: StringBuilder): JsonBase
 
     /**
      * Parse the json from a file with the given [fileName].
      * @return a JsonObject or JsonArray
      */
-    fun parse(fileName: String) : Any =
+    fun parse(fileName: String) : JsonBase =
         FileInputStream(File(fileName)).use {
             parse(it)
         }
 
-    fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): Any
+    fun parse(inputStream: InputStream, charset: Charset = Charsets.UTF_8): JsonBase
 
-    fun parse(reader: Reader): Any
+    fun parse(reader: Reader): JsonBase
 
     /**
      * Provides access to instances of the [Parser].

@@ -26,7 +26,7 @@ internal class JacksonParser
 private constructor(
     private val mapper: ObjectMapper
 ) : Parser {
-    override fun parse(rawValue: StringBuilder): Any {
+    override fun parse(rawValue: StringBuilder): JsonBase {
         return mapper.readValue(rawValue.toString(), Any::class.java)
     }
 
@@ -35,7 +35,7 @@ private constructor(
         return mapper.readValue(inputStream, Any::class.java)
     }
 
-    override fun parse(reader: Reader): Any {
+    override fun parse(reader: Reader): JsonBase {
         return mapper.readValue(reader, Any::class.java)
     }
 
@@ -96,7 +96,7 @@ private fun KlaxonJson.parseJsonArray(node: JsonNode): JsonArray<*> {
     return array(sequence.toList())
 }
 
-private fun KlaxonJson.parseValue(node: JsonNode): Any {
+private fun KlaxonJson.parseValue(node: JsonNode): JsonBase {
     val nodeType = checkNotNull(node.nodeType) {
         "JsonNode.nodeType was null."
     }
