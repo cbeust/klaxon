@@ -14,7 +14,7 @@ interface KlaxonJson {
     // we need this as now JsonArray<T> is List<T>
     fun <T> array(subArray : JsonArray<T>) : JsonArray<JsonArray<T>> = JsonArray(listOf(subArray))
 
-    fun obj(args: Collection<Pair<String, *>>): JsonObject =
+    fun obj(args: Iterable<Pair<String, *>>): JsonObject =
             JsonObject(args.toMap(LinkedHashMap()).mapValues { convert(it.value) })
 
     fun obj(vararg args: Pair<String, *>): JsonObject =
