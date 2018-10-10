@@ -10,7 +10,7 @@ object Version {
     val kotlin = "1.2.60"
 }
 
-val p = project {
+val klaxon = project {
     name = "klaxon"
     group = "com.beust"
     artifactId = name
@@ -42,5 +42,25 @@ val p = project {
 
     kotlinCompiler {
         args("-no-stdlib")
+    }
+}
+
+val jackson = project(klaxon) {
+    name = "klaxon-jackson"
+    directory = "plugins/$name"
+    group = "com.beust"
+    artifactId = name
+    version = "1.0.0"
+
+    dependencies {
+        compile("com.fasterxml.jackson.core:jackson-databind:2.9.6")
+    }
+
+    bintray {
+        publish = true
+    }
+
+    assemble {
+        mavenJars {}
     }
 }
