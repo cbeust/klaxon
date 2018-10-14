@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.token.*
 import org.testng.Assert
 import org.testng.annotations.Test
 import java.io.StringReader
@@ -8,13 +9,14 @@ import java.io.StringReader
 class LexerTest {
 
     val expected = listOf(
-            Token(TokenType.LEFT_BRACE),
+            LEFT_BRACE,
             *value("a", 1),
-            Token(TokenType.COMMA),
+            COMMA,
             *value("ab", 1),
-            Token(TokenType.COMMA),
+            COMMA,
             *value("ab", 12),
-            Token(TokenType.RIGHT_BRACE))
+            RIGHT_BRACE
+    )
 
     fun basic() {
         val s = """{
@@ -40,6 +42,6 @@ class LexerTest {
         Assert.assertEquals(result, expected)
     }
 
-    private fun value(name: String, value: Any): Array<Token>
-        = arrayOf(Token(TokenType.VALUE, name), Token(TokenType.COLON), Token(TokenType.VALUE, value))
+    private fun value(name: String, value: Any): Array<Token<*>>
+        = arrayOf(Value(name), COLON, Value(value))
 }

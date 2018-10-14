@@ -1,15 +1,18 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.token.Token
+import com.beust.klaxon.token.TokenType
+
 private data class TokenStatus(val status: Status, val tokenType: TokenType)
 
 class StateMachine(private val streaming: Boolean) {
-    private val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
+    private val map = hashMapOf<TokenStatus, (world: World, token: Token<*>) -> World>()
 
-    fun put(status: Status, tokenType: TokenType, processor: (world: World, token: Token) -> World) {
+    fun put(status: Status, tokenType: TokenType, processor: (world: World, token: Token<*>) -> World) {
         map[TokenStatus(status, tokenType)] = processor
     }
 
-    fun next(world: World, token: Token) : World {
+    fun next(world: World, token: Token<*>) : World {
         val pair = TokenStatus(world.status, token.tokenType)
         val processor = map[pair]
 
@@ -27,12 +30,12 @@ class StateMachine(private val streaming: Boolean) {
                     return result.toString()
                 }
 
-                val validTokens = map.keys.filter { it.status == world.status }.map { it.tokenType.value }
+                val validTokens = map.keys.filter { it.status == world.status }.map { it.tokenType.value.toString() }
                 val validTokenMessage =
                         if (validTokens.size == 1) validTokens[0]
                         else formatList(validTokens)
 
-                val message = "Expected $validTokenMessage, not '${token.tokenType.value}' at line ${world
+                val message = "Expected $validTokenMessage, not '$token' at line ${world
                         .line}" +
                     "\n   (internal error: \"No processor found for: (${world.status}, $token)\""
                 throw KlaxonException(message)
