@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.token.*
 import java.io.InputStream
 import java.io.Reader
 import java.io.StringReader
@@ -32,15 +33,15 @@ internal class KlaxonParser(
 
         var world = World(Status.INIT, pathMatchers)
         var wasNested: Boolean
-        if (lexer.peek().tokenType == TokenType.COMMA) lexer.nextToken()
+        if (lexer.peek() is COMMA) lexer.nextToken()
         do {
             val token = lexer.nextToken()
             log("Token: $token")
             wasNested = world.isNestedStatus()
             world = sm.next(world, token)
-        } while (wasNested || (token.tokenType != TokenType.RIGHT_BRACE &&
-                token.tokenType != TokenType.RIGHT_BRACKET &&
-                token.tokenType != TokenType.EOF
+        } while (wasNested || (token !is RIGHT_BRACE &&
+                token !is RIGHT_BRACKET &&
+                token !is EOF
                 )
         )
 
@@ -60,7 +61,7 @@ internal class KlaxonParser(
             world.index = lexer.index
             world.line = lexer.line
             world = sm.next(world, token)
-        } while (token.tokenType != TokenType.EOF)
+        } while (token !is EOF)
 
         return world.result!!
     }
@@ -75,24 +76,24 @@ internal class KlaxonParser(
         with(stateMachine) {
             put(
                 Status.INIT,
-                TokenType.VALUE, { world: World, token: Token ->
-                world.pushAndSet(Status.IN_FINISHED_VALUE, token.value!!)
+                VALUE_TYPE.tokenType, { world: World, token: Token ->
+                world.pushAndSet(Status.IN_FINISHED_VALUE, (token as Value<*>).value!!)
             })
             put(
                 Status.INIT,
-                TokenType.LEFT_BRACE, { world: World, _: Token ->
+                LEFT_BRACE.tokenType, { world: World, _: Token ->
                 world.pushAndSet(Status.IN_OBJECT, JsonObject())
             })
             put(
                 Status.INIT,
-                TokenType.LEFT_BRACKET, { world: World, _: Token ->
+                LEFT_BRACKET.tokenType, { world: World, _: Token ->
                 world.pushAndSet(Status.IN_ARRAY, JsonArray<Any>())
             })
             // else error
 
             put(
                 Status.IN_FINISHED_VALUE,
-                TokenType.EOF, { world: World, _: Token ->
+                EOF.tokenType, { world: World, _: Token ->
                 world.result = world.popValue()
                 world
             })
@@ -100,18 +101,18 @@ internal class KlaxonParser(
 
             put(
                 Status.IN_OBJECT,
-                TokenType.COMMA, { world: World, _: Token ->
+                COMMA.tokenType, { world: World, _: Token ->
                 world.foundValue()
                 world
             })
             put(
                 Status.IN_OBJECT,
-                TokenType.VALUE, { world: World, token: Token ->
-                world.pushAndSet(Status.PASSED_PAIR_KEY, token.value!!)
+                VALUE_TYPE.tokenType, { world: World, token: Token ->
+                world.pushAndSet(Status.PASSED_PAIR_KEY, (token as Value<*>).value!!)
             })
             put(
                 Status.IN_OBJECT,
-                TokenType.RIGHT_BRACE, { world: World, _: Token ->
+                RIGHT_BRACE.tokenType, { world: World, _: Token ->
                 world.foundValue()
                 with(world) {
                     status = if (hasValues()) {
@@ -127,24 +128,24 @@ internal class KlaxonParser(
 
             put(
                 Status.PASSED_PAIR_KEY,
-                TokenType.COLON, { world: World, _: Token ->
+                COLON.tokenType, { world: World, _: Token ->
                 world
             })
             put(
                 Status.PASSED_PAIR_KEY,
-                TokenType.VALUE, { world: World, token: Token ->
+                VALUE_TYPE.tokenType, { world: World, token: Token ->
                 with(world) {
                     popStatus()
                     val key = popValue() as String
                     parent = getFirstObject()
-                    parent[key] = token.value
+                    parent[key] = (token as Value<*>).value
                     status = peekStatus()
                     this
                 }
             })
             put(
                 Status.PASSED_PAIR_KEY,
-                TokenType.LEFT_BRACKET, { world: World, _: Token ->
+                LEFT_BRACKET.tokenType, { world: World, _: Token ->
                 with(world) {
                     popStatus()
                     val key = popValue() as String
@@ -156,7 +157,7 @@ internal class KlaxonParser(
             })
             put(
                 Status.PASSED_PAIR_KEY,
-                TokenType.LEFT_BRACE, { world: World, _: Token ->
+                LEFT_BRACE.tokenType, { world: World, _: Token ->
                 with(world) {
                     popStatus()
                     val key = popValue() as String
@@ -170,19 +171,19 @@ internal class KlaxonParser(
 
             put(
                 Status.IN_ARRAY,
-                TokenType.COMMA, { world: World, _: Token ->
+                COMMA.tokenType, { world: World, _: Token ->
                 world
             })
             put(
                 Status.IN_ARRAY,
-                TokenType.VALUE, { world: World, token: Token ->
+                VALUE_TYPE.tokenType, { world: World, token: Token ->
                 val value = world.getFirstArray()
-                value.add(token.value)
+                value.add((token as Value<*>).value)
                 world
             })
             put(
                 Status.IN_ARRAY,
-                TokenType.RIGHT_BRACKET, { world: World, _: Token ->
+                RIGHT_BRACKET.tokenType, { world: World, _: Token ->
                 world.foundValue()
                 with(world) {
                     status = if (hasValues()) {
@@ -197,7 +198,7 @@ internal class KlaxonParser(
             })
             put(
                 Status.IN_ARRAY,
-                TokenType.LEFT_BRACE, { world: World, _: Token ->
+                LEFT_BRACE.tokenType, { world: World, _: Token ->
                 val value = world.getFirstArray()
                 val newObject = JsonObject()
                 value.add(newObject)
@@ -205,7 +206,7 @@ internal class KlaxonParser(
             })
             put(
                 Status.IN_ARRAY,
-                TokenType.LEFT_BRACKET, { world: World, _: Token ->
+                LEFT_BRACKET.tokenType, { world: World, _: Token ->
                 val value = world.getFirstArray()
                 val newArray = JsonArray<Any>()
                 value.add(newArray)

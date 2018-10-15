@@ -1,36 +1,13 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.token.*
 import java.io.Reader
 import java.util.regex.Pattern
-
-enum class TokenType(val value: String) {
-    VALUE("a value"),
-    LEFT_BRACE("\"{\""),
-    RIGHT_BRACE("\"}\""),
-    LEFT_BRACKET("\"[\""),
-    RIGHT_BRACKET("\"]\""),
-    COMMA("\",\""),
-    COLON("\":\""),
-    EOF("EOF")
-}
-
-data class Token(val tokenType: TokenType, val value: Any? = null) {
-    override fun toString() : String {
-        val v =
-            if (value != null) {
-                " ($value)"
-            } else {
-                ""
-            }
-        return tokenType.toString() + v
-    }
-}
 
 /**
  * if `lenient` is true, names (the identifiers left of the colon) are allowed to not be surrounded by double quotes.
  */
-class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<Token> {
-    private val EOF = Token(TokenType.EOF, null)
+class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token> {
     var index = 0
     var line = 1
 
@@ -44,6 +21,8 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
 
     private val reader = passedReader.buffered()
     private var next: Char?
+    private val isDone: Boolean
+        get() = next == null
 
     init {
         val c = reader.read()
@@ -51,7 +30,7 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
     }
 
     private fun nextChar(): Char {
-        if (isDone()) throw IllegalStateException("Cannot get next char: EOF reached")
+        if (isDone) throw IllegalStateException("Cannot get next char: EOF reached")
         val c = next!!
         next = reader.read().let { if (it == -1) null else it.toChar() }
         index++
@@ -60,11 +39,9 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
     }
 
     private fun peekChar() : Char {
-        if (isDone()) throw IllegalStateException("Cannot peek next char: EOF reached")
+        if (isDone) throw IllegalStateException("Cannot peek next char: EOF reached")
         return next!!
     }
-
-    private fun isDone() : Boolean = next == null
 
     val BOOLEAN_LETTERS = "falsetrue".toSet()
     private fun isBooleanLetter(c: Char) : Boolean {
@@ -81,41 +58,30 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
     private var peeked: Token? = null
 
     fun peek() : Token {
-        if (peeked == null) {
-            peeked = actualNextToken()
-        }
+        peeked = peeked ?: actualNextToken()
         return peeked!!
     }
 
     override fun next() = nextToken()
-    override fun hasNext() = peek() != EOF
+    override fun hasNext() = peek() !is EOF
 
     fun nextToken(): Token {
-        val result =
-            if (peeked != null) {
-                val r = peeked!!
-                peeked = null
-                r
-            } else {
-                actualNextToken()
-            }
-        return result
+        return peeked?.also { peeked = null } ?: actualNextToken()
     }
 
     private var expectName = false
 
     private fun actualNextToken() : Token {
 
-        if (isDone()) {
+        if (isDone) {
             return EOF
         }
 
-        val tokenType: TokenType
+        val token: Token
         var c = nextChar()
         val currentValue = StringBuilder()
-        var jsonValue: Any? = null
 
-        while (! isDone() && isSpace(c)) {
+        while (!isDone && isSpace(c)) {
             c = nextChar()
         }
 
@@ -123,17 +89,16 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             if (lenient) {
                 currentValue.append(c)
             }
-            tokenType = TokenType.VALUE
             loop@
             do {
-                if (isDone()) {
+                if (isDone) {
                     throw KlaxonException("Unterminated string")
                 }
 
                 c = if (lenient) peekChar() else nextChar()
                 when (c) {
                     '\\' -> {
-                        if (isDone()) {
+                        if (isDone) {
                             throw KlaxonException("Unterminated string")
                         }
 
@@ -170,7 +135,7 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
                                 break@loop
                             } else {
                                 currentValue.append(c)
-                                c = nextChar()
+                                nextChar()
                             }
                         } else {
                             currentValue.append(c)
@@ -178,26 +143,26 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
                 }
             } while (true)
 
-            jsonValue = currentValue.toString()
+            token = Value(currentValue.toString())
         } else if ('{' == c) {
-            tokenType = TokenType.LEFT_BRACE
+            token = LEFT_BRACE
             expectName = true
         } else if ('}' == c) {
-            tokenType = TokenType.RIGHT_BRACE
+            token = RIGHT_BRACE
             expectName = false
         } else if ('[' == c) {
-            tokenType = TokenType.LEFT_BRACKET
+            token = LEFT_BRACKET
             expectName = false
         } else if (']' == c) {
-            tokenType = TokenType.RIGHT_BRACKET
+            token = RIGHT_BRACKET
             expectName = false
         } else if (':' == c) {
-            tokenType = TokenType.COLON
+            token = COLON
             expectName = false
         } else if (',' == c) {
-            tokenType = TokenType.COMMA
+            token = COMMA
             expectName = true
-        } else if (! isDone()) {
+        } else if (!isDone) {
             while (isValueLetter(c)) {
                 currentValue.append(c)
                 if (! isValueLetter(peekChar())) {
@@ -208,35 +173,35 @@ class Lexer(val passedReader: Reader, val lenient: Boolean = false): Iterator<To
             }
             val v = currentValue.toString()
             if (NUMERIC.matcher(v).matches()) {
-                try {
-                    jsonValue = java.lang.Integer.parseInt(v)
+                token = try {
+                    Value(java.lang.Integer.parseInt(v))
                 } catch (e: NumberFormatException){
                     try {
-                        jsonValue = java.lang.Long.parseLong(v)
+                        Value(java.lang.Long.parseLong(v))
                     } catch(e: NumberFormatException) {
-                        jsonValue = java.math.BigInteger(v)
+                        Value(java.math.BigInteger(v))
                     }
                 }
             } else if (DOUBLE.matcher(v).matches()) {
-                jsonValue = java.lang.Double.parseDouble(v)
+                token = Value(java.lang.Double.parseDouble(v))
             } else if ("true" == v.toLowerCase()) {
-                jsonValue = true
+                token = Value(true)
             } else if ("false" == v.toLowerCase()) {
-                jsonValue = false
+                token = Value(false)
             } else if (v == "null") {
-                jsonValue = null
+                token = Value(null)
             } else {
                 throw KlaxonException("Unexpected character at position ${index-1}"
-                    + ": '$c' (ASCII: ${c.toInt()})'")
+                        + ": '$c' (ASCII: ${c.toInt()})'")
             }
 
-            tokenType = TokenType.VALUE
         } else {
-            tokenType = TokenType.EOF
+            token = EOF
         }
 
-        return Token(tokenType, jsonValue)
+        return token
     }
 
-    private fun log(s: String) = if (Debug.verbose) println(s) else ""
+
+    private fun log(s: String) { if (Debug.verbose) println(s) }
 }

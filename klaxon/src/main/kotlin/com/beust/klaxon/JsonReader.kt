@@ -1,5 +1,6 @@
 package com.beust.klaxon
 
+import com.beust.klaxon.token.*
 import java.io.Reader
 import java.math.BigInteger
 
@@ -11,17 +12,13 @@ class JsonReader(val reader: Reader) : Reader() {
      * @return the next String.
      * @throws JsonParsingException the next value is not a String.
      */
-    fun nextString() = consumeValue { value ->
-        value as? String ?: throw JsonParsingException("Next token is not a string: $value")
-    }
+    fun nextString() = consumeValue<String>()
 
     /**
      * @return the next Int.
      * @throws JsonParsingException the next value is not an Int.
      */
-    fun nextInt() = consumeValue { value ->
-        value as? Int ?: throw JsonParsingException("Next token is not a int: $value")
-    }
+    fun nextInt() = consumeValue<Int>()
 
     /**
      * @return the next Long (upscaling as needed).
@@ -64,9 +61,7 @@ class JsonReader(val reader: Reader) : Reader() {
      * @return the next boolean.
      * @throws JsonParsingException the next value is not a Boolean.
      */
-    fun nextBoolean() = consumeValue { value ->
-        value as? Boolean ?: throw JsonParsingException("Next token is not a boolean: $value")
-    }
+    fun nextBoolean() = consumeValue<Boolean>()
 
     /**
      * @return the next object, making sure the current token is an open brace and the last token is a closing brace.
@@ -76,7 +71,7 @@ class JsonReader(val reader: Reader) : Reader() {
             JsonObject().let { result ->
                 while (hasNext()) {
                     val name = nextName()
-                    val value = consumeValue { value -> value }
+                    val value = consumeValue<Any?>()
                     result[name] = value
                 }
                 result
@@ -91,12 +86,8 @@ class JsonReader(val reader: Reader) : Reader() {
         return beginArray {
             arrayListOf<Any>().let { result ->
                 while (hasNext()) {
-                    val v = consumeValue { value -> value }
-                    if (v != null) {
-                        result.add(v)
-                    } else {
-                        throw KlaxonException("Couldn't parse")
-                    }
+                    val v = consumeValue<Any?>()
+                    v?.let { result.add(it) } ?: throw KlaxonException("Couldn't parse")
                 }
                 result
             }
@@ -109,11 +100,10 @@ class JsonReader(val reader: Reader) : Reader() {
     fun nextName(): String {
         skip()
         val next = lexer.nextToken()
-        if (next.tokenType == TokenType.VALUE) {
-            return next.value.toString()
-        } else {
+        if (next !is Value<*> || next.value !is String) {
             throw KlaxonException("Expected a name but got $next")
         }
+        return next.value
     }
 
     /**
@@ -143,7 +133,7 @@ class JsonReader(val reader: Reader) : Reader() {
     /**
      * @return true if this reader has more tokens to read before finishing the current object/array.
      */
-    fun hasNext(): Boolean = lexer.peek().tokenType.let { it != TokenType.RIGHT_BRACKET && it != TokenType.RIGHT_BRACE }
+    fun hasNext(): Boolean = lexer.peek().let { it !is RIGHT_BRACKET && it !is RIGHT_BRACE }
 
     override fun close() {
         reader.close()
@@ -155,33 +145,44 @@ class JsonReader(val reader: Reader) : Reader() {
 
     val lexer = Lexer(reader)
 
-    private fun consumeToken(type: TokenType, expected: String) {
+    private inline fun <reified T : Token> consumeToken() {
         val next = lexer.nextToken()
-        if (next.tokenType != type) {
-            throw KlaxonException("Expected a $expected but read $next")
+        if (next !is T) {
+            throw KlaxonException("Expected a ${T::class.objectInstance.toString()} but read $next")
         }
     }
 
-    private fun privateBeginArray() = consumeToken(TokenType.LEFT_BRACKET, "[")
-    private fun privateEndArray() = consumeToken(TokenType.RIGHT_BRACKET, "]")
+    private fun privateBeginArray() = consumeToken<LEFT_BRACKET>()
+    private fun privateEndArray() = consumeToken<RIGHT_BRACKET>()
 
-    private fun privateBeginObject() = consumeToken(TokenType.LEFT_BRACE, "{")
-    private fun privateEndObject() = consumeToken(TokenType.RIGHT_BRACE, "}")
+    private fun privateBeginObject() = consumeToken<LEFT_BRACE>()
+    private fun privateEndObject() = consumeToken<RIGHT_BRACE>()
 
-    private val SKIPS = setOf(TokenType.COLON, TokenType.COMMA)
+    private val SKIPS = setOf(COLON, COMMA)
     private fun skip() {
-        while (SKIPS.contains(lexer.peek().tokenType)) lexer.nextToken()
+        while (SKIPS.contains(lexer.peek())) lexer.nextToken()
     }
 
-    private fun <T> consumeValue(convert: (Any?) -> T): T {
+    private fun nextValue(): Any? {
         skip()
 
         val next = lexer.nextToken()
-        if (next.tokenType == TokenType.VALUE) {
-            return convert(next.value)
-        } else {
-            throw KlaxonException("Expected a name but got $next")
+        if (next !is Value<*>) {
+            throw KlaxonException("Expected a value but got $next")
         }
+        return next.value
     }
 
+    private fun <T> consumeValue(convert: (Any?) -> T): T {
+        return convert(nextValue())
+    }
+
+    /**
+     * Convenience method for consuming a primitive value as is (without any conversion needed).
+     */
+    private inline fun <reified T> consumeValue(): T {
+        val value = nextValue()
+        return value as? T
+            ?: throw JsonParsingException("Next token is not a ${T::class.java.simpleName}: $value")
+    }
 }
