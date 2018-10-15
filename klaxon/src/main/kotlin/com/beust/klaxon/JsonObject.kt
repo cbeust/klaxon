@@ -31,7 +31,7 @@ by map {
                 indent(result, level + 1)
             }
 
-            result.append("\"").append(k).append("\":")
+            result.append(Render.renderString(k)).append(":")
             if (prettyPrint && !canonical) {
                 result.append(" ")
             }

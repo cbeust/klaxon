@@ -102,6 +102,6 @@ abstract class BaseTestTypes {
 
     fun testEscapeRender(){
         val j = read("/escaped.json") as JsonObject
-        assertEquals("""{"s":"text field \"s\"\nnext line\fform feed\ttab\\rev solidus/solidus\bbackspace"}""", j.toJsonString())
+        assertEquals("""{"text field \"s\"\nnext line\fform feed\ttab\\rev solidus/solidus\bbackspace\u2018":"text field \"s\"\nnext line\fform feed\ttab\\rev solidus/solidus\bbackspace\u2018"}""", j.toJsonString())
     }
 }

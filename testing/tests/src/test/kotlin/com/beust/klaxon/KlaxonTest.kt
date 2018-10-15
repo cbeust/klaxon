@@ -158,8 +158,9 @@ abstract class KlaxonBaseTest {
     }
 
     fun parseStringEscapes() {
+        val s = "text field \"s\"\nnext line\u000cform feed\ttab\\rev solidus/solidus\bbackspace\u2018"
         assertEquals(json {
-            obj("s" to "text field \"s\"\nnext line\u000cform feed\ttab\\rev solidus/solidus\bbackspace")
+            obj(s to s)
         }, read("/escaped.json"))
     }
 
@@ -333,9 +334,9 @@ abstract class KlaxonBaseTest {
 
     fun renderMap() {
         val map = mapOf(
-            "a" to 1,
-            "b" to "x",
-            "c" to null
+                "a" to 1,
+                "b" to "x",
+                "c" to null
         )
 
         assertEquals(valueToString(map), "{\"a\":1,\"b\":\"x\",\"c\":null}")
