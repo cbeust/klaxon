@@ -6,13 +6,13 @@ import com.beust.klaxon.token.TokenType
 private data class TokenStatus(val status: Status, val tokenType: TokenType)
 
 class StateMachine(private val streaming: Boolean) {
-    private val map = hashMapOf<TokenStatus, (world: World, token: Token<*>) -> World>()
+    private val map = hashMapOf<TokenStatus, (world: World, token: Token) -> World>()
 
-    fun put(status: Status, tokenType: TokenType, processor: (world: World, token: Token<*>) -> World) {
+    fun put(status: Status, tokenType: TokenType, processor: (world: World, token: Token) -> World) {
         map[TokenStatus(status, tokenType)] = processor
     }
 
-    fun next(world: World, token: Token<*>) : World {
+    fun next(world: World, token: Token) : World {
         val pair = TokenStatus(world.status, token.tokenType)
         val processor = map[pair]
 
@@ -30,7 +30,7 @@ class StateMachine(private val streaming: Boolean) {
                     return result.toString()
                 }
 
-                val validTokens = map.keys.filter { it.status == world.status }.map { it.tokenType.value.toString() }
+                val validTokens = map.keys.filter { it.status == world.status }.map { it.tokenType.toString() }
                 val validTokenMessage =
                         if (validTokens.size == 1) validTokens[0]
                         else formatList(validTokens)

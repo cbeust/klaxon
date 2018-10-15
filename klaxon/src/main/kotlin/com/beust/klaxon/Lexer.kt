@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 /**
  * if `lenient` is true, names (the identifiers left of the colon) are allowed to not be surrounded by double quotes.
  */
-class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token<*>> {
+class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token> {
     var index = 0
     var line = 1
 
@@ -55,9 +55,9 @@ class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token<
                 || c in NULL_LETTERS
     }
 
-    private var peeked: Token<*>? = null
+    private var peeked: Token? = null
 
-    fun peek() : Token<*> {
+    fun peek() : Token {
         peeked = peeked ?: actualNextToken()
         return peeked!!
     }
@@ -65,19 +65,19 @@ class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token<
     override fun next() = nextToken()
     override fun hasNext() = peek() !is EOF
 
-    fun nextToken(): Token<*> {
+    fun nextToken(): Token {
         return peeked?.also { peeked = null } ?: actualNextToken()
     }
 
     private var expectName = false
 
-    private fun actualNextToken() : Token<*> {
+    private fun actualNextToken() : Token {
 
         if (isDone) {
             return EOF
         }
 
-        val token: Token<*>
+        val token: Token
         var c = nextChar()
         val currentValue = StringBuilder()
 

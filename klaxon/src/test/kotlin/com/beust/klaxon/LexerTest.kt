@@ -42,6 +42,6 @@ class LexerTest {
         Assert.assertEquals(result, expected)
     }
 
-    private fun value(name: String, value: Any): Array<Token<*>>
+    private fun value(name: String, value: Any): Array<Token>
         = arrayOf(Value(name), COLON, Value(value))
 }

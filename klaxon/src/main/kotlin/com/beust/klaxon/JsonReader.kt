@@ -100,7 +100,7 @@ class JsonReader(val reader: Reader) : Reader() {
     fun nextName(): String {
         skip()
         val next = lexer.nextToken()
-        if (next !is Value || next.value !is String) {
+        if (next !is Value<*> || next.value !is String) {
             throw KlaxonException("Expected a name but got $next")
         }
         return next.value
@@ -145,10 +145,10 @@ class JsonReader(val reader: Reader) : Reader() {
 
     val lexer = Lexer(reader)
 
-    private inline fun <reified T : Token<*>> consumeToken() {
+    private inline fun <reified T : Token> consumeToken() {
         val next = lexer.nextToken()
         if (next !is T) {
-            throw KlaxonException("Expected a ${T::class.java.simpleName} but read $next")
+            throw KlaxonException("Expected a ${T::class.objectInstance.toString()} but read $next")
         }
     }
 
@@ -167,7 +167,7 @@ class JsonReader(val reader: Reader) : Reader() {
         skip()
 
         val next = lexer.nextToken()
-        if (next !is Value) {
+        if (next !is Value<*>) {
             throw KlaxonException("Expected a value but got $next")
         }
         return next.value
