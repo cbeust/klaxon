@@ -29,7 +29,7 @@ class BindingAdapterTest {
             """)
             Assert.fail("Should have been unable to convert")
         } catch(ex: Exception) {
-            Assert.assertTrue(ex.message?.contains("ouldn't parse date") ?: false)
+            Assert.assertTrue(ex.message?.contains("Couldn't parse") ?: false)
         }
     }
 

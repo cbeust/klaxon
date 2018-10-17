@@ -218,7 +218,8 @@ class Klaxon : ConverterFinder {
 
     fun findConverterFromClass(cls: Class<*>, prop: KProperty<*>?) : Converter {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
-            val result = kc.getDeclaredField(prop.name)?.declaredAnnotations ?: arrayOf()
+            val result = kc.declaredFields.firstOrNull { it.name == prop.name }?.declaredAnnotations ?: arrayOf()
+
             return result
         }
 
