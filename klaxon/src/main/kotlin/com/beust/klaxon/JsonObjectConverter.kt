@@ -43,8 +43,10 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             } catch(ex: Exception) {
                 // Lazy way to find out of that constructor worked. Easier than trying to make sure each
                 // parameter matches the parameter type.
-                error = ex::class.qualifiedName + " " + ex.message
-                null
+                val errorMessage = "Unable to instantiate ${concreteClass.simpleName}" +
+                        " with parameters " +
+                        parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() }
+                throw KlaxonException(errorMessage)
             }
         }
 
