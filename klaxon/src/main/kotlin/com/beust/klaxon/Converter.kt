@@ -17,5 +17,5 @@ interface Converter {
     /**
      * Convert the given Json value into an object.
      */
-    fun fromJson(jv: JsonValue) : Any
+    fun fromJson(jv: JsonValue) : Any?
 }

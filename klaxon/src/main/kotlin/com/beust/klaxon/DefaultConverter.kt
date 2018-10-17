@@ -1,9 +1,7 @@
 package com.beust.klaxon
 
-import com.beust.klaxon.Reflection.Companion.isAssignableFromAny
 import java.lang.reflect.ParameterizedType
 import java.math.BigDecimal
-import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -159,7 +157,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 when {
                     isMap -> {
                         // Map
-                        val result = linkedMapOf<String, Any>()
+                        val result = linkedMapOf<String, Any?>()
                         value.entries.forEach { kv ->
                             val key = kv.key
                             kv.value?.let { mv ->

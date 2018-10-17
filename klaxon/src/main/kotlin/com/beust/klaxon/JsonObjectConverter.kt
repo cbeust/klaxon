@@ -80,8 +80,8 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
      * Retrieve all the properties found on the class of the object and then look up each of these
      * properties names on `jsonObject`.
      */
-    private fun retrieveKeyValues(jsonObject: JsonObject, kc: KClass<*>) : Map<String, Any> {
-        val result = hashMapOf<String, Any>()
+    private fun retrieveKeyValues(jsonObject: JsonObject, kc: KClass<*>) : Map<String, Any?> {
+        val result = hashMapOf<String, Any?>()
 
         // Only keep the properties that are public and do not have @Json(ignored = true)
         val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)

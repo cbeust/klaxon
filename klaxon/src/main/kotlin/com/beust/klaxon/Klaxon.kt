@@ -2,16 +2,12 @@ package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
 import java.io.*
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 import java.nio.charset.Charset
 import kotlin.collections.set
 import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
-import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
@@ -123,7 +119,7 @@ class Klaxon : ConverterFinder {
         = fromJsonObject(map, T::class.java, T::class) as T?
 
     inline fun <reified T> parseFromJsonArray(map: JsonArray<*>): List<T>? {
-        val result = arrayListOf<Any>()
+        val result = arrayListOf<Any?>()
         map.forEach { jo ->
             if (jo is JsonObject) {
                 val t = parseFromJsonObject<T>(jo)
