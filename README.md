@@ -132,6 +132,21 @@ class Ignored(val name: String) {
 Additionally, if you want to declare a property `private` but still want that property to be visible to
 Klaxon, you can annotate it with `@Json(ignored = false)`.
 
+### Renaming fields
+
+On top of using the `@Json(name=...)` annotation to rename fields, you can implement a field renamer yourself that
+will be applied to all the fields that Klaxon encounters, both to and from JSON. You achieve this result by passing an 
+implementation of the `FieldRenamer` interface to your `Klaxon` object:
+
+```kotlin
+    val renamer = object: FieldRenamer {
+        override fun toJson(fieldName: String) = FieldRenamer.camelToUnderscores(fieldName)
+        override fun fromJson(fieldName: String) = FieldRenamer.underscoreToCamel(fieldName)
+    }
+
+    val klaxon = Klaxon().fieldRenamer(renamer)
+```
+
 ### Custom types
 
 Klaxon will do its best to initialize the objects with what it found in the JSON document but you can take control
