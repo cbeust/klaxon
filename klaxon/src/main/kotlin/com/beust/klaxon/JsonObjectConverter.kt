@@ -80,7 +80,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
 
     /**
      * Retrieve all the properties found on the class of the object and then look up each of these
-     * properties names on `jsonObject`.
+     * properties names on `jsonObject`, which came from the JSON document.
      */
     private fun retrieveKeyValues(jsonObject: JsonObject, kc: KClass<*>) : Map<String, Any?> {
         val result = hashMapOf<String, Any?>()
