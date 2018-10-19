@@ -1,9 +1,15 @@
 package com.beust.klaxon
 
+/**
+ * Modify field names algorithmically, both from and to JSON.
+ */
 interface FieldRenamer {
     fun toJson(fieldName: String) : String
     fun fromJson(fieldName: String) : String
 
+    /**
+     * Helper functions for common use cases.
+     */
     companion object {
         /**
          * Takes a camel cased identifier name and returns an underscore separated
