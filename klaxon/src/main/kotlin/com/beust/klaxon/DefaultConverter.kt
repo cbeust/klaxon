@@ -65,10 +65,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                     properties.forEach { prop ->
                         prop.getter.call(value)?.let { getValue ->
                             val jsonValue = klaxon.toJsonString(getValue)
-                            val jsonField = Annotations.findJsonAnnotation(value::class, prop.name)
-                            val fieldName =
-                                    if (jsonField != null && jsonField.nameInitialized()) jsonField.name
-                                    else prop.name
+                            val fieldName = Annotations.retrieveJsonFieldName(klaxon, value::class, prop)
                             valueList.add("\"$fieldName\" : $jsonValue")
                         }
                     }
@@ -196,10 +193,9 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             } else {
                 if ((jt as Class<*>).isArray) {
                     val typeValue = jt.componentType
-                    val r = klaxon.fromJsonObject(value, typeValue, typeValue.kotlin)
-                    r
+                    klaxon.fromJsonObject(value, typeValue, typeValue.kotlin)
                 } else {
-                    return JsonObjectConverter(klaxon, allPaths).fromJson(jv.obj!!, jv.propertyKClass!!.jvmErasure)
+                    JsonObjectConverter(klaxon, allPaths).fromJson(jv.obj!!, jv.propertyKClass!!.jvmErasure)
                 }
             }
         return result

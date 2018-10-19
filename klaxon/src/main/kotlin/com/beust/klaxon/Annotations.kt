@@ -104,6 +104,15 @@ class Annotations {
             }
 
         fun isList(kClass: KClass<*>) = kotlin.collections.List::class.java.isAssignableFrom(kClass.java)
+
+        fun retrieveJsonFieldName(klaxon: Klaxon, kc: KClass<*>, prop: KProperty1<*, *>) : String {
+            val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
+            val fieldName =
+                    if (jsonAnnotation != null && jsonAnnotation.nameInitialized()) jsonAnnotation.name
+                    else prop.name
+            val result = klaxon.fieldRenamer?.toJson(fieldName) ?: fieldName
+            return result
+        }
     }
 
 

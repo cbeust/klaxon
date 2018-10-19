@@ -205,6 +205,15 @@ class Klaxon : ConverterFinder {
         return this
     }
 
+    var fieldRenamer: FieldRenamer? = null
+
+    /**
+     * Defines a field renamer.
+     */
+    fun fieldRenamer(renamer: FieldRenamer): Klaxon {
+        fieldRenamer = renamer
+        return this
+    }
     /**
      * @return a converter that will turn `value` into a `JsonObject`. If a non-null property is
      * passed, inspect that property for annotations that would override the type converter
