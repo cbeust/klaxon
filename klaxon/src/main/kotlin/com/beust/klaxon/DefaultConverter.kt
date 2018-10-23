@@ -149,8 +149,8 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
         val jt = jv.propertyClass
         val result =
             if (jt is ParameterizedType) {
-                val isMap = Reflection.isAssignableFromAny(AbstractMap::class.java, HashMap::class)
-                val isCollection = Reflection.isAssignableFromAny(Collection::class.java)
+                val isMap = Map::class.java.isAssignableFrom(jt.rawType as Class<*>)
+                val isCollection = List::class.java.isAssignableFrom(jt.rawType as Class<*>)
                 when {
                     isMap -> {
                         // Map
