@@ -44,7 +44,7 @@ class JsonValue(value: Any?,
      * @return the raw value inside this object.
      */
     @Suppress("IMPLICIT_CAST_TO_ANY")
-    val inside: Any
+    val inside: Any?
         get() {
             val result =
                 when {
@@ -57,9 +57,9 @@ class JsonValue(value: Any?,
                     double != null -> double
                     char != null -> char
                     boolean != null -> boolean
-                    else -> throw KlaxonException("Should never happen")
+                    else -> null
                 }
-            return result!!
+            return result
         }
 
 
@@ -134,7 +134,8 @@ class JsonValue(value: Any?,
             }
             else -> {
                 if (value == null) {
-                    throw IllegalArgumentException("Should never be null")
+                    obj = null
+                    type = Any::class.java
                 } else {
                     obj = convertToJsonObject(value)
                     type = value.javaClass

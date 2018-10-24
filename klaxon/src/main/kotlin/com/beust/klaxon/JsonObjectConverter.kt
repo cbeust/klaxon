@@ -29,12 +29,15 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         // will be filled by Kotlin reflection if they can't be found.
         var error: String? = null
         val map = retrieveKeyValues(jsonObject, kc)
+        var errorMessage = arrayListOf<String>()
         val result = concreteClass.constructors.firstNotNullResult { constructor ->
-            val parameterMap = hashMapOf<KParameter,Any>()
+            val parameterMap = hashMapOf<KParameter, Any?>()
             constructor.parameters.forEach { parameter ->
-                map[parameter.name]?.let { convertedValue ->
+                if (map.containsKey(parameter.name)) {
+                    val convertedValue = map[parameter.name]
                     parameterMap[parameter] = convertedValue
-                    klaxon.log("Parameter $parameter=$convertedValue (${convertedValue::class})")
+                    val valueClass = if (convertedValue != null) convertedValue::class else "null"
+                    klaxon.log("Parameter $parameter=$convertedValue ($valueClass)")
                 }
             }
             try {
@@ -43,11 +46,15 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             } catch(ex: Exception) {
                 // Lazy way to find out of that constructor worked. Easier than trying to make sure each
                 // parameter matches the parameter type.
-                val errorMessage = "Unable to instantiate ${concreteClass.simpleName}" +
+                errorMessage.add("Unable to instantiate ${concreteClass.simpleName}" +
                         " with parameters " +
-                        parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() }
-                throw KlaxonException(errorMessage)
+                        parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() })
+//                throw KlaxonException(errorMessage)
             }
+        }
+
+        if (errorMessage.any()) {
+            throw KlaxonException(errorMessage.joinToString("\n"))
         }
 
         // Now that we have an initialized object, find all the other non constructor properties
@@ -101,7 +108,8 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             val jValue = jsonObject[fieldName]
 
             if (path == null) {
-                if (jValue != null) {
+                // Note: use containsKey here since it's valid for a JSON object to have a value spelled "null"
+                if (jsonObject.containsKey(fieldName)) {
                     val convertedValue = klaxon.findConverterFromClass(kc.java, prop)
                             .fromJson(JsonValue(jValue, prop.returnType.javaType,
                                     prop.returnType, klaxon))

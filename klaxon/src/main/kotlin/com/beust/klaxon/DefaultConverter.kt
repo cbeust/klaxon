@@ -11,7 +11,7 @@ import kotlin.reflect.jvm.jvmErasure
 class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap<String, Any>) : Converter {
     override fun canConvert(cls: Class<*>) = true
 
-    override fun fromJson(jv: JsonValue): Any {
+    override fun fromJson(jv: JsonValue): Any? {
         val value = jv.inside
         val propertyType = jv.propertyClass
         val result =
@@ -27,6 +27,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                     else fromFloat(value, propertyType)
                 is Collection<*> -> fromCollection(value, jv)
                 is JsonObject -> fromJsonObject(value, jv)
+                null -> null
                 else -> {
                     throw KlaxonException("Don't know how to convert $value")
                 }
