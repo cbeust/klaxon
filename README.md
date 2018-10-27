@@ -23,10 +23,10 @@ Join the [`#klaxon` Slack channel](https://kotlinlang.slack.com/messages/C90AVCD
 
 Klaxon has different API's depending on your needs:
 
-- [An object binding API](#objectBindingApi) to bind JSON documents directly to your objects, and vice versa.
-- [A streaming API](#streamingApi) to process your JSON documents as they're being read.
-- [A low level API](#lowLevelApi) to manipulate JSON objects and use queries on them.
-- [A JSON path query API](#jsonPath) to extract specific parts of your JSON document while streaming.
+- [An object binding API](#object-binding-api) to bind JSON documents directly to your objects, and vice versa.
+- [A streaming API](#streaming-api) to process your JSON documents as they're being read.
+- [A low level API](#low-level-api) to manipulate JSON objects and use queries on them.
+- [A JSON path query API](#json-path-query-api) to extract specific parts of your JSON document while streaming.
 
 These four API's cover various scenarios and you can decide which one to use based on whether you want
 to stream your document and whether you need to query it.
@@ -39,7 +39,7 @@ to stream your document and whether you need to query it.
 | JSON Path query API | Yes       | Yes          | JsonObject/JsonArray |
 
 
-## <a name="objectBindingApi">Object binding API</a>
+## Object binding API
 
 ### General usage
 
@@ -284,7 +284,7 @@ val klaxon = Klaxon().propertyStrategy(ps)
 
 You can define multiple `PropertyStrategy` instances, and in such a case, they all need to return `true` for a property to be included.
 
-## <a name="streamingApi">Streaming API</a>
+## Streaming API
 
 The streaming API is useful in a few scenarios:
 
@@ -301,7 +301,7 @@ looking to extract a single value the [`PathMatcher API`](#jsonPath) may be a be
 ### Writing JSON with the streaming API
 
 As opposed to conventional JSON libraries, Klaxon doesn't supply a `JsonWriter` class to create JSON documents since
-this need is already covered by the `json()` function, documented in the [Advanced DSL](#advancedDsl) section.
+this need is already covered by the `json()` function, documented in the [Advanced DSL](#advanced-dsl) section.
 
 ### Reading JSON with the streaming API
 
@@ -370,7 +370,7 @@ fun streamingArray() {
     }
 }
 ```
-## <a name="jsonPath">JSON Path Query API</a>
+## JSON Path Query API
 
 The [JSON Path specification](https://github.com/json-path/JsonPath) defines how to locate elements inside
 a JSON document. Klaxon allows you to define path matchers that can match specific elements in your
@@ -431,7 +431,7 @@ Two notes:
 detected and its value completely parsed.
 
 
-## <a name="lowLevelApi">Low level API</a>
+## Low level API
 
 Values parsed from a valid JSON file can be of the following type:
 
@@ -636,7 +636,7 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get a pretty-printed
 version of that string, call `toJsonString(true)`
 
-## <a name="advancedDsl">Advanced DSL</a>
+## Advanced DSL
 
 Creating a JSON object with the Klaxon DSL makes it possible to insert arbitrary pieces of Kotlin code anywhere you want. For example, the following creates an object that maps each number from 1 to 3 with its string key:
 
