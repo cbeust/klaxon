@@ -49,7 +49,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 errorMessage.add("Unable to instantiate ${concreteClass.simpleName}" +
                         " with parameters " +
                         parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() })
-//                throw KlaxonException(errorMessage)
+                null
             }
         }
 
