@@ -9,10 +9,10 @@ class Issue177 {
     data class UserData(val id: Int,
                       val name: String,
                       val role: String,
-                      val additionalRole: String = ""
+                      val additionalRole: String? = ""
                      )
 
-    private val expected = UserData(1, "Jason", "SuperUser")
+    private val expected = UserData(1, "Jason", "SuperUser", null)
 
     fun test() {
 
@@ -30,7 +30,7 @@ class Issue177 {
 
         toTest?.let{
             assertThat(toTest.additionalRole)
-                    .isNotNull()
+                    .isNull()
             assertThat(toTest)
                     .isEqualTo(expected)
         } ?: throw AssertionError("Expected object to be not null")
