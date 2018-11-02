@@ -44,11 +44,11 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             is String, is Enum<*> -> "\"" + Render.escapeString(value.toString()) + "\""
             is Double, is Float, is Int, is Boolean, is Long -> value.toString()
             is Array<*> -> {
-                val elements = value.filterNotNull().map { klaxon.toJsonString(it) }
+                val elements = value.map { klaxon.toJsonString(it) }
                 joinToString(elements, "[", "]")
             }
             is Collection<*> -> {
-                val elements = value.filterNotNull().map { klaxon.toJsonString(it) }
+                val elements = value.map { klaxon.toJsonString(it) }
                 joinToString(elements, "[", "]")
             }
             is Map<*, *> -> {
