@@ -4,7 +4,7 @@ package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
-import java.util.HashMap
+import java.util.*
 
 data class ConferenceDataModel(
         val events: Map<String, EventModel>,
@@ -99,9 +99,9 @@ class MapTest {
     }
 
     fun bigFile() {
-        val ins = MapTest::class.java.getResourceAsStream("/data.json")
-        val r = Klaxon()
-                .parse<ConferenceDataModel>(ins!!)!!
+        val ins = MapTest::class.java.getResourceAsStream("/data.json") ?:
+                throw IllegalArgumentException("Couldn't find data.json")
+        val r = Klaxon().parse<ConferenceDataModel>(ins)!!
         assertThat(r.events.size).isEqualTo(5)
         assertThat(r.events["-L3daccTVLOcYi9hVHsD"]?.name).isEqualTo("Registration & Breakfast")
     }
