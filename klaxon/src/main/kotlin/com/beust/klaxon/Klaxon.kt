@@ -225,6 +225,9 @@ class Klaxon : ConverterFinder {
         return result
     }
 
+    /**
+     * Given a Kotlin class and a property where the object should be stored, returns a `Converter` for that type.
+     */
     fun findConverterFromClass(cls: Class<*>, prop: KProperty<*>?) : Converter {
         fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
             val result = kc.declaredFields.firstOrNull { it.name == prop.name }?.declaredAnnotations ?: arrayOf()
@@ -261,8 +264,9 @@ class Klaxon : ConverterFinder {
         return converters.firstOrNull { it.canConvert(toConvert) }
     }
 
-    fun toJsonString(value: Any): String = toJsonString(value, findConverter(value))
-    fun toJsonString(value: Any, converter: Any /* can be Converter or Converter */) : String {
+    fun toJsonString(value: Any?): String = if (value == null) "null" else toJsonString(value, findConverter(value))
+
+    private fun toJsonString(value: Any, converter: Any /* can be Converter or Converter */) : String {
         // It's not possible to safely call converter.toJson(value) since its parameter is generic,
         // so use reflection
         val toJsonMethod = converter::class.functions.firstOrNull { it.name == "toJson" }
