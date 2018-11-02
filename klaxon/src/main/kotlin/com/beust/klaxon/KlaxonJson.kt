@@ -34,6 +34,8 @@ interface KlaxonJson {
             is BigInteger -> value
             is JsonObject -> value
             is JsonArray<*> -> value
+            is Short -> value.toInt()
+            is Byte -> value.toInt()
             null -> null
             else -> throw IllegalArgumentException("Unrecognized type: " + value)
         }
