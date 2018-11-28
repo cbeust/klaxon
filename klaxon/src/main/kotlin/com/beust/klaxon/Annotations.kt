@@ -19,7 +19,7 @@ class Annotations {
          */
         fun findJsonAnnotation(kc: KClass<*>, propertyName: String): Json? {
             val result1 = kc.memberProperties.firstOrNull { it.name == propertyName }?.findAnnotation<Json>()
-            if (result1 != null) return result1 as Json?
+            if (result1 != null) return result1
 
             try {
                 val r1 = kc.java.getField(propertyName).annotations.firstOrNull {
