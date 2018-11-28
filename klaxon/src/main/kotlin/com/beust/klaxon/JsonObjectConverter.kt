@@ -21,6 +21,24 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
      * no suitable constructor was found.
      */
     fun fromJson(jsonObject: JsonObject, kc: KClass<*>): Any {
+        val result =
+            if (kc == Map::class) {
+                initIntoMap(jsonObject, kc)
+            } else {
+                initIntoUserClass(jsonObject, kc)
+            }
+        return result
+    }
+
+    private fun initIntoMap(jsonObject: JsonObject, kc: KClass<*>): Any {
+        val result = hashMapOf<String, Any?>()
+        jsonObject.keys.forEach { key ->
+            result[key] = jsonObject[key]
+        }
+        return result
+    }
+
+    private fun initIntoUserClass(jsonObject: JsonObject, kc: KClass<*>): Any {
         val concreteClass = if (Annotations.isList(kc)) ArrayList::class else kc
 
         // Go through all the Kotlin constructors and associate each parameter with its value.
@@ -35,6 +53,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             constructor.parameters.forEach { parameter ->
                 if (map.containsKey(parameter.name)) {
                     val convertedValue = map[parameter.name]
+//                    parameterMap[parameter] = adjustType(convertedValue, parameter)
                     parameterMap[parameter] = convertedValue
                     val valueClass = if (convertedValue != null) convertedValue::class else "null"
                     klaxon.log("Parameter $parameter=$convertedValue ($valueClass)")
@@ -83,6 +102,29 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
 
         return result ?: throw KlaxonException(
                 "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map: $error")
+    }
+
+    private fun adjustType(convertedValue: Any?, parameter: KParameter): Any? {
+        var result = convertedValue
+        val cj = convertedValue!!::class.java
+        if (cj.isArray) {
+            val cl = parameter.type.classifier
+            if (cl is KClass<*>) {
+                if (IntArray::class.java.isAssignableFrom(cl.java)) {
+                    val array = convertedValue as IntArray
+                    val ac = array::class
+                    val componentType = (ac as Class<*>).componentType
+                    val realArray = java.lang.reflect.Array.newInstance(componentType, array.size)
+                    result = realArray//IntArray(array.size)
+                    array.forEachIndexed{ i, v ->
+//                        result.set(i, v)
+                        java.lang.reflect.Array.set(realArray, i, v)
+                    }
+                    println("Array: $array")
+                }
+            }
+        }
+        return result
     }
 
     /**
