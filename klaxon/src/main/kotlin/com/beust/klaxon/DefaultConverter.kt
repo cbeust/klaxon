@@ -65,7 +65,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 if (properties.isNotEmpty()) {
                     properties.forEach { prop ->
                         prop.getter.call(value)?.let { getValue ->
-                            val jsonValue = klaxon.toJsonString(getValue)
+                            val jsonValue = klaxon.toJsonString(getValue, prop)
                             val fieldName = Annotations.retrieveJsonFieldName(klaxon, value::class, prop)
                             valueList.add("\"$fieldName\" : $jsonValue")
                         }

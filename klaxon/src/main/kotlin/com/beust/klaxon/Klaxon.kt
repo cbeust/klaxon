@@ -237,7 +237,7 @@ class Klaxon : ConverterFinder {
 
         var propertyClass: Class<*>? = null
         val propConverter : Converter? =
-            if (prop != null) {
+            if (prop != null && prop.returnType.classifier is KClass<*>) {
                 propertyClass = (prop.returnType.classifier as KClass<*>).java
                 val dc = prop.getter.javaMethod?.declaringClass ?: prop.javaField?.declaringClass
                 annotationsForProp(prop, dc!!).mapNotNull {
@@ -264,9 +264,11 @@ class Klaxon : ConverterFinder {
         return converters.firstOrNull { it.canConvert(toConvert) }
     }
 
-    fun toJsonString(value: Any?): String = if (value == null) "null" else toJsonString(value, findConverter(value))
+    fun toJsonString(value: Any?, prop: KProperty<*>? = null): String
+            = if (value == null) "null" else toJsonString(value, findConverter(value, prop))
 
-    private fun toJsonString(value: Any, converter: Any /* can be Converter or Converter */) : String {
+    private fun toJsonString(value: Any, converter: Any /* can be Converter or Converter */)
+            : String {
         // It's not possible to safely call converter.toJson(value) since its parameter is generic,
         // so use reflection
         val toJsonMethod = converter::class.functions.firstOrNull { it.name == "toJson" }
