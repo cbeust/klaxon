@@ -2,37 +2,25 @@ package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Test
 class Issue221Test {
-    class WithDate @JvmOverloads constructor(val name: String, @ESDate val birth: Date)
-
-
-    val dateConverter = object : Converter {
-        val format = SimpleDateFormat("yyyy/MM/dd")
-
-        override fun canConvert(cls: Class<*>): Boolean {
-            return cls == Date::class.java
-        }
-
-        override fun fromJson(jv: JsonValue) =
-                throw KlaxonException("Couldn't parse date: ${jv.string}")
-
-        override fun toJson(o: Any): String {
-            return format.format(o as Date)
-        }
-    }
-
-    fun test() {
-        val k = Klaxon()
-                .fieldConverter(ESDate::class, dateConverter)
-        val s = k.toJsonString(WithDate("hha", Date()))
-        assertThat(s).contains("2018/11/30")
-    }
-
+    class WithDate constructor(val name: String, @ESDate val birth: LocalDate)
 
     @Target(AnnotationTarget.FIELD)
     annotation class ESDate
+
+    private val dateConverter = object : Converter {
+        override fun canConvert(cls: Class<*>) = cls == LocalDate::class.java
+        override fun fromJson(jv: JsonValue) = throw KlaxonException("Couldn't parse date: ${jv.string}")
+        override fun toJson(value: Any) = (value as LocalDate).format(DateTimeFormatter.ofPattern("Y/M/d"))
+    }
+
+    fun issue221() {
+        val k = Klaxon().fieldConverter(ESDate::class, dateConverter)
+        val s = k.toJsonString(WithDate("hha", LocalDate.of(2018, 11, 30)))
+        assertThat(s).contains("2018/11/30")
+    }
 }
