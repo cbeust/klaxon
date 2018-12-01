@@ -4,6 +4,6 @@ jdk:
 
 install: true
 
-script: ./gradlew  check --console=plain
+script: ./gradlew  check --console=plain -q
 #script: ./kobaltw --noIncrementalKotlin test
 
