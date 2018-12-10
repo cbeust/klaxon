@@ -1,7 +1,5 @@
 package com.beust.klaxon
 
-import java.math.BigInteger
-
 /**
  * The class used to define the DSL that generates JSON documents. All the functions defined in this class
  * can be used inside a `json { ... }` call.

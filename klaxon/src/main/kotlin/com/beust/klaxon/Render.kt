@@ -29,10 +29,9 @@ object Render {
                     properties.forEach { prop ->
                         prop.getter.call(v)?.let { getValue ->
                             val jsonField = if (v != null) Annotations.findJsonAnnotation(v::class, prop.name)
-                            else null
-                            val fieldName =
-                                if (jsonField != null && jsonField.nameInitialized()) jsonField.name
-                                else prop.name
+                                            else null
+                            val fieldName = if (jsonField != null && jsonField.nameInitialized()) jsonField.name
+                                            else prop.name
 
                             if (comma) {
                                 result.append(",")
@@ -44,6 +43,7 @@ object Render {
                             if (prettyPrint && !canonical) {
                                 result.append(" ")
                             }
+
                             renderValue(getValue, result, prettyPrint, canonical, level)
                         }
                     }
