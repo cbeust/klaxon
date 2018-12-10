@@ -18,12 +18,13 @@ class Issue167Test {
         println("Json array: ${anArray.toJsonString()}")
 
         val aPlainObject = TestObject(10, "test string", 3.141659f)
+        println("Plain object: ${aPlainObject.toString()}")
 
         val aMix = json {
             obj (
                 "theArray" to anArray,
                 "theObject" to aJsonObject,
-                "thePlainObject" to aPlainObject,
+                "thePlainObject" to aPlainObject,   // This entry would fail previously: IllegalArgumentException
                 "anInt" to 4
             )
         }
