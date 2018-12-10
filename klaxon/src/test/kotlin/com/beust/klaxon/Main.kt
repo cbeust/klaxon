@@ -1,6 +1,5 @@
 package com.beust.klaxon.test
 
-import java.util.ArrayList
 import com.beust.klaxon.*
 
 fun main(args : Array<String>) {
@@ -27,11 +26,13 @@ fun main(args : Array<String>) {
     }
     println("Json array: ${anArray.toJsonString()}")
 
+    val aPlainObject = Triple("hi", 3, true)
     val aMix = json {
-        obj (
-                "theArray" to anArray,
-                "theObject" to anObject,
-                "anInt" to 4
+        obj(
+            "theArray" to anArray,
+            "theObject" to anObject,
+            "thePlainObject" to aPlainObject,
+            "anInt" to 4
         )
     }
     println("Mix: ${aMix.toJsonString()}")
@@ -96,9 +97,9 @@ fun example1() {
     println("=== All grades bigger than 75")
     val result = array.filterIsInstance<JsonObject>().map {
         it.obj("schoolResults")
-                ?.array<JsonObject>("scores")?.filter {
-                    it.long("grade")!! > 75
-                }!!
+            ?.array<JsonObject>("scores")?.filter {
+                it.long("grade")!! > 75
+            }!!
     }
     println("Result: ${result}")
 }
