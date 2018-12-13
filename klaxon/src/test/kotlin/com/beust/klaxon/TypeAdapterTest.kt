@@ -10,7 +10,7 @@ class TypeAdapterTest {
     data class Rectangle(val width: Int, val height: Int): Shape()
     data class Circle(val radius: Int): Shape()
 
-    class C (
+    class Data (
         @TypeFor(field = "shape", adapter = ShapeTypeAdapter::class)
         val type: Integer,
 
@@ -32,7 +32,7 @@ class TypeAdapterTest {
                 { "type": 2, "shape": { "radius": 20} }
             ]
         """
-        val shapes = Klaxon().parseArray<C>(json)
+        val shapes = Klaxon().parseArray<Data>(json)
         assertThat(shapes!![0].shape as Rectangle).isEqualTo(Rectangle(100, 50))
         assertThat(shapes[1].shape as Circle).isEqualTo(Circle(20))
     }
