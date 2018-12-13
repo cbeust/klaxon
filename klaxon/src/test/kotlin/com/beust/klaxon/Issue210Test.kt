@@ -1,6 +1,5 @@
 package com.beust.klaxon
 
-import javafx.scene.shape.Shape
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
 
