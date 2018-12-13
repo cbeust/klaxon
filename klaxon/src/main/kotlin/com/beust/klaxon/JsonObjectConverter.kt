@@ -5,6 +5,10 @@ import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KParameter
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
@@ -45,9 +49,8 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         // (Kotlin constructors contain the names of their parameters).
         // Note that this code will work for default parameters as well: values missing in the JSON map
         // will be filled by Kotlin reflection if they can't be found.
-        var error: String? = null
         val map = retrieveKeyValues(jsonObject, kc)
-        var errorMessage = arrayListOf<String>()
+        val errorMessage = arrayListOf<String>()
         val result = concreteClass.constructors.firstNotNullResult { constructor ->
             val parameterMap = hashMapOf<KParameter, Any?>()
             constructor.parameters.forEach { parameter ->
@@ -101,7 +104,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         }
 
         return result ?: throw KlaxonException(
-                "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map: $error")
+                "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map")
     }
 
     private fun adjustType(convertedValue: Any?, parameter: KParameter): Any? {
@@ -137,6 +140,9 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         // Only keep the properties that are public and do not have @Json(ignored = true)
         val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
 
+        // See if have any polymorphic properties
+        val typeAdapters = findPolymorphicProperties(allProperties)
+
         allProperties.forEach { thisProp ->
             //
             // Check if the name of the field was overridden with a @Json annotation
@@ -152,9 +158,24 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             if (path == null) {
                 // Note: use containsKey here since it's valid for a JSON object to have a value spelled "null"
                 if (jsonObject.containsKey(fieldName)) {
-                    val convertedValue = klaxon.findConverterFromClass(kc.java, prop)
+                    val typeValue = jsonObject[fieldName]
+                    val polymorphicInfo = typeAdapters[fieldName]
+                    val classFromAdapter =
+                        if (typeValue != null && polymorphicInfo != null) {
+                            val typeValue = jsonObject[polymorphicInfo.typeFieldName] as Any
+                            val result= polymorphicInfo.adapter.createInstance()
+                                    .instantiate(typeValue)
+                            result
+                        } else {
+                            null
+                        }
+
+                    val kClass = classFromAdapter ?: kc
+                    val ktype = if (classFromAdapter != null) kClass.createType() else prop.returnType
+                    val cls = classFromAdapter?.java ?: kc.java
+                    val convertedValue = klaxon.findConverterFromClass(cls, prop)
                             .fromJson(JsonValue(jValue, prop.returnType.javaType,
-                                    prop.returnType, klaxon))
+                                    ktype, klaxon))
                     result[prop.name] = convertedValue
                 } else {
                     // Didn't find any value for that property: don't do anything. If a value is missing here,
@@ -165,6 +186,22 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 result[prop.name] = allPaths[path]
                         ?: throw KlaxonException("Couldn't find path \"$path\" specified on field \"${prop.name}\"")
 
+            }
+        }
+        return result
+    }
+
+    class PolymorphicInfo(val typeFieldName: String, val valueFieldName: String,
+            val adapter: KClass<out TypeAdapter<*>>)
+
+    private fun findPolymorphicProperties(allProperties: List<KProperty1<out Any, Any?>>)
+            : Map<String, PolymorphicInfo> {
+        val result = hashMapOf<String, PolymorphicInfo>()
+        allProperties.forEach {
+            it.findAnnotation<TypeFor>()?.let { typeForAnnotation ->
+                typeForAnnotation.field.let { field ->
+                    result[field] = PolymorphicInfo(it.name, field, typeForAnnotation.adapter)
+                }
             }
         }
         return result
