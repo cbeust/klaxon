@@ -173,11 +173,11 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                         }
 
                     val kClass = polymorphicClass ?: kc
-                    val ktype = if (polymorphicClass != null) kClass.createType() else prop.returnType
+                    val kType = if (polymorphicClass != null) kClass.createType() else prop.returnType
                     val cls = polymorphicClass?.java ?: kc.java
                     val convertedValue = klaxon.findConverterFromClass(cls, prop)
                             .fromJson(JsonValue(jValue, prop.returnType.javaType,
-                                    ktype, klaxon))
+                                    kType, klaxon))
                     result[prop.name] = convertedValue
                 } else {
                     // Didn't find any value for that property: don't do anything. If a value is missing here,
