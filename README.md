@@ -308,7 +308,7 @@ data class Circle(val radius: Int): Shape()
 
 We then define the class that the objects of this array are instances of:
 
-```json
+```kotlin
 class Data (
     @TypeFor(field = "shape", adapter = ShapeTypeAdapter::class)
     val type: Integer,
