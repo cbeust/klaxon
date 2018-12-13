@@ -3,7 +3,7 @@ package com.beust.klaxon
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
 
-class Issue95 {
+class Issue95Test {
     @Test
     fun deserializeStringArray() {
         val mapper = Klaxon()

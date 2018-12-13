@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
 
 @Test
-class Issue169 {
+class Issue169Test {
 
     data class Person(val id: Int,
                       val name: String,
@@ -15,7 +15,7 @@ class Issue169 {
     private val expected = Person(id = 2,
                                   name = "Arthur")
 
-    fun test() {
+    fun issue169() {
 
         // language=JSON
         val jsonToTest = """

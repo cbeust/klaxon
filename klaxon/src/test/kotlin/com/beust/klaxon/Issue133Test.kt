@@ -9,8 +9,8 @@ enum class THING {
 data class Data(val types: List<THING> =listOf(THING.TYPE1))
 
 @Test
-class Issue133 {
-    fun enum() {
+class Issue133Test {
+    fun issue133() {
         val json= """{"types" : ["TYPE1"]}"""
         val instance = Klaxon().parse<Data>(json)!! //parse JSON without failure
         /*

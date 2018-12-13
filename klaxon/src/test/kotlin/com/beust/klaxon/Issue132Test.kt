@@ -3,7 +3,7 @@ package com.beust.klaxon
 import org.testng.annotations.Test
 
 @Test
-class Issue132 {
+class Issue132Test {
     @Test(expectedExceptions = [(KlaxonException::class)])
     fun recursion() {
 

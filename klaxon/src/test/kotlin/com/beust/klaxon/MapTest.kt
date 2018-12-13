@@ -106,3 +106,13 @@ class MapTest {
         assertThat(r.events["-L3daccTVLOcYi9hVHsD"]?.name).isEqualTo("Registration & Breakfast")
     }
 }
+
+class Employee(val firstName: String, val lastName: String, val age: Int) {
+    val lazyValue: String by lazy {
+        val result = ""
+        result
+    }
+}
+
+
+

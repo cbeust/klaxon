@@ -1,13 +1,14 @@
 package com.beust.klaxon
 
+import javafx.scene.shape.Shape
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
 
 @Test(description = "Tests that null JSON values are correctly handled")
-class Issue210 {
+class Issue210Test {
     data class DClass(val some: String, val none: String?)
 
-    fun f() {
+    fun issue210() {
         val json = """
         {
         "some": "test",

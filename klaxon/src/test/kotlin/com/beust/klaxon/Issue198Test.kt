@@ -9,7 +9,7 @@ val measurementConditionDouble = MeasurementConditionDouble("foo", 1.0,2.0)
 val measurementConditionFloat = MeasurementConditionFloat("foo", 1.0f, 2.0f)
 
 @Test
-class Issue198 {
+class Issue198Test {
     fun f() {
         println(Klaxon().toJsonString(measurementConditionDouble))
         println(Klaxon().toJsonString(measurementConditionFloat))

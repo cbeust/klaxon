@@ -7,7 +7,7 @@ import org.testng.annotations.Test
  * https://github.com/cbeust/klaxon/issues/125
  */
 @Test
-class Issue125 {
+class Issue125Test {
     open class Parent(open val foo: String)
     class Child(@Json(ignored = false) override val foo: String, val bar: String) : Parent(foo)
 

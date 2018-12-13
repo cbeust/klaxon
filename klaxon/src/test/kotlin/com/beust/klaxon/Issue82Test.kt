@@ -4,7 +4,7 @@ import org.testng.Assert
 import org.testng.annotations.Test
 
 @Test
-class Issue82 {
+class Issue82Test {
 
     fun serializePrivateVal() {
         data class Person(private val id: String, val firstName: String)

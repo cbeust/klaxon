@@ -5,8 +5,8 @@ import org.testng.annotations.Test
 import kotlin.reflect.KProperty
 
 @Test
-class Issue180 {
-    fun f() {
+class Issue180Test {
+    fun issue180() {
         val x = Klaxon().toJsonString(CharacterPlayer(12))
         val char = Klaxon().parse<CharacterPlayer>(x)
         assertThat(char!!.id).isEqualTo(12)

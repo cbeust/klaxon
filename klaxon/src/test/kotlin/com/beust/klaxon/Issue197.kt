@@ -10,7 +10,7 @@ data class Thinger(
 
 class ThingerTest {
     @Test
-    fun testThingerFromJSON() {
+    fun issue197() {
         val input = """{"width": 2}"""
         val thinger = Klaxon().parse<Thinger>(StringReader(input))!!
 

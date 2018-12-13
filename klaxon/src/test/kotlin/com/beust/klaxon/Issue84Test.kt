@@ -3,7 +3,7 @@ package com.beust.klaxon
 import org.testng.annotations.Test
 import java.time.Instant
 
-class Issue84 {
+class Issue84Test {
     /**
      * This test passes.
      */
