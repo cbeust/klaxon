@@ -199,10 +199,16 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
     private fun findPolymorphicProperties(allProperties: List<KProperty1<out Any, Any?>>)
             : Map<String, PolymorphicInfo> {
         val result = hashMapOf<String, PolymorphicInfo>()
+        val propertyNames = allProperties.map { it.name }.toSet()
         allProperties.forEach {
             it.findAnnotation<TypeFor>()?.let { typeForAnnotation ->
                 typeForAnnotation.field.let { field ->
-                    result[field] = PolymorphicInfo(it.name, field, typeForAnnotation.adapter)
+                    if (propertyNames.contains(field)) {
+                        result[field] = PolymorphicInfo(it.name, field, typeForAnnotation.adapter)
+                    } else {
+                        throw KlaxonException("The @TypeFor annotation on field \"${it.name}\"" +
+                                " refers to nonexistent field \"$field\"")
+                    }
                 }
             }
         }
