@@ -141,7 +141,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
 
         // See if have any polymorphic properties
-        val typeAdapters = findPolymorphicProperties(allProperties)
+        val polymorphicMap = findPolymorphicProperties(allProperties)
 
         allProperties.forEach { thisProp ->
             //
@@ -158,21 +158,23 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             if (path == null) {
                 // Note: use containsKey here since it's valid for a JSON object to have a value spelled "null"
                 if (jsonObject.containsKey(fieldName)) {
-                    val typeValue = jsonObject[fieldName]
-                    val polymorphicInfo = typeAdapters[fieldName]
-                    val classFromAdapter =
-                        if (typeValue != null && polymorphicInfo != null) {
-                            val typeValue = jsonObject[polymorphicInfo.typeFieldName] as Any
-                            val result= polymorphicInfo.adapter.createInstance()
-                                    .instantiate(typeValue)
-                            result
+                    // Look up the polymorphic info for that field. If there is one, we need to
+                    // retrieve its TypeAdapter
+                    val polymorphicInfo = polymorphicMap[fieldName]
+
+                    val polymorphicClass =
+                        if (polymorphicInfo != null) {
+                            // We have polymorphic information for this field. Retrieve its TypeAdapter,
+                            // instantiate it, and invoke it with the discriminant value.
+                            val discriminant = jsonObject[polymorphicInfo.typeFieldName] as Any
+                            polymorphicInfo.adapter.createInstance().instantiate(discriminant)
                         } else {
                             null
                         }
 
-                    val kClass = classFromAdapter ?: kc
-                    val ktype = if (classFromAdapter != null) kClass.createType() else prop.returnType
-                    val cls = classFromAdapter?.java ?: kc.java
+                    val kClass = polymorphicClass ?: kc
+                    val ktype = if (polymorphicClass != null) kClass.createType() else prop.returnType
+                    val cls = polymorphicClass?.java ?: kc.java
                     val convertedValue = klaxon.findConverterFromClass(cls, prop)
                             .fromJson(JsonValue(jValue, prop.returnType.javaType,
                                     ktype, klaxon))
