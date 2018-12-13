@@ -166,7 +166,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                         if (polymorphicInfo != null) {
                             // We have polymorphic information for this field. Retrieve its TypeAdapter,
                             // instantiate it, and invoke it with the discriminant value.
-                            val discriminant = jsonObject[polymorphicInfo.typeFieldName] as Any
+                            val discriminant = jsonObject[polymorphicInfo.discriminantFieldName] as Any
                             polymorphicInfo.adapter.createInstance().instantiate(discriminant)
                         } else {
                             null
@@ -193,7 +193,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         return result
     }
 
-    class PolymorphicInfo(val typeFieldName: String, val valueFieldName: String,
+    class PolymorphicInfo(val discriminantFieldName: String, val valueFieldName: String,
             val adapter: KClass<out TypeAdapter<*>>)
 
     private fun findPolymorphicProperties(allProperties: List<KProperty1<out Any, Any?>>)
