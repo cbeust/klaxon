@@ -284,6 +284,61 @@ val klaxon = Klaxon().propertyStrategy(ps)
 
 You can define multiple `PropertyStrategy` instances, and in such a case, they all need to return `true` for a property to be included.
 
+### Polymorphic fields
+
+JSON documents sometimes contain dynamic payloads whose type can vary. Consider the following JSON document:
+
+```json
+[
+    { "type": 1, "shape": { "width": 100, "height": 50 } },
+    { "type": 2, "shape": { "radius": 20} }
+]
+```
+
+This is an array of polymorphic objects. The `type` field is a discriminant which determines the type of the field
+`shape`: if its value is `1`, the shape is a rectangle, if `2`, it's a circle.
+
+To parse this document with Klaxon, we first model these classes with a hierarchy:
+
+```kotlin
+open class Shape
+data class Rectangle(val width: Int, val height: Int): Shape()
+data class Circle(val radius: Int): Shape()
+```
+
+We then define the class that the objects of this array are instances of:
+
+```json
+class Data (
+    @TypeFor(field = "shape", adapter = ShapeTypeAdapter::class)
+    val type: Integer,
+
+    val shape: Shape
+)
+```
+
+Notice the `@TypeFor` annotation, which tells Klaxon which field this value is a discriminant for, and also provides
+a class that will translate these integer values into the correct class:
+
+```kotlin
+class ShapeTypeAdapter: TypeAdapter<Shape> {
+    override fun instantiate(type: Any): KClass<out Shape> = when(type as Int) {
+        1 -> Rectangle::class
+        2 -> Circle::class
+        else -> throw IllegalArgumentException("Unknown type: $type")
+    }
+}
+```
+
+With this code in place, you can now parse the provided JSON document above the regular way and the the following
+tests will pass:
+
+```kotlin
+val shapes = Klaxon().parseArray<Data>(json)
+assertThat(shapes!![0].shape as Rectangle).isEqualTo(Rectangle(100, 50))
+assertThat(shapes[1].shape as Circle).isEqualTo(Circle(20))
+```
+
 ## Streaming API
 
 The streaming API is useful in a few scenarios:
