@@ -11,7 +11,7 @@ val measurementConditionFloat = MeasurementConditionFloat("foo", 1.0f, 2.0f)
 @Test
 class Issue198Test {
     fun f() {
-        println(Klaxon().toJsonString(measurementConditionDouble))
-        println(Klaxon().toJsonString(measurementConditionFloat))
+        Klaxon().toJsonString(measurementConditionDouble)
+        Klaxon().toJsonString(measurementConditionFloat)
     }
 }
