@@ -73,10 +73,13 @@ class JsonValue(value: Any?,
                 type = value.javaClass
             }
             is Collection<*> -> {
-                val v = JsonArray<Any>()
+                val v = JsonArray<Any?>()
                 genericType = null
                 value.forEach {
-                    if (it is Any) {
+                    if (it == null) {
+                        v.add(null)
+                        genericType = Any::class.java
+                    } else if (it is Any) {
                         v.add(it)
                         genericType = it.javaClass
                     } else {
