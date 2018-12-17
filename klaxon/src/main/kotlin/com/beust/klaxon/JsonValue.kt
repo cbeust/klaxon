@@ -79,11 +79,9 @@ class JsonValue(value: Any?,
                     if (it == null) {
                         v.add(null)
                         genericType = Any::class.java
-                    } else if (it is Any) {
+                    } else {
                         v.add(it)
                         genericType = it.javaClass
-                    } else {
-                        throw KlaxonException("Need to extract inside")
                     }
                 }
                 array = v
