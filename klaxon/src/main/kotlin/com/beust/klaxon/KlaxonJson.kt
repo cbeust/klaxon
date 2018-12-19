@@ -37,7 +37,8 @@ interface KlaxonJson {
             is Short -> value.toInt()
             is Byte -> value.toInt()
             null -> null
-            else -> throw IllegalArgumentException("Unrecognized type: " + value)
+            else ->
+                throw IllegalArgumentException("Unrecognized type `${value::class}` with value `$value`")
         }
     }
 
