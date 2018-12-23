@@ -110,12 +110,17 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             if (jt is ParameterizedType) {
                 val typeArgument = jt.actualTypeArguments[0]
                 val converter =
-                    if (typeArgument is Class<*>) {
-                        klaxon.findConverterFromClass(typeArgument, null)
-                    } else if (typeArgument is ParameterizedType) {
-                        klaxon.findConverterFromClass(typeArgument.actualTypeArguments[0] as Class<*>, null)
-                    } else {
-                        throw IllegalArgumentException("Should never happen")
+                    when (typeArgument) {
+                        is Class<*> -> klaxon.findConverterFromClass(typeArgument, null)
+                        is ParameterizedType -> {
+                            val ta = typeArgument.actualTypeArguments[0]
+                            when (ta) {
+                                is Class<*> -> klaxon.findConverterFromClass(ta, null)
+                                is ParameterizedType -> klaxon.findConverterFromClass(ta.rawType.javaClass, null)
+                                else -> throw KlaxonException("SHOULD NEVER HAPPEN")
+                            }
+                        }
+                        else -> throw IllegalArgumentException("Should never happen")
                     }
                 val kTypeArgument = kt?.arguments!![0].type
                 converter.fromJson(JsonValue(it, typeArgument, kTypeArgument, klaxon))
