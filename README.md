@@ -292,7 +292,7 @@ annotation `@TypeFor`, which can be placed either on a class or on a field.
 
 #### Polymorphic classes
 
-A polymorphic class is a class whose actual type is defined by one of its own property. Consider this JSON:
+A polymorphic class is a class whose actual type is defined by one of its own properties. Consider this JSON:
 
 ```json
 [
