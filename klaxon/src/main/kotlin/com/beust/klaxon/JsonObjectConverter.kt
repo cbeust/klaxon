@@ -43,7 +43,22 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
     }
 
     private fun initIntoUserClass(jsonObject: JsonObject, kc: KClass<*>): Any {
-        val concreteClass = if (Annotations.isList(kc)) ArrayList::class else kc
+        val typeFor = kc.findAnnotation<TypeFor>()
+        // kc is the desired class in output, but Klaxon might decide to produce a different class
+        // in certain conditions, such as a polymorphic class (with a @TypeFor annotation at the class level).
+        val concreteClass =
+            if (Annotations.isList(kc)) {
+                ArrayList::class
+            } else if (typeFor != null) {
+                val prop = kc.memberProperties.find { it.name == typeFor.field}
+                        ?: illegalPropClass(typeFor.field, kc.simpleName!!)
+                val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
+
+                val pi = createPolymorphicInfo(typeFor, prop, allProperties)
+                calculatePolymorphicClass(pi, jsonObject) ?: throw KlaxonException("Cant't find polymorphic class")
+            } else {
+                kc
+            }
 
         // Go through all the Kotlin constructors and associate each parameter with its value.
         // (Kotlin constructors contain the names of their parameters).
@@ -162,16 +177,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     // retrieve its TypeAdapter
                     val polymorphicInfo = polymorphicMap[fieldName]
 
-                    val polymorphicClass =
-                        if (polymorphicInfo != null) {
-                            // We have polymorphic information for this field. Retrieve its TypeAdapter,
-                            // instantiate it, and invoke it with the discriminant value.
-                            val discriminant = jsonObject[polymorphicInfo.discriminantFieldName] as Any
-                            polymorphicInfo.adapter.createInstance().instantiate(discriminant)
-                        } else {
-                            null
-                        }
-
+                    val polymorphicClass = calculatePolymorphicClass(polymorphicInfo, jsonObject)
                     val kClass = polymorphicClass ?: kc
                     val kType = if (polymorphicClass != null) kClass.createType() else prop.returnType
                     val cls = polymorphicClass?.java ?: kc.java
@@ -193,25 +199,53 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         return result
     }
 
+    private fun calculatePolymorphicClass(polymorphicInfo: PolymorphicInfo?, jsonObject: JsonObject)
+            : KClass<out Any>? {
+        return if (polymorphicInfo != null) {
+            // We have polymorphic information for this field. Retrieve its TypeAdapter,
+            // instantiate it, and invoke it with the discriminant value.
+            val discriminant = jsonObject[polymorphicInfo.discriminantFieldName] as Any
+            polymorphicInfo.adapter.createInstance().classFor(discriminant)
+        } else {
+            null
+        }
+    }
+
+
+
     class PolymorphicInfo(val discriminantFieldName: String, val valueFieldName: String,
             val adapter: KClass<out TypeAdapter<*>>)
 
     private fun findPolymorphicProperties(allProperties: List<KProperty1<out Any, Any?>>)
             : Map<String, PolymorphicInfo> {
         val result = hashMapOf<String, PolymorphicInfo>()
-        val propertyNames = allProperties.map { it.name }.toSet()
         allProperties.forEach {
             it.findAnnotation<TypeFor>()?.let { typeForAnnotation ->
-                typeForAnnotation.field.let { field ->
-                    if (propertyNames.contains(field)) {
-                        result[field] = PolymorphicInfo(it.name, field, typeForAnnotation.adapter)
-                    } else {
-                        throw KlaxonException("The @TypeFor annotation on field \"${it.name}\"" +
-                                " refers to nonexistent field \"$field\"")
-                    }
-                }
+                result[typeForAnnotation.field] = createPolymorphicInfo(typeForAnnotation, it, allProperties)
             }
         }
         return result
+    }
+
+    private fun createPolymorphicInfo(typeForAnnotation: TypeFor, prop: KProperty1<out Any, Any?>,
+            allProperties: List<KProperty1<out Any, Any?>>): PolymorphicInfo {
+        val propertyNames = allProperties.map { it.name }.toSet()
+        typeForAnnotation.field.let { field ->
+            if (propertyNames.contains(field)) {
+                return PolymorphicInfo(prop.name, field, typeForAnnotation.adapter)
+            } else {
+                illegalPropField(prop.name, field)
+            }
+        }
+    }
+
+    private fun illegalPropField(prop: String, field: String): Nothing {
+        throw KlaxonException("The @TypeFor annotation on field \"$prop\"" +
+                " refers to nonexistent field \"$field\"")
+    }
+
+    private fun illegalPropClass(field: String, className: String): Nothing {
+        throw KlaxonException("The @TypeFor annotation on class \"$className\"" +
+                " refers to nonexistent field \"$field\"")
     }
 }

@@ -11,7 +11,7 @@ class TypeAdapterTest {
     data class Circle(val radius: Int): Shape()
 
     class ShapeTypeAdapter: TypeAdapter<Shape> {
-        override fun instantiate(type: Any): KClass<out Shape> = when(type as Int) {
+        override fun classFor(type: Any): KClass<out Shape> = when(type as Int) {
             1 -> Rectangle::class
             2 -> Circle::class
             else -> throw IllegalArgumentException("Unknown type: $type")
@@ -53,7 +53,7 @@ class TypeAdapterTest {
             expectedExceptionsMessageRegExp = ".*Unknown type.*")
     fun unknownDiscriminantValue() {
         class BogusShapeTypeAdapter: TypeAdapter<Shape> {
-            override fun instantiate(type: Any): KClass<out Shape> = when(type as Int) {
+            override fun classFor(type: Any): KClass<out Shape> = when(type as Int) {
                 1 -> Rectangle::class
                 else -> throw IllegalArgumentException("Unknown type: $type")
             }
@@ -68,4 +68,32 @@ class TypeAdapterTest {
 
         val shapes = Klaxon().parseArray<BogusData>(json)
     }
+
+    class AnimalTypeAdapter: TypeAdapter<Animal> {
+        override fun classFor(type: Any): KClass<out Animal> = when(type as String) {
+            "dog" -> Dog::class
+            "cat" -> Cat::class
+            else -> throw IllegalArgumentException("Unknown type: $type")
+        }
+    }
+
+    @TypeFor(field = "name", adapter = AnimalTypeAdapter::class)
+    open class Animal {
+        var name: String = ""
+    }
+    class Cat: Animal()
+    class Dog: Animal()
+
+    fun embedded() {
+        val json = """
+            [
+                { "name": "dog" },
+                { "name": "cat" }
+            ]
+        """
+        val r = Klaxon().parseArray<Animal>(json)
+        assertThat(r!![0]).isInstanceOf(Dog::class.java)
+        assertThat(r[1]).isInstanceOf(Cat::class.java)
+    }
+
 }
