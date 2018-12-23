@@ -284,9 +284,48 @@ val klaxon = Klaxon().propertyStrategy(ps)
 
 You can define multiple `PropertyStrategy` instances, and in such a case, they all need to return `true` for a property to be included.
 
-### Polymorphic fields
+### Polymorphism
 
-JSON documents sometimes contain dynamic payloads whose type can vary. Consider the following JSON document:
+JSON documents sometimes contain dynamic payloads whose type can vary. Klaxon supports two different use cases for
+polymorphism: polymorphic classes and polymorphic fields. Klaxon gives you control on polymorphism with the
+annotation `@TypeFor`, which can be placed either on a class or on a field.
+
+#### Polymorphic classes
+
+A polymorphic class is a class whose actual type is defined by one of its own property. Consider this JSON:
+
+```json
+[
+    { "type": "rectangle", "width": 100, "height": 50 },
+    { "type": "circle", "radius": 20}
+]
+```
+
+The content of the field `type` determines the class that needs to be instantiated. You would model this as
+follows with Klaxon:
+
+```kotlin
+@TypeFor(field = "type", adapter = ShapeTypeAdapter::class)
+open class Shape(val type: String)
+data class Rectangle(val width: Int, val height: Int): Shape()
+data class Circle(val radius: Int): Shape()
+```
+
+The type adapter is as follows:
+
+```kotlin
+class ShapeTypeAdapter: TypeAdapter<Shape> {
+    override fun classFor(type: Any): KClass<out Shape> = when(type as String) {
+        "rectangle" -> Rectangle::class
+        "circle" -> Circle::class
+        else -> throw IllegalArgumentException("Unknown type: $type")
+    }
+}
+```
+
+#### Polymorphic fields
+
+Klaxon also allows a field to determine the class to be instantiated for another field. Consider the following JSON document:
 
 ```json
 [
