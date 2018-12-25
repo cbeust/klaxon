@@ -83,7 +83,11 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
     private fun fromInt(value: Int, propertyType: java.lang.reflect.Type?): Any {
         // If the value is an Int and the property is a Long, widen it
         val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
-        return if (isLong) value.toLong() else value
+        val result =
+            if (isLong) value.toLong()
+            else if (propertyType == BigDecimal::class.java) BigDecimal(value)
+            else value
+        return result
     }
 
     private fun fromDouble(value: Double, propertyType: java.lang.reflect.Type?): Any {
