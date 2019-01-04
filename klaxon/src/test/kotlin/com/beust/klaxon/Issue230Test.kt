@@ -19,9 +19,9 @@ class Issue230Test {
     data class Data(val threshold: Threshold, val monitoringTime: MonitoringTime)
 
     class SettingValueAdapter : TypeAdapter<SettingValue> {
-        override fun classFor(type: Any): KClass<out SettingValue> = when (type as String) {
-            "MonitoringTime" -> MonitoringTime::class
-            "Threshold" -> Threshold::class
+        override fun classFor(type: Any): KClass<out SettingValue> = when (type as Setting) {
+            Setting.MonitoringTime -> MonitoringTime::class
+            Setting.Threshold -> Threshold::class
             else -> throw IllegalArgumentException("Unknown type: $type")
         }
     }
