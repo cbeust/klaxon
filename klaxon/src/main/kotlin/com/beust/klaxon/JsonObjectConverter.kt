@@ -64,7 +64,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         // (Kotlin constructors contain the names of their parameters).
         // Note that this code will work for default parameters as well: values missing in the JSON map
         // will be filled by Kotlin reflection if they can't be found.
-        val map = retrieveKeyValues(jsonObject, kc)
+        val map = retrieveKeyValues(jsonObject, concreteClass)
         val errorMessage = arrayListOf<String>()
         val result = concreteClass.constructors.firstNotNullResult { constructor ->
             val parameterMap = hashMapOf<KParameter, Any?>()
