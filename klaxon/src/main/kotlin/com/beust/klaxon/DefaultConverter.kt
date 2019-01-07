@@ -54,7 +54,9 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             is Map<*, *> -> {
                 val valueList = arrayListOf<String>()
                 value.entries.forEach { entry ->
-                    val jsonValue = klaxon.toJsonString(entry.value as Any)
+                    val jsonValue =
+                        if (entry.value == null) "null"
+                        else """"${entry.value}""""
                     valueList.add("\"${entry.key}\": $jsonValue")
                 }
                 joinToString(valueList, "{", "}")
