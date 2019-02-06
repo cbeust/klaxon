@@ -1,7 +1,9 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
+import java.lang.reflect.TypeVariable
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -18,6 +20,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             when(value) {
                 is Boolean, is String, is Long -> value
                 is Int -> fromInt(value, propertyType)
+                is BigInteger, is BigDecimal -> value
                 is Double ->
                     if (jv.propertyKClass?.classifier == kotlin.Float::class) fromFloat(value.toFloat(), propertyType)
                     else fromDouble(value, propertyType)

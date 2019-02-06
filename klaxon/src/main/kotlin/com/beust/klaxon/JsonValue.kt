@@ -2,6 +2,8 @@ package com.beust.klaxon
 
 import com.beust.klaxon.internal.ConverterFinder
 import java.lang.reflect.Type
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
 
@@ -17,6 +19,8 @@ class JsonValue(value: Any?,
     var array: JsonArray<*>? = null
     var string: String? = null
     var int: Int? = null
+    var bigDecimal: BigDecimal? = null
+    var bigInteger: BigInteger? = null
     var longValue: Long? = null
     var float: Float? = null
     var double: Double? = null
@@ -57,6 +61,8 @@ class JsonValue(value: Any?,
                     double != null -> double
                     char != null -> char
                     boolean != null -> boolean
+                    bigDecimal != null -> bigDecimal
+                    bigInteger != null -> bigInteger
                     else -> null
                 }
             return result
@@ -95,6 +101,14 @@ class JsonValue(value: Any?,
             is String -> {
                 string = value
                 type = String::class.java
+            }
+            is BigInteger -> {
+                bigInteger = value as BigInteger
+                type = BigInteger::class.java
+            }
+            is BigDecimal -> {
+                bigDecimal = value as BigDecimal
+                type = BigDecimal::class.java
             }
             is Int -> {
                 when(propertyKClass?.classifier) {
