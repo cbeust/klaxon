@@ -49,15 +49,16 @@ class TypeAdapterTest {
         val shapes = Klaxon().parseArray<BogusData>(json)
     }
 
+    class BogusShapeTypeAdapter: TypeAdapter<Shape> {
+        override fun classFor(type: Any): KClass<out Shape> = when(type as Int) {
+            1 -> Rectangle::class
+            else -> throw IllegalArgumentException("Unknown type: $type")
+        }
+    }
     @Test(expectedExceptions = [IllegalArgumentException::class],
             expectedExceptionsMessageRegExp = ".*Unknown type.*")
     fun unknownDiscriminantValue() {
-        class BogusShapeTypeAdapter: TypeAdapter<Shape> {
-            override fun classFor(type: Any): KClass<out Shape> = when(type as Int) {
-                1 -> Rectangle::class
-                else -> throw IllegalArgumentException("Unknown type: $type")
-            }
-        }
+
 
         class BogusData (
                 @TypeFor(field = "shape", adapter = BogusShapeTypeAdapter::class)

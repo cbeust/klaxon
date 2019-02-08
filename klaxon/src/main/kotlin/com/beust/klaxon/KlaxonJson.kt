@@ -1,7 +1,5 @@
 package com.beust.klaxon
 
-import java.math.BigInteger
-
 /**
  * The class used to define the DSL that generates JSON documents. All the functions defined in this class
  * can be used inside a `json { ... }` call.
@@ -25,20 +23,11 @@ interface KlaxonJson {
         internal val theKlaxonJson = object : KlaxonJson { }
 
         private fun convert(value: Any?): Any? = when (value) {
-            is Int -> value
-            is Long -> value
-            is String -> value
-            is Boolean -> value
             is Float -> value.toDouble()
-            is Double -> value
-            is BigInteger -> value
-            is JsonObject -> value
-            is JsonArray<*> -> value
             is Short -> value.toInt()
             is Byte -> value.toInt()
             null -> null
-            else ->
-                throw IllegalArgumentException("Unrecognized type `${value::class}` with value `$value`")
+            else -> value
         }
     }
 

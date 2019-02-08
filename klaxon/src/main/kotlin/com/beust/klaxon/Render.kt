@@ -17,7 +17,11 @@ object Render {
             is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, canonical, level)
             is Double, is Float ->
                 result.append(if (canonical) decimalFormat.format(v) else v.toString())
-            else -> result.append(v.toString())
+            null -> result.append("null")
+            else -> {
+                // TODO - Here we are reusing Converter.toJson() logic, but loose support for prettyPrint and canonical
+                result.append(Klaxon().findConverter(v).toJson(v))
+            }
         }
     }
 

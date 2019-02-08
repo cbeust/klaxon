@@ -64,6 +64,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 }
                 joinToString(valueList, "{", "}")
             }
+            is BigInteger -> value.toString()
             else -> {
                 val valueList = arrayListOf<String>()
                 val properties = Annotations.findNonIgnoredProperties(value::class, klaxon.propertyStrategies)
