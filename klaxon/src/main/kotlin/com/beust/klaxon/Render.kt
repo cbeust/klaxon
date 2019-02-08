@@ -3,54 +3,24 @@ package com.beust.klaxon
 import java.text.DecimalFormat
 
 object Render {
-    fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
+    tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
         when (v) {
             is JsonBase -> v.appendJsonStringImpl(result, prettyPrint, canonical, level)
             is String -> result.renderString(v)
             is Map<*, *> -> renderValue(
-                JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value }),
-                result,
-                prettyPrint,
-                canonical,
-                level)
+                    JsonObject(v.mapKeys { it.key.toString() }.mapValues { it.value }),
+                    result,
+                    prettyPrint,
+                    canonical,
+                    level)
             is List<*> -> renderValue(JsonArray(v), result, prettyPrint, canonical, level)
             is Pair<*, *> -> renderValue(v.second, result.renderString(v.first.toString()).append(": "), prettyPrint, canonical, level)
             is Double, is Float ->
                 result.append(if (canonical) decimalFormat.format(v) else v.toString())
-            is Int, is Boolean -> result.append(v.toString())
+            null -> result.append("null")
             else -> {
-                val properties = if (v != null) Annotations.findNonIgnoredProperties(v::class, Klaxon().propertyStrategies)
-                else emptyList()
-
-                if (properties.isNotEmpty()) {
-                    result.append('{')
-                    var comma = false
-
-                    properties.forEach { prop ->
-                        prop.getter.call(v)?.let { getValue ->
-                            val jsonField = if (v != null) Annotations.findJsonAnnotation(v::class, prop.name)
-                                            else null
-                            val fieldName = if (jsonField != null && jsonField.nameInitialized()) jsonField.name
-                                            else prop.name
-
-                            if (comma) {
-                                result.append(",")
-                            } else {
-                                comma = true
-                            }
-
-                            result.renderString(fieldName).append(':')
-                            if (prettyPrint && !canonical) {
-                                result.append(" ")
-                            }
-
-                            renderValue(getValue, result, prettyPrint, canonical, level)
-                        }
-                    }
-                    result.append('}')
-                } else {
-                    result.append(v.toString())
-                }
+                // TODO - Here we are reusing Converter.toJson() logic, but loose support for prettyPrint and canonical
+                result.append(Klaxon().findConverter(v).toJson(v))
             }
         }
     }
@@ -92,9 +62,9 @@ object Render {
     }
 
     private fun isNotPrintableUnicode(c: Char): Boolean =
-        c in '\u0000'..'\u001F' ||
-                c in '\u007F'..'\u009F' ||
-                c in '\u2000'..'\u20FF'
+            c in '\u0000'..'\u001F' ||
+                    c in '\u007F'..'\u009F' ||
+                    c in '\u2000'..'\u20FF'
 
     private val decimalFormat = DecimalFormat("0.0####E0;-0.0####E0")
 }

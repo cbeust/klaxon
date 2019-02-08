@@ -2,7 +2,11 @@ package com.beust.klaxon
 
 import org.testng.annotations.Test
 
-data class TestObject(val a: Int, val b: String, val c: Float)
+data class TestObject(
+    val a: Int,
+    @Json(name = "filed_b")
+    val b: String,
+    val c: Float)
 
 @Test
 class Issue167Test {
@@ -24,11 +28,12 @@ class Issue167Test {
             obj (
                 "theArray" to anArray,
                 "theObject" to aJsonObject,
-                "thePlainObject" to aPlainObject,   // This entry would fail previously: IllegalArgumentException
+                "thePlainObject" to aPlainObject,   // This entry would previously fail with IllegalArgumentException
                 "anInt" to 4
             )
         }
 
-        println("Mix: ${aMix.toJsonString()}")
+        // Just checking that we don't get an exception when serializing
+        println("Mix: ${aMix.toJsonString(prettyPrint = true, canonical = false)}")
     }
 }

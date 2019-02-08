@@ -2,6 +2,7 @@ package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -61,6 +62,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 }
                 joinToString(valueList, "{", "}")
             }
+            is BigInteger -> value.toString()
             else -> {
                 val valueList = arrayListOf<String>()
                 val properties = Annotations.findNonIgnoredProperties(value::class, klaxon.propertyStrategies)
