@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
         jcenter()
         maven {
-            setUrl("http://oss.sonatype.org/content/repositories/snapshots")
+            setUrl("https://oss.sonatype.org/content/repositories/snapshots")
         }
     }
 
@@ -30,7 +30,7 @@ allprojects {
         mavenCentral()
         jcenter()
         maven {
-            setUrl("http://oss.sonatype.org/content/repositories/snapshots")
+            setUrl("https://oss.sonatype.org/content/repositories/snapshots")
         }
     }
 }
