@@ -428,9 +428,28 @@ abstract class KlaxonBaseTest {
     }
 
     enum class Colour { Red, Green, Blue }
+    data class ColourHolder(val colour: Colour)
 
     fun serializeEnum() {
-        Assert.assertEquals(Klaxon().toJsonString(Colour.Red), "\"Red\"")
+        val klaxon = Klaxon()
+        Assert.assertEquals(klaxon.toJsonString(Colour.Red), "\"Red\"")
+        Assert.assertEquals(klaxon.parse<ColourHolder>("{\"colour\": \"Green\"}"), ColourHolder(Colour.Green))
+    }
+    
+    enum class ShortColour {
+        @Json("R")
+        Red,
+        @Json("G")
+        Green,
+        @Json("B")
+        Blue
+    }
+    data class ShortColourHolder(val colour: ShortColour)
+
+    fun serializeEnumWithRenames() {
+        val klaxon = Klaxon()
+        Assert.assertEquals(klaxon.toJsonString(ShortColour.Red), "\"R\"")
+        Assert.assertEquals(klaxon.parse<ShortColourHolder>("{\"colour\": \"G\"}"), ShortColourHolder(ShortColour.Green))
     }
 
     @Test
