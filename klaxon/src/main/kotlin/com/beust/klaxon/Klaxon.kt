@@ -53,15 +53,17 @@ class Klaxon : ConverterFinder {
      * Parse a JSON file into an object.
      */
     @Suppress("unused")
-    inline fun <reified T> parse(file: File): T?
-            = maybeParse(parser(T::class).parse(FileReader(file)) as JsonObject)
+    inline fun <reified T> parse(file: File): T? = FileReader(file).use { reader ->
+        maybeParse(parser(T::class).parse(reader) as JsonObject)
+    }
 
     /**
      * Parse a JSON file into a List.
      */
     @Suppress("unused")
-    inline fun <reified T> parseArray(file: File): List<T>?
-            = parseFromJsonArray(parser(T::class).parse(FileReader(file)) as JsonArray<*>)
+    inline fun <reified T> parseArray(file: File): List<T>? = FileReader(file).use { reader ->
+        parseFromJsonArray(parser(T::class).parse(reader) as JsonArray<*>)
+    }
 
     /**
      * Parse an InputStream into an object.
