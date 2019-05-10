@@ -307,8 +307,8 @@ follows with Klaxon:
 ```kotlin
 @TypeFor(field = "type", adapter = ShapeTypeAdapter::class)
 open class Shape(val type: String)
-data class Rectangle(val width: Int, val height: Int): Shape()
-data class Circle(val radius: Int): Shape()
+data class Rectangle(val width: Int, val height: Int): Shape("rectangle")
+data class Circle(val radius: Int): Shape("circle")
 ```
 
 The type adapter is as follows:
