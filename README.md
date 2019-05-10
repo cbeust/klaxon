@@ -73,7 +73,7 @@ val result = Klaxon()
     }
     """)
 
-assert(result.name == "John Smith")
+assert(result?.name == "John Smith")
 assert(result.age == 23)
 ```
 
