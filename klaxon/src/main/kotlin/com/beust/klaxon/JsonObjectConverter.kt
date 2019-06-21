@@ -88,7 +88,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                         parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() })
                 null
             }
-        }
+        } ?: concreteClass.objectInstance
 
         if (errorMessage.any()) {
             throw KlaxonException(errorMessage.joinToString("\n"))
