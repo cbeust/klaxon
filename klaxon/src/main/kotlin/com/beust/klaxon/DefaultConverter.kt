@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
+import java.lang.reflect.TypeVariable
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.jvm.jvmErasure
@@ -201,11 +202,21 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                             ":\n  $value")
                 }
             } else {
-                if ((jt as Class<*>).isArray) {
-                    val typeValue = jt.componentType
-                    klaxon.fromJsonObject(value, typeValue, typeValue.kotlin)
+                if (jt is Class<*>) {
+                    if (jt.isArray) {
+                        val typeValue = jt.componentType
+                        klaxon.fromJsonObject(value, typeValue, typeValue.kotlin)
+                    } else {
+                        JsonObjectConverter(klaxon, allPaths).fromJson(jv.obj!!, jv.propertyKClass!!.jvmErasure)
+                    }
                 } else {
-                    JsonObjectConverter(klaxon, allPaths).fromJson(jv.obj!!, jv.propertyKClass!!.jvmErasure)
+                    val typeName =
+                        if (jt is TypeVariable<*>) {
+                            jt.genericDeclaration
+                        } else {
+                            jt
+                        }
+                    throw IllegalArgumentException("Generic type not supported: $typeName")
                 }
             }
         return result
