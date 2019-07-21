@@ -178,6 +178,7 @@ class JsonValue(value: Any?,
             else if (double != null) "{double: $double"
             else if (char != null) "{char: $char"
             else if (boolean != null) "{boolean: $boolean"
+            else if (longValue != null) "{longBalue: $longValue"
             else throw KlaxonException("Should never happen")
         return result + ", property: " + propertyKClass + "}"
 
