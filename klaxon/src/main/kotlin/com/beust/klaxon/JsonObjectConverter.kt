@@ -66,6 +66,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         // will be filled by Kotlin reflection if they can't be found.
         val map = retrieveKeyValues(jsonObject, concreteClass)
         val errorMessage = arrayListOf<String>()
+        var success = false
         val result = concreteClass.constructors.firstNotNullResult { constructor ->
             val parameterMap = hashMapOf<KParameter, Any?>()
             constructor.parameters.forEach { parameter ->
@@ -79,7 +80,9 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             }
             try {
                 constructor.isAccessible = true
-                constructor.callBy(parameterMap)
+                val result = constructor.callBy(parameterMap)
+                success = true
+                result
             } catch(ex: Exception) {
                 // Lazy way to find out of that constructor worked. Easier than trying to make sure each
                 // parameter matches the parameter type.
@@ -90,7 +93,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             }
         } ?: concreteClass.objectInstance
 
-        if (errorMessage.any()) {
+        if (errorMessage.any() && ! success) {
             throw KlaxonException(errorMessage.joinToString("\n"))
         }
 
