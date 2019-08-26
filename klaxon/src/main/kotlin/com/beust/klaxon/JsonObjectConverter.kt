@@ -88,7 +88,8 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 // parameter matches the parameter type.
                 errorMessage.add("Unable to instantiate ${concreteClass.simpleName}" +
                         " with parameters " +
-                        parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() })
+                        parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() } +
+                        " - " + ex.message)
                 null
             }
         } ?: concreteClass.objectInstance
