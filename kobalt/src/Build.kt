@@ -6,8 +6,8 @@ import com.beust.kobalt.plugin.publish.bintray
 import com.beust.kobalt.project
 
 object Version {
-    val klaxon = "5.0.12"
-    val kotlin = "1.3.41"
+    val klaxon = "5.0.13"
+    val kotlin = "1.3.50"
 }
 
 val klaxon = project {

@@ -2,6 +2,9 @@ package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.util.*
+import java.util.Collections.emptyList
+import java.util.Collections.emptySet
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KType

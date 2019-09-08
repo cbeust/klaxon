@@ -1,3 +1,4 @@
+
 package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
