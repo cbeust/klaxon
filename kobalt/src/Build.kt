@@ -47,7 +47,7 @@ val klaxon = project {
 
 val jackson = project(klaxon) {
     name = "klaxon-jackson"
-    directory = "plugins/$name"
+    directory = "$name"
     group = "com.beust"
     artifactId = name
     version = "1.0.0"
