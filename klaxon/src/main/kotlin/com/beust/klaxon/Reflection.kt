@@ -47,11 +47,15 @@ val KClass<*>.fixedMemberProperties: List<Property1>
         var cl: Class<*> = this.java
         while (cl != Object::class.java) {
             val properties = cl.methods
+                    .filter { it.name != "getClass" }
 //                    .filter { it.isAccessible }
-                    .filter { it.name.startsWith("get") }
+                    .filter { it.name.startsWith("get") || it.name.startsWith("is") }
                     .filter { it.parameterCount == 0 }
                     .map {
-                        val name = it.name[3].toLowerCase() + it.name.substring(4)
+                        val isBoolean = it.name.startsWith("is")
+                        val count = if (isBoolean) 2 else 3
+                        val name = if (isBoolean) it.name
+                            else it.name[count].toLowerCase() + it.name.substring(count + 1)
                         val setter = try {
                             cl.getMethod("set" + name.capitalize())
                         } catch(ex: NoSuchMethodException) {
@@ -66,4 +70,4 @@ val KClass<*>.fixedMemberProperties: List<Property1>
     }
 
 val KClass<*>.fixedDeclaredMemberProperties: List<Property1>
-    get() = emptyList()
+    get() = TODO()
