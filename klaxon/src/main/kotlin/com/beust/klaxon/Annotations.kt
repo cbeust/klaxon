@@ -1,16 +1,13 @@
 package com.beust.klaxon
 
-import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.*
 import java.util.Collections.emptyList
 import java.util.Collections.emptySet
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.jvmErasure
 
 class Annotations {
     companion object {
@@ -96,20 +93,12 @@ class Annotations {
             return result
         }
 
-        fun isArray(type: KType?) = type?.jvmErasure is KClass<*> && type.jvmErasure.java.isArray
         fun isArray(type: Type?) = (type is Class<*> && type.isArray) || type is Array<*>
-
-        fun isSet(type: Type?) =
-            if (type is ParameterizedType) {
-                Set::class.java.isAssignableFrom(type.rawType as Class<*>)
-            } else {
-                false
-            }
-
-        fun isList(kClass: KClass<*>) = kotlin.collections.List::class.java.isAssignableFrom(kClass.java)
+        fun isSet(type: Type?) = Set::class.java.isAssignableFrom(type as Class<*>)
+        fun isList(kClass: KClass<*>) = List::class.java.isAssignableFrom(kClass.java)
 
         fun retrieveJsonFieldName(klaxon: Klaxon, kc: KClass<*>, prop: Property1) : String {
-            val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
+            val jsonAnnotation = findJsonAnnotation(kc, prop.name)
             val fieldName =
                     if (jsonAnnotation != null && jsonAnnotation.nameInitialized()) jsonAnnotation.name
                     else prop.name
