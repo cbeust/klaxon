@@ -15,16 +15,17 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
     override fun fromJson(jv: JsonValue): Any? {
         val value = jv.inside
         val propertyType = jv.propertyClass
+        val cl = jv.propertyClass as Class<*>
         val result =
             when(value) {
                 is Boolean, is String, is Long -> value
                 is Int -> fromInt(value, propertyType)
                 is BigInteger, is BigDecimal -> value
                 is Double ->
-                    if (jv.propertyClass == kotlin.Float::class) fromFloat(value.toFloat(), propertyType)
+                    if (cl.name == "float") fromFloat(value.toFloat(), propertyType)
                     else fromDouble(value, propertyType)
                 is Float ->
-                    if (jv.propertyClass == kotlin.Double::class) fromDouble(value.toDouble(),
+                    if (cl.name == "double") fromDouble(value.toDouble(),
                             propertyType)
                     else fromFloat(value, propertyType)
                 is Collection<*> -> fromCollection(value, jv)
