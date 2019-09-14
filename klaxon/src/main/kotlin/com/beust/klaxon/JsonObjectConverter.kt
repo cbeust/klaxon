@@ -175,16 +175,15 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     val polymorphicInfo = polymorphicMap[fieldName]
 
                     val polymorphicClass = calculatePolymorphicClass(polymorphicInfo, jsonObject)
-                    val kClass = polymorphicClass ?: kc
-//                    val kType = if (polymorphicClass != null) kClass.createType() else prop.returnType
                     val cls = polymorphicClass?.java ?: kc.java
                     val convertedValue = klaxon.findConverterFromClass(cls, prop)
-                            .fromJson(JsonValue(jValue, prop.returnType.java, klaxon))
+                            .fromJson(JsonValue(jValue, polymorphicClass?.java ?: prop.returnType.java, klaxon))
                     result[prop.name] = convertedValue
                 } else {
                     // Didn't find any value for that property: don't do anything. If a value is missing here,
                     // it might still be found as a default value on the constructor, and we'll find out once we
                     // try to instantiate that object.
+                    println("COULDN'T FIND FIELD $fieldName")
                 }
             } else {
                 result[prop.name] = allPaths[path]

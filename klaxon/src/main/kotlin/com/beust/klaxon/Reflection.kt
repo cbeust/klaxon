@@ -4,6 +4,8 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
 
 class Reflection {
     companion object {
@@ -15,7 +17,9 @@ class Reflection {
 enum class Visibility { PUBLIC, PRIVATE }
 
 class Property1(val name: String,
-        val getter: Method, val javaSetter: Method? = null, val javaField: Field? = null) {
+        val getter: Method, val javaSetter: Method? = null, val javaField: Field? = null,
+        val json: Json? = null,
+        val typeFor: TypeFor? = null) {
     fun call(obj: Any): Any? {
         TODO()
     }
@@ -32,13 +36,6 @@ class Property1(val name: String,
     val visibility: Visibility =
             if (Modifier.isPublic(getter.modifiers)) Visibility.PUBLIC
             else Visibility.PRIVATE
-    val typeFor: TypeFor? =
-            getter.getAnnotation(TypeFor::class.java)
-    val json: Json? =
-            getter.getAnnotation(Json::class.java)
-//    fun <T> findAnnotation(): KClass<*>? {
-//        return null
-//    }
 }
 
 val KClass<*>.fixedMemberProperties: List<Property1>
@@ -61,7 +58,12 @@ val KClass<*>.fixedMemberProperties: List<Property1>
                         } catch(ex: NoSuchMethodException) {
                             null
                         }
-                        Property1(name, it, setter)
+                        val annotationsMethod = cl.methods.firstOrNull { it.name == name + "\$annotations" }
+                        val anns = annotationsMethod?.invoke(null)
+                        val p = this.declaredMemberProperties.firstOrNull { it.name == name }
+                        val typeFor = p?.findAnnotation<TypeFor>()
+                        val json = p?.findAnnotation<Json>()
+                        Property1(name, it, setter, null, json, typeFor)
                     }
             result.addAll(properties)
             cl = cl.superclass
