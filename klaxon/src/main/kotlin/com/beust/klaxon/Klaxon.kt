@@ -125,7 +125,7 @@ class Klaxon : ConverterFinder {
                 else throw KlaxonException("Couldn't convert $jo")
             } else if (jo != null) {
                 val converter = findConverterFromClass(T::class.java, null)
-                val convertedValue = converter.fromJson(JsonValue(jo, null, this))
+                val convertedValue = converter.fromJson(JsonValue(jo, T::class.java, this))
                 result.add(convertedValue)
             } else {
                 throw KlaxonException("Couldn't convert $jo")
