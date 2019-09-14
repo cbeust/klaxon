@@ -2,17 +2,16 @@ package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
 import org.testng.annotations.Test
-import kotlin.reflect.KProperty
 
 @Test
 class PropertyStrategyTest {
     private fun runTest(enabled: Boolean) {
         data class Simple(val field1: String, val field2: String = "right")
         val ps = object: PropertyStrategy {
-            override fun accept(property: KProperty<*>) = property.name != "field2"
+            override fun accept(property: Property1) = property.name != "field2"
         }
         val ps2 = object: PropertyStrategy {
-            override fun accept(property: KProperty<*>) = true
+            override fun accept(property: Property1) = true
         }
         val klaxon = Klaxon()
                 .propertyStrategy(ps2)

@@ -3,17 +3,11 @@ package com.beust.klaxon
 import com.beust.klaxon.internal.firstNotNullResult
 import java.util.*
 import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaField
-import kotlin.reflect.jvm.javaSetter
-import kotlin.reflect.jvm.javaType
 
 /**
  * Convert a JsonObject into a class instance.
@@ -50,7 +44,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             if (Annotations.isList(kc)) {
                 ArrayList::class
             } else if (typeFor != null) {
-                val prop = kc.memberProperties.find { it.name == typeFor.field}
+                val prop = kc.fixedMemberProperties.find { it.name == typeFor.field}
                         ?: illegalPropClass(typeFor.field, kc.simpleName!!)
                 val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
 
@@ -104,7 +98,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         properties.filter {
             it.name in map
         }.forEach {
-            if (it is KMutableProperty<*>) {
+            if (it.isMutable) {
                 val value = map[it.name]
                 if (value != null) {
                     it.javaSetter!!.invoke(result, value)
@@ -166,7 +160,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             //
             // Check if the name of the field was overridden with a @Json annotation
             //
-            val prop = kc.memberProperties.first { it.name == thisProp.name }
+            val prop = kc.fixedMemberProperties.first { it.name == thisProp.name }
             val fieldName = Annotations.retrieveJsonFieldName(klaxon, kc, prop)
             val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
             val path = if (jsonAnnotation?.path != "") jsonAnnotation?.path else null
@@ -186,8 +180,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     val kType = if (polymorphicClass != null) kClass.createType() else prop.returnType
                     val cls = polymorphicClass?.java ?: kc.java
                     val convertedValue = klaxon.findConverterFromClass(cls, prop)
-                            .fromJson(JsonValue(jValue, prop.returnType.javaType,
-                                    kType, klaxon))
+                            .fromJson(JsonValue(jValue, prop.returnType.java, klaxon))
                     result[prop.name] = convertedValue
                 } else {
                     // Didn't find any value for that property: don't do anything. If a value is missing here,
@@ -220,19 +213,19 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
     class PolymorphicInfo(val discriminantFieldName: String, val valueFieldName: String,
             val adapter: KClass<out TypeAdapter<*>>)
 
-    private fun findPolymorphicProperties(allProperties: List<KProperty1<out Any, Any?>>)
+    private fun findPolymorphicProperties(allProperties: List<Property1>)
             : Map<String, PolymorphicInfo> {
         val result = hashMapOf<String, PolymorphicInfo>()
         allProperties.forEach {
-            it.findAnnotation<TypeFor>()?.let { typeForAnnotation ->
+            it.typeFor?.let { typeForAnnotation ->
                 result[typeForAnnotation.field] = createPolymorphicInfo(typeForAnnotation, it, allProperties)
             }
         }
         return result
     }
 
-    private fun createPolymorphicInfo(typeForAnnotation: TypeFor, prop: KProperty1<out Any, Any?>,
-            allProperties: List<KProperty1<out Any, Any?>>): PolymorphicInfo {
+    private fun createPolymorphicInfo(typeForAnnotation: TypeFor, prop: Property1,
+            allProperties: List<Property1>): PolymorphicInfo {
         val propertyNames = allProperties.map { it.name }.toSet()
         typeForAnnotation.field.let { field ->
             if (propertyNames.contains(field)) {

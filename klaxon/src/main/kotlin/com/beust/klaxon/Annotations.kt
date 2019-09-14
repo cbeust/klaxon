@@ -6,9 +6,7 @@ import java.util.*
 import java.util.Collections.emptyList
 import java.util.Collections.emptySet
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
-import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
@@ -43,21 +41,21 @@ class Annotations {
             }
         }
 
-        private fun findProperties(kc: KClass<*>?): Collection<KProperty1<out Any, Any?>> = try {
-            if (kc != null) kc.memberProperties else emptyList()
+        private fun findProperties(kc: KClass<*>?): Collection<Property1> = try {
+            if (kc != null) kc.fixedMemberProperties else emptyList()
         } catch (ex: Throwable) {
             // https://youtrack.jetbrains.com/issue/KT-16616
             emptyList()
         }
 
         fun findNonIgnoredProperties(kc: KClass<*>?, strategies: List<PropertyStrategy>)
-                : List<KProperty1<out Any, Any?>> {
+                : List<Property1> {
             val result = findProperties(kc)
                 .filter {
                     // Visibility
-                    val ignored = it.findAnnotation<Json>()?.ignored
-                    it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false) ||
-                            it.visibility == KVisibility.PRIVATE && (ignored != null || ignored == false)
+                    val ignored = it.json?.ignored
+                    it.visibility == Visibility.PUBLIC && (ignored == null || ignored == false) ||
+                            it.visibility == Visibility.PRIVATE && (ignored != null || ignored == false)
                 }.filter {
                     // PropertyStrategy
                     val r = strategies.fold(true) { initial: Boolean, op: PropertyStrategy ->
@@ -75,12 +73,13 @@ class Annotations {
             val others = arrayListOf<KClass<*>>()
             val thesePaths = findProperties(kc)
                     .mapNotNull {
-                        val classifier = it.returnType.classifier
-                        if (classifier is KClass<*>) others.add(classifier)
-                        else {
-                            // Generic type, ignore
-                        }
-                        it.findAnnotation<Json>()
+                        others.add(it.returnType)
+//                        val classifier = it.returnType.classifier
+//                        if (classifier is KClass<*>) others.add(it.returnType)
+//                        else {
+//                            // Generic type, ignore
+//                        }
+                        it.json
                     }
                     .map { it.path }
             val recursive = others.flatMap {
@@ -98,6 +97,7 @@ class Annotations {
         }
 
         fun isArray(type: KType?) = type?.jvmErasure is KClass<*> && type.jvmErasure.java.isArray
+        fun isArray(type: Type?) = (type is Class<*> && type.isArray) || type is Array<*>
 
         fun isSet(type: Type?) =
             if (type is ParameterizedType) {
@@ -108,7 +108,7 @@ class Annotations {
 
         fun isList(kClass: KClass<*>) = kotlin.collections.List::class.java.isAssignableFrom(kClass.java)
 
-        fun retrieveJsonFieldName(klaxon: Klaxon, kc: KClass<*>, prop: KProperty1<*, *>) : String {
+        fun retrieveJsonFieldName(klaxon: Klaxon, kc: KClass<*>, prop: Property1) : String {
             val jsonAnnotation = Annotations.findJsonAnnotation(kc, prop.name)
             val fieldName =
                     if (jsonAnnotation != null && jsonAnnotation.nameInitialized()) jsonAnnotation.name

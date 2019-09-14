@@ -1,8 +1,8 @@
 package com.beust.klaxon.internal
 
 import com.beust.klaxon.Converter
-import kotlin.reflect.KProperty
+import com.beust.klaxon.Property1
 
 interface ConverterFinder {
-    fun findConverter(value: Any, prop: KProperty<*>? = null): Converter
+    fun findConverter(value: Any, prop: Property1? = null): Converter
 }

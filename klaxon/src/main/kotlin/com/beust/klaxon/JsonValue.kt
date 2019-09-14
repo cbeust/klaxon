@@ -4,8 +4,6 @@ import com.beust.klaxon.internal.ConverterFinder
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlin.reflect.KProperty
-import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
@@ -13,7 +11,7 @@ import kotlin.reflect.full.declaredMemberProperties
  */
 class JsonValue(value: Any?,
         val propertyClass: Type?,
-        val propertyKClass: kotlin.reflect.KType?,
+//        val propertyKClass: kotlin.reflect.KType?,
         private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
@@ -111,7 +109,7 @@ class JsonValue(value: Any?,
                 type = BigDecimal::class.java
             }
             is Int -> {
-                when(propertyKClass?.classifier) {
+                when(propertyClass) {
                     kotlin.Float::class -> {
                         float = value.toFloat()
                         type = Float::class.java
@@ -180,14 +178,14 @@ class JsonValue(value: Any?,
             else if (boolean != null) "{boolean: $boolean"
             else if (longValue != null) "{longBalue: $longValue"
             else throw KlaxonException("Should never happen")
-        return result + ", property: " + propertyKClass + "}"
+        return result + ", property: " + propertyClass + "}"
 
     }
 
     companion object {
-        fun propertiesAndValues(obj: Any): Map<KProperty<*>, Any?> {
-            val result = hashMapOf<KProperty<*>, Any?>()
-            obj::class.declaredMemberProperties
+        fun propertiesAndValues(obj: Any): Map<Property1, Any?> {
+            val result = hashMapOf<Property1, Any?>()
+            obj::class.fixedDeclaredMemberProperties
 //                    .filter { it.visibility != KVisibility.PRIVATE && it.isAccessible }
 //            obj.javaClass.declaredFields
                     .forEach { property ->

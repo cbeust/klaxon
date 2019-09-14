@@ -5,13 +5,9 @@ import java.io.*
 import java.nio.charset.Charset
 import kotlin.collections.set
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.javaField
-import kotlin.reflect.jvm.javaMethod
-import kotlin.reflect.jvm.javaType
 
 class Klaxon : ConverterFinder {
     /**
@@ -129,7 +125,7 @@ class Klaxon : ConverterFinder {
                 else throw KlaxonException("Couldn't convert $jo")
             } else if (jo != null) {
                 val converter = findConverterFromClass(T::class.java, null)
-                val convertedValue = converter.fromJson(JsonValue(jo, null, null, this))
+                val convertedValue = converter.fromJson(JsonValue(jo, null, this))
                 result.add(convertedValue)
             } else {
                 throw KlaxonException("Couldn't convert $jo")
@@ -221,7 +217,7 @@ class Klaxon : ConverterFinder {
      * passed, inspect that property for annotations that would override the type converter
      * we need to use to convert it.
      */
-    override fun findConverter(value: Any, prop: KProperty<*>?): Converter {
+    override fun findConverter(value: Any, prop: Property1?): Converter {
         val result = findConverterFromClass(value::class.java, prop)
         log("Value: $value, converter: $result")
         return result
@@ -230,8 +226,8 @@ class Klaxon : ConverterFinder {
     /**
      * Given a Kotlin class and a property where the object should be stored, returns a `Converter` for that type.
      */
-    fun findConverterFromClass(cls: Class<*>, prop: KProperty<*>?) : Converter {
-        fun annotationsForProp(prop: KProperty<*>, kc: Class<*>): Array<out Annotation> {
+    fun findConverterFromClass(cls: Class<*>, prop: Property1?) : Converter {
+        fun annotationsForProp(prop: Property1, kc: Class<*>): Array<out Annotation> {
             val result = kc.declaredFields.firstOrNull { it.name == prop.name }?.declaredAnnotations ?: arrayOf()
 
             return result
@@ -239,9 +235,9 @@ class Klaxon : ConverterFinder {
 
         var propertyClass: Class<*>? = null
         val propConverter : Converter? =
-            if (prop != null && prop.returnType.classifier is KClass<*>) {
-                propertyClass = (prop.returnType.classifier as KClass<*>).java
-                val dc = prop.getter.javaMethod?.declaringClass ?: prop.javaField?.declaringClass
+            if (prop != null) {
+                propertyClass = prop.returnType.java
+                val dc = prop.getter?.declaringClass ?: prop.javaField?.declaringClass
                 annotationsForProp(prop, dc!!).mapNotNull {
                     fieldTypeMap[it.annotationClass]
                 }.firstOrNull()
@@ -261,12 +257,12 @@ class Klaxon : ConverterFinder {
         return result
     }
 
-    private fun findBestConverter(cls: Class<*>, prop: KProperty<*>?) : Converter? {
-        val toConvert = prop?.returnType?.javaType as? Class<*> ?: cls
+    private fun findBestConverter(cls: Class<*>, prop: Property1?) : Converter? {
+        val toConvert = prop?.returnType?.java as? Class<*> ?: cls
         return converters.firstOrNull { it.canConvert(toConvert) }
     }
 
-    fun toJsonString(value: Any?, prop: KProperty<*>? = null): String
+    fun toJsonString(value: Any?, prop: Property1? = null): String
             = if (value == null) "null" else toJsonString(value, findConverter(value, prop))
 
     private fun toJsonString(value: Any, converter: Any /* can be Converter or Converter */)
@@ -290,10 +286,10 @@ class Klaxon : ConverterFinder {
         // If the user provided a type converter, use it, otherwise try to instantiate the object ourselves.
         val classConverter = findConverterFromClass(cls, null)
         val types = kc.typeParameters.map { KTypeProjection.invariant(it.createType()) }
-        val type =
-                if (kc.typeParameters.any()) kc.createType(types)
-                else kc.createType()
-        return classConverter.fromJson(JsonValue(jsonObject, cls, type, this@Klaxon)) as Any
+//        val type =
+//                if (kc.typeParameters.any()) kc.createType(types)
+//                else kc.createType()
+        return classConverter.fromJson(JsonValue(jsonObject, cls, this@Klaxon)) as Any
     }
 
     fun warn(s: String) = println("Warning: $s")
