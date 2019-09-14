@@ -5,7 +5,6 @@ import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.isAccessible
 
@@ -177,7 +176,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
 
                     val polymorphicClass = calculatePolymorphicClass(polymorphicInfo, jsonObject)
                     val kClass = polymorphicClass ?: kc
-                    val kType = if (polymorphicClass != null) kClass.createType() else prop.returnType
+//                    val kType = if (polymorphicClass != null) kClass.createType() else prop.returnType
                     val cls = polymorphicClass?.java ?: kc.java
                     val convertedValue = klaxon.findConverterFromClass(cls, prop)
                             .fromJson(JsonValue(jValue, prop.returnType.java, klaxon))
