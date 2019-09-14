@@ -10,8 +10,7 @@ import java.math.BigInteger
  * constructor is guaranteed to be non null.
  */
 class JsonValue(value: Any?,
-        val propertyClass: Type?,
-//        val propertyKClass: kotlin.reflect.KType?,
+        val propertyClass: Type,
         private val converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
