@@ -144,8 +144,8 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
             if (Annotations.isSet(jt)) {
                 convertedCollection.toSet()
             } else if (Annotations.isArray(kt)) {
-                val componentType = kt?.jvmErasure?.java?.componentType
-                val array = java.lang.reflect.Array.newInstance(componentType, value.size)
+                val componentType = (jt as Class<*>).componentType
+                val array = java.lang.reflect.Array.newInstance(componentType, convertedCollection.size)
                 convertedCollection.indices.forEach { i ->
                     java.lang.reflect.Array.set(array, i, convertedCollection[i])
                 }
