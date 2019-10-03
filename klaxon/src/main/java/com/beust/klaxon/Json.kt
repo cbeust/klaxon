@@ -22,7 +22,12 @@ annotation class Json(
     /**
      * Work in progress
      */
-    val path: String = ""
+    val path: String = "",
+
+    /**
+     * Where this property should appear in the JSON output. Lower numbers appear first.
+     */
+    val index: Long = Long.MAX_VALUE
 )
 
 fun Json.nameInitialized() = this.name != NAME_NOT_INITIALIZED

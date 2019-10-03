@@ -5,6 +5,7 @@ import java.lang.reflect.Type
 import java.util.*
 import java.util.Collections.emptyList
 import java.util.Collections.emptySet
+import kotlin.Comparator
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
@@ -44,7 +45,12 @@ class Annotations {
         }
 
         private fun findProperties(kc: KClass<*>?): Collection<KProperty1<out Any, Any?>> = try {
-            if (kc != null) kc.memberProperties else emptyList()
+            (kc?.memberProperties ?: emptyList()).sortedWith(Comparator() { o1, o2 ->
+                val j1 = o1.findAnnotation<Json>()
+                val j2 = o2.findAnnotation<Json>()
+                if (j1 == null || j2 == null) 0
+                    else j1.index.compareTo(j2.index)
+            })
         } catch (ex: Throwable) {
             // https://youtrack.jetbrains.com/issue/KT-16616
             emptyList()
