@@ -1,5 +1,5 @@
 object This {
-    val version = "5.0.14-SNAPSHOT"
+    val version = "5.2-SNAPSHOT"
     val groupId = "com.beust"
     val artifactId = "klaxon"
     val description = "A JSON parsing library"
