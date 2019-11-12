@@ -391,7 +391,7 @@ a class that will translate these integer values into the correct class:
 
 ```kotlin
 class ShapeTypeAdapter: TypeAdapter<Shape> {
-    override fun instantiate(type: Any): KClass<out Shape> = when(type as Int) {
+    override fun classFor(type: Any): KClass<out Shape> = when(type as Int) {
         1 -> Rectangle::class
         2 -> Circle::class
         else -> throw IllegalArgumentException("Unknown type: $type")
