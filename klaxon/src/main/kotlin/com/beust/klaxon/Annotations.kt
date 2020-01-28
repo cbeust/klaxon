@@ -56,23 +56,16 @@ class Annotations {
             emptyList()
         }
 
-        fun findNonIgnoredProperties(kc: KClass<*>?, strategies: List<PropertyStrategy>)
-                : List<KProperty1<out Any, Any?>> {
-            val result = findProperties(kc)
-                .filter {
-                    // Visibility
-                    val ignored = it.findAnnotation<Json>()?.ignored
-                    it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false) ||
-                            it.visibility == KVisibility.PRIVATE && (ignored != null || ignored == false)
-                }.filter {
-                    // PropertyStrategy
-                    val r = strategies.fold(true) { initial: Boolean, op: PropertyStrategy ->
-                        initial and op.accept(it) }
-                    val result = strategies.isEmpty() || r
-                    result
-                }
-            return result
-        }
+		fun findNonIgnoredProperties(kc: KClass<*>?, strategies: List<PropertyStrategy>): List<KProperty1<out Any, Any?>> =
+				findProperties(kc).filter {
+					// Visibility
+					val ignored = it.findAnnotation<Json>()?.ignored
+					it.visibility == KVisibility.PUBLIC && (ignored == null || ignored == false) ||
+							it.visibility == KVisibility.PRIVATE && (ignored != null || ignored == false)
+				}.filter { property ->
+					// PropertyStrategy
+					strategies.none { !it.accept(property) }
+				}
 
         fun findJsonPaths(kc: KClass<*>?) = findJsonPaths(kc, HashSet())
 
