@@ -129,7 +129,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     it.javaSetter!!.invoke(result, value)
                 }
             } else {
-                // Non-Mutable property
+                // Non-Mutable property with (possibly) mutable backing field.
                 val field = it.javaField
                 if ( field != null && result != null && !Modifier.isFinal(field.modifiers) ) {
                     val value = map[it.name]
