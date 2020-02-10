@@ -1,6 +1,7 @@
 package com.beust.klaxon
 
 import com.beust.klaxon.internal.firstNotNullResult
+import java.lang.reflect.Modifier
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -128,9 +129,9 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     it.javaSetter!!.invoke(result, value)
                 }
             } else {
-                // Mutable property
+                // Non-Mutable property
                 val field = it.javaField
-                if (field != null && result != null) {
+                if ( field != null && result != null && !Modifier.isFinal(field.modifiers) ) {
                     val value = map[it.name]
                     field.isAccessible = true
                     field.set(result, value)
