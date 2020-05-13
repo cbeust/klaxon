@@ -42,8 +42,11 @@ buildscript {
 }
 
 dependencies {
-    listOf("stdlib", "reflect", "test").forEach {
+    listOf("stdlib", "reflect").forEach {
         compile(kotlin(it))
+    }
+    listOf("test").forEach {
+        testCompile(kotlin(it))
     }
     listOf("org.testng:testng:7.0.0", "org.assertj:assertj-core:3.10.0").forEach {
         testCompile(it)
