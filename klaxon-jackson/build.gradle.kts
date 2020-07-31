@@ -12,7 +12,7 @@ plugins {
 }
 
 dependencies {
-    compile(kotlin("stdlib"))
-    compile(project(":klaxon"))
+    implementation(kotlin("stdlib"))
+    implementation(project(":klaxon"))
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.6")
 }
