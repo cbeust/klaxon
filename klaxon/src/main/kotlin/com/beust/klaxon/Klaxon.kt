@@ -301,4 +301,9 @@ class Klaxon : ConverterFinder {
     fun log(s: String) {
         if (Debug.verbose) println(s)
     }
+
+    /**
+     * Convert the parameer into a JsonObject
+     */
+    fun convertToJsonObject(obj: Any) = JsonValue.convertToJsonObject(obj, this)
 }

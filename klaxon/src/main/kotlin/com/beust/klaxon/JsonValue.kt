@@ -11,7 +11,7 @@ import kotlin.reflect.full.declaredMemberProperties
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
  * constructor is guaranteed to be non null.
  */
-class JsonValue(value: Any?,
+class JsonValue constructor(value: Any?,
         val propertyClass: Type?,
         val propertyKClass: kotlin.reflect.KType?,
         private val converterFinder: ConverterFinder) {
@@ -152,21 +152,11 @@ class JsonValue(value: Any?,
                     obj = null
                     type = Any::class.java
                 } else {
-                    obj = convertToJsonObject(value)
+                    obj = convertToJsonObject(value, converterFinder)
                     type = value.javaClass
                 }
             }
         }
-    }
-
-    private fun convertToJsonObject(obj: Any): JsonObject {
-        val result = JsonObject()
-        propertiesAndValues(obj).entries.forEach { entry ->
-            val property = entry.key
-            val p = entry.value
-            result[property.name] = converterFinder.findConverter(p!!, property)
-        }
-        return result
     }
 
     override fun toString() : String {
@@ -185,7 +175,17 @@ class JsonValue(value: Any?,
     }
 
     companion object {
-        fun propertiesAndValues(obj: Any): Map<KProperty<*>, Any?> {
+        fun convertToJsonObject(obj: Any, converterFinder: ConverterFinder = Klaxon()): JsonObject {
+            val result = JsonObject()
+            propertiesAndValues(obj).entries.forEach { entry ->
+                val property = entry.key
+                val p = entry.value
+                result[property.name] = converterFinder.findConverter(p!!, property).toJson(p!!)
+            }
+            return result
+        }
+
+        private fun propertiesAndValues(obj: Any): Map<KProperty<*>, Any?> {
             val result = hashMapOf<KProperty<*>, Any?>()
             obj::class.declaredMemberProperties
 //                    .filter { it.visibility != KVisibility.PRIVATE && it.isAccessible }
