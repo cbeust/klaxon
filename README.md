@@ -132,6 +132,36 @@ class Ignored(val name: String) {
 Additionally, if you want to declare a property `private` but still want that property to be visible to
 Klaxon, you can annotate it with `@Json(ignored = false)`.
 
+#### `index`
+
+The `index` attribute allows you to specify where in the JSON string the key should appear. This allows you to
+specify that certain keys should appear before others:
+
+```kotlin
+class Data(
+    @Json(index = 1) val id: String,
+    @Json(index = 2) val name: String
+)
+println(Klaxon().toJsonString(Data("id", "foo")))
+
+// displays { "id": "id", "name": "foo" }
+```
+
+whereas
+
+```kotlin
+class Data(
+    @Json(index = 2) val id: String,
+    @Json(index = 1) val name: String
+)
+println(Klaxon().toJsonString(Data("id", "foo")))
+
+// displays { "name": "foo" , "id": "id" }
+```
+
+Properties that are not assigned an index will be displayed in a non deterministic order in the output JSON.
+
+
 ### Renaming fields
 
 On top of using the `@Json(name=...)` annotation to rename fields, you can implement a field renamer yourself that
@@ -361,7 +391,7 @@ a class that will translate these integer values into the correct class:
 
 ```kotlin
 class ShapeTypeAdapter: TypeAdapter<Shape> {
-    override fun instantiate(type: Any): KClass<out Shape> = when(type as Int) {
+    override fun classFor(type: Any): KClass<out Shape> = when(type as Int) {
         1 -> Rectangle::class
         2 -> Circle::class
         else -> throw IllegalArgumentException("Unknown type: $type")

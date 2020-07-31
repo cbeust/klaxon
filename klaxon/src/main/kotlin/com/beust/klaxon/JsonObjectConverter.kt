@@ -84,12 +84,30 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 success = true
                 result
             } catch(ex: Exception) {
-                // Lazy way to find out of that constructor worked. Easier than trying to make sure each
-                // parameter matches the parameter type.
-                errorMessage.add("Unable to instantiate ${concreteClass.simpleName}" +
-                        " with parameters " +
-                        parameterMap.entries.map { it.key.name.toString() + ": " + it.value.toString() } +
-                        " - " + ex.message)
+                // Lazy way to find out of that constructor worked: catch the exception.
+                // Easier than trying to make sure each parameter matches the parameter type. Still try to
+                // output a meaningful error message pointing out directly at the parameter(s) that are probably
+                // wrong using isAssignableFrom.
+                val expected = constructor.parameters.map { it.name!! to it.type }.toMap()
+                val actual = parameterMap.entries.map { it.key.name!! to parameterMap[it.key]}.toMap()
+                val errors = expected.keys.mapNotNull { name ->
+                    val exp = expected[name]
+                    val act = actual[name]
+                    if (act != null) {
+                        val actClass = act::class.java
+                        val ok = actClass.isAssignableFrom((exp!!.classifier as KClass<*>).java)
+                        if (!ok) {
+                            "\n    Parameter $name: expected $exp but received ${actClass.name} (value: $act)"
+                        } else {
+                            null
+                        }
+                    } else {
+                        ex.message
+                    }
+                }
+
+                errorMessage.add("Unable to instantiate ${concreteClass.simpleName}:"
+                        + errors.joinToString("\n") + "\n")
                 null
             }
         } ?: concreteClass.objectInstance
