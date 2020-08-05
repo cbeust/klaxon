@@ -297,10 +297,10 @@ class Klaxon : ConverterFinder {
     }
 
     /**
-     * Convert the parameer into a JsonObject
+     * Convert the parameter into a JsonObject
      */
     @Suppress("unused")
-    fun convertToJsonObject(obj: Any) = JsonValue.convertToJsonObject(obj, this)
+    fun toJsonObject(obj: Any) = JsonValue.convertToJsonObject(obj, this)
 
     fun log(s: String) {
         if (Debug.verbose) println(s)

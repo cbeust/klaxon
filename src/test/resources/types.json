@@ -1,0 +1,15 @@
+{
+    "int_value": 123456789,
+    "long_value": 2147483649,
+    "bigint_value": 123456789123456789123456789,
+    "boolean_value": false,
+    "float_value": 12.34,
+    "float_exp_value": 3.141E-10,
+    "string_value": "foo-bar",
+    "unicode_value": "foo\u20ffbar",
+    "unicode_unescaped_value": "ú\u00fa",
+    "escape_value": "[\"|\\|\/|\b|\f|\n|\r|\t]",
+    "object_value": {},
+    "array_value": [],
+    "null_value": null
+}

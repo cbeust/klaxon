@@ -30,7 +30,7 @@ plugins {
     `maven-publish`
     signing
     id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
-    kotlin("jvm") version "1.3.50" apply true
+    kotlin("jvm")
 }
 
 buildscript {

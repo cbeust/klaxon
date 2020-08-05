@@ -2,6 +2,7 @@ plugins {
     java
     maven
     `java-library`
+    kotlin("jvm") version "1.3.70" apply true
 }
 
 allprojects {
@@ -25,9 +26,25 @@ repositories {
     maven { setUrl("https://plugins.gradle.org/m2") }
 }
 
-//dependencies {
-//    listOf("org.testng:testng:7.0.0").forEach { testCompile(it) }
-//}
+val test by tasks.getting(Test::class) {
+    useTestNG()
+}
+
+dependencies {
+    listOf("stdlib", "reflect").forEach {
+        implementation(kotlin(it))
+    }
+    listOf("test").forEach {
+        testImplementation(kotlin(it))
+    }
+    listOf("org.testng:testng:7.0.0", "org.assertj:assertj-core:3.10.0").forEach {
+        testImplementation(it)
+    }
+
+    listOf("klaxon", "klaxon-jackson").forEach {
+        compile(project(":$it", "default"))
+    }
+}
 
 //
 //dependencies {

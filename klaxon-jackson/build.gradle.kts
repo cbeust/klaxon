@@ -8,11 +8,11 @@ buildscript {
 
 plugins {
     java
-//    kotlin("jvm") version "1.3.50"
+    kotlin("jvm")
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(project(":klaxon"))
+    implementation(project(":klaxon", "default"))
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.6")
 }

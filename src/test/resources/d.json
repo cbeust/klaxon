@@ -1,0 +1,38 @@
+[
+    {
+        "first": "Dale",
+        "last": "Cooper",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 90 },
+                { "name": "physics", "grade" : 50 },
+                { "name": "history", "grade" : 85 }
+            ],
+            "location" : "Berkeley"
+        }
+    },
+    {
+        "first": "Kara",
+        "last": "Thrace",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 75 },
+                { "name": "physics", "grade" : 90 },
+                { "name": "history", "grade" : 55 }
+            ],
+            "location" : "Stanford"
+        }
+    },
+    {
+        "first": "Jack",
+        "last": "Harkness",
+        "schoolResults" : {
+            "scores": [
+                { "name": "math", "grade" : 40 },
+                { "name": "physics", "grade" : 82 },
+                { "name": "history", "grade" : 60 }
+            ],
+            "location" : "Berkeley"
+        }
+    }
+]
