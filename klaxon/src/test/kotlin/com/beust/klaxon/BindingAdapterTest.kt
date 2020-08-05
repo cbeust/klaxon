@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.beust.klaxon
 
 import org.assertj.core.api.Assertions.assertThat
@@ -15,13 +17,14 @@ annotation class KlaxonDayOfTheWeek
 class BindingAdapterTest {
     class WrongFieldAdapter(
         @KlaxonDate
+        // Need to keep that unused field or the test will break
         var dayOfTheWeek: String? = null // 0 = Sunday, 1 = Monday, ...
     )
 
     @Test
     fun wrongFieldAdapter() {
         try {
-            val result = createKlaxon()
+            createKlaxon()
                     .parse<WrongFieldAdapter>("""
                 {
                   "dayOfTheWeek": 2
@@ -54,8 +57,8 @@ class BindingAdapterTest {
                         throw KlaxonException("Couldn't parse date: ${jv.string}")
                     }
 
-                override fun toJson(o: Any)
-                        = """ { "date" : $o } """
+                override fun toJson(value: Any)
+                        = """ { "date" : $value } """
             })
 
             .fieldConverter(KlaxonDayOfTheWeek::class, object: Converter {
@@ -69,8 +72,8 @@ class BindingAdapterTest {
                     }
                 }
 
-                override fun toJson(o: Any) : String {
-                    return when(o.toString()) {
+                override fun toJson(value: Any) : String {
+                    return when(value.toString()) {
                         "Sunday" -> "0"
                         "Monday" -> "1"
                         "Tuesday" -> "2"
@@ -141,7 +144,7 @@ class BindingAdapterTest {
 
     fun withConverter2() = privateConverter2(withAdapter = true)
 
-    @Test(expectedExceptions = arrayOf(KlaxonException::class))
+    @Test(expectedExceptions = [KlaxonException::class])
     fun withoutConverter2() = privateConverter2(withAdapter = false)
 
     class Person(var fullName: String? = null)
