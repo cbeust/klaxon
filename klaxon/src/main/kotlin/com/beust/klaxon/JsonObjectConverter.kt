@@ -24,17 +24,13 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
      * found on the object. We return the first successful instantiation, or fail with an exception if
      * no suitable constructor was found.
      */
-    fun fromJson(jsonObject: JsonObject, kc: KClass<*>): Any {
-        val result =
-            if (kc == Map::class) {
-                initIntoMap(jsonObject, kc)
-            } else {
-                initIntoUserClass(jsonObject, kc)
-            }
-        return result
-    }
+    fun fromJson(jsonObject: JsonObject, kc: KClass<*>) = if (kc == Map::class) {
+            initIntoMap(jsonObject)
+        } else {
+            initIntoUserClass(jsonObject, kc)
+        }
 
-    private fun initIntoMap(jsonObject: JsonObject, kc: KClass<*>): Any {
+    private fun initIntoMap(jsonObject: JsonObject): Any {
         val result = hashMapOf<String, Any?>()
         jsonObject.keys.forEach { key ->
             result[key] = jsonObject[key]
@@ -46,19 +42,22 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         val typeFor = kc.findAnnotation<TypeFor>()
         // kc is the desired class in output, but Klaxon might decide to produce a different class
         // in certain conditions, such as a polymorphic class (with a @TypeFor annotation at the class level).
-        val concreteClass =
-            if (Annotations.isList(kc)) {
+        val concreteClass = when {
+            Annotations.isList(kc) -> {
                 ArrayList::class
-            } else if (typeFor != null) {
+            }
+            typeFor != null -> {
                 val prop = kc.memberProperties.find { it.name == typeFor.field}
                         ?: illegalPropClass(typeFor.field, kc.simpleName!!)
                 val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
 
                 val pi = createPolymorphicInfo(typeFor, prop, allProperties)
                 calculatePolymorphicClass(pi, jsonObject) ?: throw KlaxonException("Cant't find polymorphic class")
-            } else {
+            }
+            else -> {
                 kc
             }
+        }
 
         // Go through all the Kotlin constructors and associate each parameter with its value.
         // (Kotlin constructors contain the names of their parameters).
@@ -74,7 +73,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                     val convertedValue = map[parameter.name]
 //                    parameterMap[parameter] = adjustType(convertedValue, parameter)
                     parameterMap[parameter] = convertedValue
-                    val valueClass = if (convertedValue != null) convertedValue::class else "null"
+                    val valueClass: Any = if (convertedValue != null) convertedValue::class else "null"
                     klaxon.log("Parameter $parameter=$convertedValue ($valueClass)")
                 }
             }
@@ -144,28 +143,28 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 "Couldn't find a suitable constructor for class ${kc.simpleName} to initialize with $map")
     }
 
-    private fun adjustType(convertedValue: Any?, parameter: KParameter): Any? {
-        var result = convertedValue
-        val cj = convertedValue!!::class.java
-        if (cj.isArray) {
-            val cl = parameter.type.classifier
-            if (cl is KClass<*>) {
-                if (IntArray::class.java.isAssignableFrom(cl.java)) {
-                    val array = convertedValue as IntArray
-                    val ac = array::class
-                    val componentType = (ac as Class<*>).componentType
-                    val realArray = java.lang.reflect.Array.newInstance(componentType, array.size)
-                    result = realArray//IntArray(array.size)
-                    array.forEachIndexed{ i, v ->
-//                        result.set(i, v)
-                        java.lang.reflect.Array.set(realArray, i, v)
-                    }
-                    println("Array: $array")
-                }
-            }
-        }
-        return result
-    }
+//    private fun adjustType(convertedValue: Any?, parameter: KParameter): Any? {
+//        var result = convertedValue
+//        val cj = convertedValue!!::class.java
+//        if (cj.isArray) {
+//            val cl = parameter.type.classifier
+//            if (cl is KClass<*>) {
+//                if (IntArray::class.java.isAssignableFrom(cl.java)) {
+//                    val array = convertedValue as IntArray
+//                    val ac = array::class
+//                    val componentType = (ac as Class<*>).componentType
+//                    val realArray = java.lang.reflect.Array.newInstance(componentType, array.size)
+//                    result = realArray//IntArray(array.size)
+//                    array.forEachIndexed{ i, v ->
+////                        result.set(i, v)
+//                        java.lang.reflect.Array.set(realArray, i, v)
+//                    }
+//                    println("Array: $array")
+//                }
+//            }
+//        }
+//        return result
+//    }
 
     /**
      * Retrieve all the properties found on the class of the object and then look up each of these
@@ -194,6 +193,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
 
             if (path == null) {
                 // Note: use containsKey here since it's valid for a JSON object to have a value spelled "null"
+                @Suppress("ControlFlowWithEmptyBody")
                 if (jsonObject.containsKey(fieldName)) {
                     // Look up the polymorphic info for that field. If there is one, we need to
                     // retrieve its TypeAdapter
@@ -235,8 +235,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
 
 
 
-    class PolymorphicInfo(val discriminantFieldName: String, val valueFieldName: String,
-            val adapter: KClass<out TypeAdapter<*>>)
+    class PolymorphicInfo(val discriminantFieldName: String, val adapter: KClass<out TypeAdapter<*>>)
 
     private fun findPolymorphicProperties(allProperties: List<KProperty1<out Any, Any?>>)
             : Map<String, PolymorphicInfo> {
@@ -254,7 +253,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         val propertyNames = allProperties.map { it.name }.toSet()
         typeForAnnotation.field.let { field ->
             if (propertyNames.contains(field)) {
-                return PolymorphicInfo(prop.name, field, typeForAnnotation.adapter)
+                return PolymorphicInfo(prop.name, typeForAnnotation.adapter)
             } else {
                 illegalPropField(prop.name, field)
             }

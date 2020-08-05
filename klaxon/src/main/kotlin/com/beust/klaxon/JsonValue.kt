@@ -14,23 +14,23 @@ import kotlin.reflect.full.declaredMemberProperties
 class JsonValue constructor(value: Any?,
         val propertyClass: Type?,
         val propertyKClass: kotlin.reflect.KType?,
-        private val converterFinder: ConverterFinder) {
+        converterFinder: ConverterFinder) {
     var obj: JsonObject? = null
     var array: JsonArray<*>? = null
     var string: String? = null
     var int: Int? = null
-    var bigDecimal: BigDecimal? = null
-    var bigInteger: BigInteger? = null
+    private var bigDecimal: BigDecimal? = null
+    private var bigInteger: BigInteger? = null
     var longValue: Long? = null
     var float: Float? = null
     var double: Double? = null
-    var char: Char? = null
+    private var char: Char? = null
     var boolean: Boolean? = null
 
     /**
      * If this object contains a JsonArray, @return the generic type of that array, null otherwise.
      */
-    var genericType: Class<*>? = null
+    private var genericType: Class<*>? = null
 
     var type: Class<*>
 
@@ -50,22 +50,20 @@ class JsonValue constructor(value: Any?,
     @Suppress("IMPLICIT_CAST_TO_ANY")
     val inside: Any?
         get() {
-            val result =
-                when {
-                    obj != null -> obj
-                    array != null -> array
-                    string != null -> string
-                    int != null -> int
-                    longValue != null -> longValue
-                    float != null -> float
-                    double != null -> double
-                    char != null -> char
-                    boolean != null -> boolean
-                    bigDecimal != null -> bigDecimal
-                    bigInteger != null -> bigInteger
-                    else -> null
-                }
-            return result
+            return when {
+                obj != null -> obj
+                array != null -> array
+                string != null -> string
+                int != null -> int
+                longValue != null -> longValue
+                float != null -> float
+                double != null -> double
+                char != null -> char
+                boolean != null -> boolean
+                bigDecimal != null -> bigDecimal
+                bigInteger != null -> bigInteger
+                else -> null
+            }
         }
 
 
@@ -82,12 +80,12 @@ class JsonValue constructor(value: Any?,
                 val v = JsonArray<Any?>()
                 genericType = null
                 value.forEach {
-                    if (it == null) {
+                    genericType = if (it == null) {
                         v.add(null)
-                        genericType = Any::class.java
+                        Any::class.java
                     } else {
                         v.add(it)
-                        genericType = it.javaClass
+                        it.javaClass
                     }
                 }
                 array = v
@@ -103,20 +101,20 @@ class JsonValue constructor(value: Any?,
                 type = String::class.java
             }
             is BigInteger -> {
-                bigInteger = value as BigInteger
+                bigInteger = value
                 type = BigInteger::class.java
             }
             is BigDecimal -> {
-                bigDecimal = value as BigDecimal
+                bigDecimal = value
                 type = BigDecimal::class.java
             }
             is Int -> {
                 when(propertyKClass?.classifier) {
-                    kotlin.Float::class -> {
+                    Float::class -> {
                         float = value.toFloat()
                         type = Float::class.java
                     }
-                    kotlin.Double::class -> {
+                    Double::class -> {
                         double = value.toDouble()
                         type = Double::class.java
                     }
@@ -160,17 +158,19 @@ class JsonValue constructor(value: Any?,
     }
 
     override fun toString() : String {
-        val result = if (obj != null) "{object: $obj"
-            else if (array != null) "{array: $array"
-            else if (string != null) "{string: $string"
-            else if (int != null) "{int: $int"
-            else if (float != null) "{float: $float"
-            else if (double != null) "{double: $double"
-            else if (char != null) "{char: $char"
-            else if (boolean != null) "{boolean: $boolean"
-            else if (longValue != null) "{longBalue: $longValue"
-            else throw KlaxonException("Should never happen")
-        return result + ", property: " + propertyKClass + "}"
+        val result = when {
+            obj != null -> "{object: $obj"
+            array != null -> "{array: $array"
+            string != null -> "{string: $string"
+            int != null -> "{int: $int"
+            float != null -> "{float: $float"
+            double != null -> "{double: $double"
+            char != null -> "{char: $char"
+            boolean != null -> "{boolean: $boolean"
+            longValue != null -> "{longBalue: $longValue"
+            else -> throw KlaxonException("Should never happen")
+        }
+        return "$result, property: $propertyKClass}"
 
     }
 
@@ -180,7 +180,7 @@ class JsonValue constructor(value: Any?,
             propertiesAndValues(obj).entries.forEach { entry ->
                 val property = entry.key
                 val p = entry.value
-                result[property.name] = converterFinder.findConverter(p!!, property).toJson(p!!)
+                result[property.name] = converterFinder.findConverter(p!!, property).toJson(p)
             }
             return result
         }
@@ -192,7 +192,7 @@ class JsonValue constructor(value: Any?,
 //            obj.javaClass.declaredFields
                     .forEach { property ->
                         val p = property.call(obj)
-                        result.put(property, p)
+                        result[property] = p
                     }
             return result
         }
