@@ -2,7 +2,7 @@ plugins {
     java
     maven
     `java-library`
-    kotlin("jvm") version "1.3.70" apply true
+    kotlin("jvm") version KOTLIN_VERSION apply true
 }
 
 allprojects {

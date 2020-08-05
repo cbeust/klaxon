@@ -1,5 +1,7 @@
+@file:Suppress("MayBeConstant")
+
 object This {
-    val version = "5.4-SNAPSHOT"
+    val version = KLAXON_VERSION
     val groupId = "com.beust"
     val artifactId = "klaxon"
     val description = "A JSON parsing library"
