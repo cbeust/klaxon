@@ -49,7 +49,7 @@ bintray {
     user = project.findProperty("bintrayUser")?.toString()
     key = project.findProperty("bintrayApiKey")?.toString()
     dryRun = false
-    publish = false
+    publish = true
 
     setPublications("custom")
 
