@@ -760,26 +760,40 @@ Note the use of `flatMap` which transforms an initial result of a list of lists 
 You can convert any `JsonObject` to a valid JSON string by calling `toJsonString()` on it. If you want to get a pretty-printed
 version of that string, call `toJsonString(true)`
 
-## Advanced DSL
+## DSL
 
-Creating a JSON object with the Klaxon DSL makes it possible to insert arbitrary pieces of Kotlin code anywhere you want. For example, the following creates an object that maps each number from 1 to 3 with its string key:
+You can easily create JSON objects with Klaxon's DSL. There are two different variants of that DSL: declarative and imperative.
+
+The declarative DSL uses maps and pairs (with the `to` operator) to declare the associations between your keys and your values:
 
 ```kotlin
-val logic = json {
-    array(listOf(1,2,3).map {
-        obj(it.toString() to it)
-    })
+val obj = json {
+    "color" to "red",
+    "age" to 23
 }
-println("Result: ${logic.toJsonString()}")
 ```
 
-will output:
+The declarative syntax limits you to only having values in your object, so if you need to use arbitrary pieces of code inside your DSL object, you can use the imperative syntax instead. This syntax doesn't use pairs but lambdas, and you use the function `put()` to define your fields:
 
-```text
-Result: [ { "1" : 1 }, { "2" : 2 }, { "3" : 3 }  ]
+```kotlin
+val obj = json {
+   repeat(3) {
+      put("field$it", it * 2)
+   }
+}
 ```
 
-Functions that you can use inside a `json {}` expression are defined in the [`KlaxonJson`](https://github.com/cbeust/klaxon/blob/master/klaxon/src/main/kotlin/com/beust/klaxon/KlaxonJson.kt) class.
+Output:
+
+```json
+{
+  "fields": {
+    "field0": 0,
+    "field1": 2,
+    "field2": 4
+  }
+}
+```
 
 ## Flattening and path lookup
 
