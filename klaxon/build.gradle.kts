@@ -17,41 +17,18 @@ allprojects {
     group = This.groupId
     version = This.version
     apply<MavenPublishPlugin>()
-    tasks.withType<Javadoc> {
-        options {
-            quiet()
-//            outputLevel = JavadocOutputLevel.QUIET
-//            jFlags = listOf("-Xdoclint:none", "foo")
-//            "-quiet"
-        }
-    }
 }
 
 plugins {
-    java
     `maven-publish`
     signing
     id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
     kotlin("jvm")
 }
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven { setUrl("https://plugins.gradle.org/m2") }
-    }
-}
-
 dependencies {
     listOf("stdlib", "reflect").forEach {
         implementation(kotlin(it))
-    }
-    listOf("test").forEach {
-        testImplementation(kotlin(it))
-    }
-    listOf("org.testng:testng:7.0.0", "org.assertj:assertj-core:3.10.0").forEach {
-        testImplementation(it)
     }
 }
 
