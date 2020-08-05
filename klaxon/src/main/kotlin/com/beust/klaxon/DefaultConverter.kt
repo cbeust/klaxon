@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryVariable")
+
 package com.beust.klaxon
 
 import java.lang.reflect.ParameterizedType
@@ -29,9 +31,11 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                     if (classifier == Double::class) fromDouble(value.toDouble(), propertyType)
                     else fromFloat(value, propertyType)
                 is Long ->
-                    if (classifier == Double::class) fromDouble(value.toDouble(), propertyType)
-                    else if (classifier == Float::class) fromFloat(value.toFloat(), propertyType)
-                    else value
+                    when (classifier) {
+                        Double::class -> fromDouble(value.toDouble(), propertyType)
+                        Float::class -> fromFloat(value.toFloat(), propertyType)
+                        else -> value
+                    }
                 is Collection<*> -> fromCollection(value, jv)
                 is JsonObject -> fromJsonObject(value, jv)
                 null -> null
@@ -88,10 +92,11 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
     private fun fromInt(value: Int, propertyType: java.lang.reflect.Type?): Any {
         // If the value is an Int and the property is a Long, widen it
         val isLong = java.lang.Long::class.java == propertyType || Long::class.java == propertyType
-        val result =
-            if (isLong) value.toLong()
-            else if (propertyType == BigDecimal::class.java) BigDecimal(value)
-            else value
+        val result: Any = when {
+            isLong -> value.toLong()
+            propertyType == BigDecimal::class.java -> BigDecimal(value)
+            else -> value
+        }
         return result
     }
 
@@ -122,8 +127,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                     when (typeArgument) {
                         is Class<*> -> klaxon.findConverterFromClass(typeArgument, null)
                         is ParameterizedType -> {
-                            val ta = typeArgument.actualTypeArguments[0]
-                            when (ta) {
+                            when (val ta = typeArgument.actualTypeArguments[0]) {
                                 is Class<*> -> klaxon.findConverterFromClass(ta, null)
                                 is ParameterizedType -> klaxon.findConverterFromClass(ta.rawType.javaClass, null)
                                 else -> throw KlaxonException("SHOULD NEVER HAPPEN")
@@ -145,18 +149,22 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
         }
 
         val result =
-            if (Annotations.isSet(jt)) {
-                convertedCollection.toSet()
-            } else if (Annotations.isArray(kt)) {
-                val componentType = (jt as Class<*>).componentType
-                val array = java.lang.reflect.Array.newInstance(componentType, convertedCollection.size)
-                convertedCollection.indices.forEach { i ->
-                    java.lang.reflect.Array.set(array, i, convertedCollection[i])
+                when {
+                    Annotations.isSet(jt) -> {
+                        convertedCollection.toSet()
+                    }
+                    Annotations.isArray(kt) -> {
+                        val componentType = (jt as Class<*>).componentType
+                        val array = java.lang.reflect.Array.newInstance(componentType, convertedCollection.size)
+                        convertedCollection.indices.forEach { i ->
+                            java.lang.reflect.Array.set(array, i, convertedCollection[i])
+                        }
+                        array
+                    }
+                    else -> {
+                        convertedCollection
+                    }
                 }
-                array
-            } else {
-                convertedCollection
-            }
         return result
     }
 
@@ -185,14 +193,13 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                         result
                     }
                     isCollection -> {
-                        val type =jt.actualTypeArguments[0]
-                        when(type) {
+                        when(val type =jt.actualTypeArguments[0]) {
                             is Class<*> -> {
                                 val cls = jt.actualTypeArguments[0] as Class<*>
                                 klaxon.fromJsonObject(value, cls, cls.kotlin)
                             }
                             is ParameterizedType -> {
-                                val result2 = JsonObjectConverter(klaxon, HashMap<String, Any>()).fromJson(value,
+                                val result2 = JsonObjectConverter(klaxon, HashMap()).fromJson(value,
                                         jv.propertyKClass!!.jvmErasure)
                                 result2
 
@@ -214,7 +221,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                         JsonObjectConverter(klaxon, allPaths).fromJson(jv.obj!!, jv.propertyKClass!!.jvmErasure)
                     }
                 } else {
-                    val typeName =
+                    val typeName: Any? =
                         if (jt is TypeVariable<*>) {
                             jt.genericDeclaration
                         } else {

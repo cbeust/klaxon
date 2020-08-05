@@ -27,6 +27,13 @@ plugins {
 }
 
 dependencies {
+    listOf("test").forEach {
+        testImplementation(kotlin(it))
+    }
+    listOf("org.testng:testng:7.0.0", "org.assertj:assertj-core:3.10.0").forEach {
+        testImplementation(it)
+    }
+
     listOf("stdlib", "reflect").forEach {
         implementation(kotlin(it))
     }
