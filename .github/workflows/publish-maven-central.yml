@@ -25,12 +25,6 @@ jobs:
         gpg --export-secret-keys >~/.gnupg/secring.gpg
         gpg --list-secret-keys --keyid-format LONG
 
-    # Runs a set of commands using the runners shell
-    - name: List keys
-      run: |
-        gpg --list-secret-keys
-        ls -l /home/runner/.gnupg
-
     - name: Publish release
       env:
         SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
@@ -38,6 +32,5 @@ jobs:
       run: |
         ./gradlew -Psigning.secretKeyRingFile=.gnupg/secring.gpg -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} publish
 
-    - name: List artifacts
-      run: |
-        ls -l klaxon/build/libs
+# Next, go to https://oss.sonatype.org/index.html#stagingRepositories, select the repo, "Close" it and then
+# "Release it"
