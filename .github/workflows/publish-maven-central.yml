@@ -33,4 +33,4 @@ jobs:
         ./gradlew -Psigning.secretKeyRingFile=.gnupg/secring.gpg -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} publish
 
 # Next, go to https://oss.sonatype.org/index.html#stagingRepositories, select the repo, "Close" it and then
-# "Release it"
+# "Release" it
