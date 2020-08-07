@@ -33,3 +33,11 @@ jobs:
     - name: List keys
       run: |
         gpg --list-secret-keys
+
+    - name: Sign release
+      run: |
+        ./gradlew -P signing.keyId=DFCFFA92 signCustomPublication
+
+    - name: List artifacts
+      run: |
+        ls -l klaxon/build/libs
