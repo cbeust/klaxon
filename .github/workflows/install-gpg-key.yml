@@ -31,7 +31,10 @@ jobs:
         gpg --list-secret-keys
         ls -l /home/runner/.gnupg
 
-    - name: Sign release
+    - name: Publish release
+      env:
+        SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+        SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       run: |
         ./gradlew -Psigning.secretKeyRingFile=.gnupg/secring.gpg -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} publish
 
