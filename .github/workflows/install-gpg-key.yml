@@ -33,6 +33,7 @@ jobs:
     - name: List keys
       run: |
         gpg --list-secret-keys
+        ls -l /home/runner/.gnupg
 
     - name: Sign release
       run: |
