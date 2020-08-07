@@ -27,6 +27,7 @@ jobs:
     - name: Install gpg secret key
       run: |
         cat <(echo -e "${{ secrets.GPG_SECRET_KEY }}") | gpg --batch --import
+        gpg --export-secret-keys >~/.gnupg/secring.gpg
         gpg --list-secret-keys --keyid-format LONG
 
     # Runs a set of commands using the runners shell
@@ -37,7 +38,7 @@ jobs:
 
     - name: Sign release
       run: |
-        ./gradlew -Psigning.secretKeyRingFile=/home/runner/.gnupg/pubring.kbx -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} signCustomPublication
+        ./gradlew -Psigning.secretKeyRingFile=/home/runner/.gnupg/secring.gpg -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} signCustomPublication
 
     - name: List artifacts
       run: |
