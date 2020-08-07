@@ -154,6 +154,7 @@ tasks.register("publishSnapshotOnly") {
     }
 }
 
+// Sign with ./gradlew signCustomPublication
 with(signing) {
     sign(publishing.publications.getByName("custom"))
 }
