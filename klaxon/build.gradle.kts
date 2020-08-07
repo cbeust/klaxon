@@ -46,10 +46,10 @@ dependencies {
 //
 
 bintray {
-    user = project.findProperty("bintrayUser")?.toString()
-    key = project.findProperty("bintrayApiKey")?.toString()
+    user = project.findProperty("bintrayUser")?.toString() ?: System.getenv("BINTRAY_USER")
+    key = project.findProperty("bintrayApiKey")?.toString() ?: System.getenv("BINTRAY_API_KEY")
     dryRun = false
-    publish = true
+    publish = false
 
     setPublications("custom")
 
