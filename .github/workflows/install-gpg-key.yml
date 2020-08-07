@@ -33,7 +33,7 @@ jobs:
 
     - name: Sign release
       run: |
-        ./gradlew -Psigning.secretKeyRingFile=.gnupg/secring.gpg -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} signCustomPublication
+        ./gradlew -Psigning.secretKeyRingFile=.gnupg/secring.gpg -Psigning.password="" -P signing.keyId=${{ secrets.GPG_KEY_ID }} publish
 
     - name: List artifacts
       run: |
