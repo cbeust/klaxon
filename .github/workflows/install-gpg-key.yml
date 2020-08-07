@@ -36,7 +36,7 @@ jobs:
 
     - name: Sign release
       run: |
-        ./gradlew -PsecretKeyRingFile=.gnupg/pubring.kbx -Psigning.password="" -P signing.keyId=DFCFFA92 signCustomPublication
+        ./gradlew -Psigning.secretKeyRingFile=.gnupg/pubring.kbx -Psigning.password="" -P signing.keyId=$${ secrets.GPG_KEY_ID }} signCustomPublication
 
     - name: List artifacts
       run: |
