@@ -52,7 +52,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 val allProperties = Annotations.findNonIgnoredProperties(kc, klaxon.propertyStrategies)
 
                 val pi = createPolymorphicInfo(typeFor, prop, allProperties)
-                calculatePolymorphicClass(pi, jsonObject) ?: throw KlaxonException("Cant't find polymorphic class")
+                calculatePolymorphicClass(pi, kc, jsonObject) ?: throw KlaxonException("Cant't find polymorphic class")
             }
             else -> {
                 kc
@@ -197,9 +197,9 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                 if (jsonObject.containsKey(fieldName)) {
                     // Look up the polymorphic info for that field. If there is one, we need to
                     // retrieve its TypeAdapter
-                    val polymorphicInfo = polymorphicMap[fieldName]
+                    val polymorphicInfo = polymorphicMap[prop.name]
 
-                    val polymorphicClass = calculatePolymorphicClass(polymorphicInfo, jsonObject)
+                    val polymorphicClass = calculatePolymorphicClass(polymorphicInfo, kc, jsonObject)
                     val kClass = polymorphicClass ?: kc
                     val kType = if (polymorphicClass != null) kClass.createType() else prop.returnType
                     val cls = polymorphicClass?.java ?: kc.java
@@ -221,12 +221,13 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         return result
     }
 
-    private fun calculatePolymorphicClass(polymorphicInfo: PolymorphicInfo?, jsonObject: JsonObject)
+    private fun calculatePolymorphicClass(polymorphicInfo: PolymorphicInfo?, kc: KClass<*>, jsonObject: JsonObject)
             : KClass<out Any>? {
         return if (polymorphicInfo != null) {
             // We have polymorphic information for this field. Retrieve its TypeAdapter,
             // instantiate it, and invoke it with the discriminant value.
-            val discriminant = jsonObject[polymorphicInfo.discriminantFieldName] as Any
+            val discriminantFieldName = Annotations.retrieveJsonFieldName(klaxon, kc, polymorphicInfo.discriminantField)
+            val discriminant = jsonObject[discriminantFieldName] as Any
             polymorphicInfo.adapter.createInstance().classFor(discriminant)
         } else {
             null
@@ -235,7 +236,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
 
 
 
-    class PolymorphicInfo(val discriminantFieldName: String, val adapter: KClass<out TypeAdapter<*>>)
+    class PolymorphicInfo(val discriminantField: KProperty1<out Any, Any?>, val adapter: KClass<out TypeAdapter<*>>)
 
     private fun findPolymorphicProperties(allProperties: List<KProperty1<out Any, Any?>>)
             : Map<String, PolymorphicInfo> {
@@ -253,7 +254,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         val propertyNames = allProperties.map { it.name }.toSet()
         typeForAnnotation.field.let { field ->
             if (propertyNames.contains(field)) {
-                return PolymorphicInfo(prop.name, typeForAnnotation.adapter)
+                return PolymorphicInfo(prop, typeForAnnotation.adapter)
             } else {
                 illegalPropField(prop.name, field)
             }
