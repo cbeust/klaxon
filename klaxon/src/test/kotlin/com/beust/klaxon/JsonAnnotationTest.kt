@@ -50,7 +50,41 @@ class JsonAnnotationTest {
     }
 
     @Test
-    fun serializeNullTest() {
+    fun serializeNullFalseRoundtripWithoutDefault() {
+        // when serializeNull == false, null is the default value during parsing
+        data class ObjWithSerializeNullFalse(
+            @Json(serializeNull = false)
+            val value: Int?
+        )
+
+        val originalObj = ObjWithSerializeNullFalse(null)
+        val serialized = Klaxon().toJsonString(originalObj)
+        Assert.assertEquals("{}", serialized) // with serializeNull = false, the null property is not serialized
+        val parsed = Klaxon().parse<ObjWithSerializeNullFalse>(serialized)
+        val expected = ObjWithSerializeNullFalse(null)
+
+        Assert.assertEquals(expected, parsed)
+    }
+
+    @Test
+    fun serializeNullFalseRoundtripWithDefault() {
+        // Kotlin defaults are ignored when serializeNull == false and replaced with null during parsing
+        data class ObjWithSerializeNullFalseAndDefault(
+            @Json(serializeNull = false)
+            val value: Int? = 1
+        )
+
+        val originalObj = ObjWithSerializeNullFalseAndDefault(null)
+        val serialized = Klaxon().toJsonString(originalObj)
+        Assert.assertEquals("{}", serialized)
+        val parsed = Klaxon().parse<ObjWithSerializeNullFalseAndDefault>(serialized)
+        val expected = ObjWithSerializeNullFalseAndDefault(null)
+
+        Assert.assertEquals(expected, parsed)
+    }
+
+    @Test
+    fun serializeNullFalseValueSet() {
         data class ObjWithSerializeNullFalse(
             @Json(serializeNull = false)
             val value: Int?
@@ -59,19 +93,14 @@ class JsonAnnotationTest {
         Assertions
             .assertThat(
                 Klaxon().toJsonString(
-                    ObjWithSerializeNullFalse(null)
-                )
-            )
-            .isEqualTo("{}") // with serializeNull = false, the field is not serialized
-
-        Assertions
-            .assertThat(
-                Klaxon().toJsonString(
                     ObjWithSerializeNullFalse(1)
                 )
             )
             .isEqualTo("""{"value" : 1}""")
+    }
 
+    @Test
+    fun serializeNullTrue() {
         data class ObjWithSerializeNullTrue(
             @Json(serializeNull = true)
             val value: Int?
@@ -80,7 +109,7 @@ class JsonAnnotationTest {
         Assertions
             .assertThat(
                 Klaxon().toJsonString(
-                ObjWithSerializeNullTrue(null)
+                    ObjWithSerializeNullTrue(null)
                 )
             )
             .isEqualTo("""{"value" : null}""")
@@ -90,63 +119,5 @@ class JsonAnnotationTest {
                 Klaxon().toJsonString(
                     ObjWithSerializeNullTrue(1)))
             .isEqualTo("""{"value" : 1}""")
-    }
-
-    // TODO The following tests show some tricky examples with parsing and defaults
-
-    @Test
-    fun serializeNullFalseParse() {
-        // when serializeNull = false, empty field in JSON should default to null value
-        data class ObjWithSerializeNullFalse(
-            @Json(serializeNull = false)
-            val value: Int?
-        )
-
-        val originalObj = ObjWithSerializeNullFalse(null)
-        val serialized = Klaxon().toJsonString(originalObj)
-        Assert.assertEquals("{}", serialized)
-        val parsed = Klaxon().parse<ObjWithSerializeNullFalse>(serialized)
-        val expected = ObjWithSerializeNullFalse(null)
-
-        Assert.assertEquals(expected, parsed)
-    }
-
-    @Test
-    fun serializeNullFalseParseWithDefault() {
-        // when a default is set, it should override the null default from serializeNull
-        data class ObjWithSerializeNullFalseAndDefault(
-            @Json(serializeNull = false)
-            val value: Int? = 1
-        )
-
-        val originalObj = ObjWithSerializeNullFalseAndDefault(null)
-        val serialized = Klaxon().toJsonString(originalObj)
-        Assert.assertEquals("{}", serialized)
-
-        val parsed = Klaxon().parse<ObjWithSerializeNullFalseAndDefault>(serialized)
-        val expected = ObjWithSerializeNullFalseAndDefault(1)
-
-        Assert.assertEquals(expected, parsed)
-        // The roundtrip object-json-object does not lead to the same object!
-    }
-
-    // Another variant that the previous test could go
-    @Test
-    fun serializeNullFalseParseWithDefaultAlternative() {
-        // Kotlin defaults are ignored when serializeNull == false
-        data class ObjWithSerializeNullFalseAndDefault(
-            @Json(serializeNull = false)
-            val value: Int? = 1
-        )
-
-        val originalObj = ObjWithSerializeNullFalseAndDefault(null)
-        val serialized = Klaxon().toJsonString(originalObj)
-        Assert.assertEquals("{}", serialized)
-
-        val parsed = Klaxon().parse<ObjWithSerializeNullFalseAndDefault>(serialized)
-        val expected = ObjWithSerializeNullFalseAndDefault(null)
-
-        Assert.assertEquals(expected, parsed)
-        // The roundtrip object-json-object leads to the same object
     }
 }
