@@ -48,4 +48,47 @@ class JsonAnnotationTest {
         Assertions.assertThat(r).isEqualTo(Config("v1", setOf("abc")))
 
     }
+
+    @Test
+    fun serializeNullTest() {
+        data class ObjWithSerializeNullFalse(
+            @Json(serializeNull = false)
+            val value: Int?
+        )
+
+        Assertions
+            .assertThat(
+                Klaxon().toJsonString(
+                    ObjWithSerializeNullFalse(null)
+                )
+            )
+            .isEqualTo("{}") // with serializeNull = false, the field is not serialized
+
+        Assertions
+            .assertThat(
+                Klaxon().toJsonString(
+                    ObjWithSerializeNullFalse(1)
+                )
+            )
+            .isEqualTo("""{"value" : 1}""")
+
+        data class ObjWithSerializeNullTrue(
+            @Json(serializeNull = true)
+            val value: Int?
+        )
+
+        Assertions
+            .assertThat(
+                Klaxon().toJsonString(
+                ObjWithSerializeNullTrue(null)
+                )
+            )
+            .isEqualTo("""{"value" : null}""")
+
+        Assertions
+            .assertThat(
+                Klaxon().toJsonString(
+                    ObjWithSerializeNullTrue(1)))
+            .isEqualTo("""{"value" : 1}""")
+    }
 }

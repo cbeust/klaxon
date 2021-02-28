@@ -27,7 +27,13 @@ annotation class Json(
     /**
      * Where this property should appear in the JSON output. Lower numbers appear first.
      */
-    val index: Long = Long.MAX_VALUE
+    val index: Long = Long.MAX_VALUE,
+
+    /**
+     * If false, property will be absent in JSON when value is null.
+     * If true, property will be present in JSON with value null.
+     */
+    val serializeNull: Boolean = true
 )
 
 fun Json.nameInitialized() = this.name != NAME_NOT_INITIALIZED
