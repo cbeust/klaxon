@@ -120,4 +120,17 @@ class JsonAnnotationTest {
                     ObjWithSerializeNullTrue(1)))
             .isEqualTo("""{"value" : 1}""")
     }
+
+    @Test
+    fun serializeNullWithoutNullableProperty() {
+        data class ObjWithSerializeNullFalse(
+            @Json(serializeNull = false)
+            val value: Int = 1
+        )
+
+        val parsed = Klaxon().parse<ObjWithSerializeNullFalse>("{}")
+        val expected = ObjWithSerializeNullFalse(1)
+
+        Assert.assertEquals(expected, parsed)
+    }
 }
