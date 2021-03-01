@@ -161,6 +161,34 @@ println(Klaxon().toJsonString(Data("id", "foo")))
 
 Properties that are not assigned an index will be displayed in a non deterministic order in the output JSON.
 
+#### `serializeNull`
+
+By default, all properties with the value null are serialized to JSON, for example: 
+
+```kotlin
+class Data(
+    val id: Int?
+)
+println(Klaxon().toJsonString(Data(null)))
+
+// displays { "id": null }
+```
+
+If you instead want the properties with a null value to be absent in the JSON string, 
+use `@Json(serializeNull = false)`:
+
+```kotlin
+class Data(
+    @Json(serializeNull = false)
+    val id: Int?
+)
+println(Klaxon().toJsonString(Data(null)))
+
+// displays {}
+```
+
+If `serializeNull` is false, the Kotlin default values for this property will be ignored during parsing. 
+Instead, if the property is absent in the JSON, the value will default to `null`.
 
 ### Renaming fields
 
