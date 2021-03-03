@@ -109,12 +109,6 @@ with(publishing) {
                         name.set("Cedric Beust")
                         email.set("cedric@beust.com")
                     }
-                    developer {
-                        name.set("Julien Herr")
-                    }
-                    developer {
-                        name.set("Krishnan Mahadevan")
-                    }
                 }
                 scm {
                     connection.set("scm:git:git://${This.scm}.git")
