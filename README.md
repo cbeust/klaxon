@@ -528,7 +528,7 @@ The [JSON Path specification](https://github.com/json-path/JsonPath) defines how
 a JSON document. Klaxon allows you to define path matchers that can match specific elements in your
 document and receive a callback each time a matching element is found.
 
-Consider the following docoument:
+Consider the following document:
 
 ```json
 {
