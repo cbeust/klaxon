@@ -1,7 +1,7 @@
 
 <img src="doc/klaxon.png" alt="Klaxon logo" height="101" width="220" />
 
-Klaxon is a library to parse JSON in Kotlin.  [ ![Download](https://api.bintray.com/packages/cbeust/maven/klaxon/images/download.svg) ](https://bintray.com/cbeust/maven/klaxon/_latestVersion)
+Klaxon is a library to parse JSON in Kotlin
 
 ## Install
 
