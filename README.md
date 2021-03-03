@@ -6,12 +6,8 @@ Klaxon is a library to parse JSON in Kotlin.  [ ![Download](https://api.bintray.
 ## Install
 
 ```kotlin
-repositories {
-    jcenter()
-}
-
 dependencies {
-    implementation 'com.beust:klaxon:5.0.1'
+    implementation 'com.beust:klaxon:5.5'
 }
 ```
 
