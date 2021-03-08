@@ -136,7 +136,10 @@ internal class KlaxonParser(
                 VALUE_TYPE.tokenType, { world: World, token: Token ->
                 with(world) {
                     popStatus()
-                    val key = popValue() as String
+                    val key = popValue()
+                    if (key !is String) {
+                        throw KlaxonException("Object keys must be strings, got: $key")
+                    }
                     parent = getFirstObject()
                     parent[key] = (token as Value<*>).value
                     status = peekStatus()
@@ -148,7 +151,10 @@ internal class KlaxonParser(
                 LEFT_BRACKET.tokenType, { world: World, _: Token ->
                 with(world) {
                     popStatus()
-                    val key = popValue() as String
+                    val key = popValue()
+                    if (key !is String) {
+                        throw KlaxonException("Object keys must be strings, got: $key")
+                    }
                     parent = getFirstObject()
                     val newArray = JsonArray<Any>()
                     parent[key] = newArray
@@ -160,7 +166,10 @@ internal class KlaxonParser(
                 LEFT_BRACE.tokenType, { world: World, _: Token ->
                 with(world) {
                     popStatus()
-                    val key = popValue() as String
+                    val key = popValue()
+                    if (key !is String) {
+                        throw KlaxonException("Object keys must be strings, got: $key")
+                    }
                     parent = getFirstObject()
                     val newObject = JsonObject()
                     parent[key] = newObject

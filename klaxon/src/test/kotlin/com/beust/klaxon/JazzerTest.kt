@@ -8,4 +8,22 @@ class JazzerTest {
         val json = "0r"
         Parser.default().parse(StringBuilder(json))
     }
+
+    @Test(expectedExceptions = [KlaxonException::class])
+    fun numericKeyAndObject() {
+        val json = "{1{"
+        Parser.default().parse(StringBuilder(json))
+    }
+
+    @Test(expectedExceptions = [KlaxonException::class])
+    fun numericKeyAndArray() {
+        val json = "{3["
+        Parser.default().parse(StringBuilder(json))
+    }
+
+    @Test(expectedExceptions = [KlaxonException::class])
+    fun numericKeyAndString() {
+        val json = "{0\"\""
+        Parser.default().parse(StringBuilder(json))
+    }
 }
