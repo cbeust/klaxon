@@ -116,10 +116,15 @@ class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token>
                             't' -> currentValue.append("\t")
                             'u' -> {
                                 val unicodeChar = StringBuilder(4)
-                                    .append(nextChar())
-                                    .append(nextChar())
-                                    .append(nextChar())
-                                    .append(nextChar())
+                                try {
+                                    unicodeChar
+                                        .append(nextChar())
+                                        .append(nextChar())
+                                        .append(nextChar())
+                                        .append(nextChar())
+                                } catch(_: IllegalStateException) {
+                                    throw KlaxonException("EOF reached in unicode char after: u$unicodeChar")
+                                }
 
                                 val intValue = java.lang.Integer.parseInt(unicodeChar.toString(), 16)
                                 currentValue.append(intValue.toChar())
