@@ -32,4 +32,10 @@ class JazzerTest {
         val json = "\"\\u"
         Parser.default().parse(StringBuilder(json))
     }
+
+    @Test(expectedExceptions = [KlaxonException::class])
+    fun nonNumericUnicodeEscape() {
+        val json = "\"\\u\\\\{["
+        Parser.default().parse(StringBuilder(json))
+    }
 }

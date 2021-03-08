@@ -126,7 +126,11 @@ class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token>
                                     throw KlaxonException("EOF reached in unicode char after: u$unicodeChar")
                                 }
 
-                                val intValue = java.lang.Integer.parseInt(unicodeChar.toString(), 16)
+                                val intValue = try {
+                                    java.lang.Integer.parseInt(unicodeChar.toString(), 16)
+                                } catch(e: NumberFormatException) {
+                                    throw KlaxonException("Failed to parse unicode char: u$unicodeChar")
+                                }
                                 currentValue.append(intValue.toChar())
                             }
                             else -> currentValue.append(c)
