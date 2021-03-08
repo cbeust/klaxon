@@ -165,7 +165,7 @@ class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token>
         } else if (!isDone) {
             while (isValueLetter(c)) {
                 currentValue.append(c)
-                if (! isValueLetter(peekChar())) {
+                if (isDone || !isValueLetter(peekChar())) {
                     break
                 } else {
                     c = nextChar()
