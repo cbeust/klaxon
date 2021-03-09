@@ -116,12 +116,21 @@ class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token>
                             't' -> currentValue.append("\t")
                             'u' -> {
                                 val unicodeChar = StringBuilder(4)
-                                    .append(nextChar())
-                                    .append(nextChar())
-                                    .append(nextChar())
-                                    .append(nextChar())
+                                try {
+                                    unicodeChar
+                                        .append(nextChar())
+                                        .append(nextChar())
+                                        .append(nextChar())
+                                        .append(nextChar())
+                                } catch(_: IllegalStateException) {
+                                    throw KlaxonException("EOF reached in unicode char after: u$unicodeChar")
+                                }
 
-                                val intValue = java.lang.Integer.parseInt(unicodeChar.toString(), 16)
+                                val intValue = try {
+                                    java.lang.Integer.parseInt(unicodeChar.toString(), 16)
+                                } catch(e: NumberFormatException) {
+                                    throw KlaxonException("Failed to parse unicode char: u$unicodeChar")
+                                }
                                 currentValue.append(intValue.toChar())
                             }
                             else -> currentValue.append(c)
@@ -165,7 +174,7 @@ class Lexer(passedReader: Reader, val lenient: Boolean = false): Iterator<Token>
         } else if (!isDone) {
             while (isValueLetter(c)) {
                 currentValue.append(c)
-                if (! isValueLetter(peekChar())) {
+                if (isDone || !isValueLetter(peekChar())) {
                     break
                 } else {
                     c = nextChar()
