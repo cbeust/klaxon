@@ -449,7 +449,7 @@ looking to extract a single value the [`PathMatcher API`](#json-path-query-api) 
 ### Writing JSON with the streaming API
 
 As opposed to conventional JSON libraries, Klaxon doesn't supply a `JsonWriter` class to create JSON documents since
-this need is already covered by the `json()` function, documented in the [Advanced DSL](#advanced-dsl) section.
+this need is already covered by the `json()` function, documented in the [Advanced DSL](#dsl) section.
 
 ### Reading JSON with the streaming API
 
