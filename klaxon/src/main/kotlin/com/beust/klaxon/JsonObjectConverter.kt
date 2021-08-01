@@ -31,7 +31,7 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
         }
 
     private fun initIntoMap(jsonObject: JsonObject): Any {
-        val result = hashMapOf<String, Any?>()
+        val result = hashMapOf<Any, Any?>()
         jsonObject.keys.forEach { key ->
             result[key] = jsonObject[key]
         }

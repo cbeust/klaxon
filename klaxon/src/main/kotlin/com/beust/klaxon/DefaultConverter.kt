@@ -179,7 +179,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 when {
                     isMap -> {
                         // Map
-                        val result = linkedMapOf<String, Any?>()
+                        val result = linkedMapOf<Any, Any?>()
                         value.entries.forEach { kv ->
                             val key = kv.key
                             kv.value?.let { mv ->

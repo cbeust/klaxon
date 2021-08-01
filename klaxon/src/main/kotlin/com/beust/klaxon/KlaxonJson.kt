@@ -23,7 +23,7 @@ class KlaxonJson {
             obj(args.toList())
 
     fun obj(key: String, init: KlaxonJson.() -> Unit): JsonObject {
-        stackMap.push(LinkedHashMap<String, Any?>())
+        stackMap.push(LinkedHashMap<Any, Any?>())
         theKlaxonJson.init()
         val map = stackMap.pop()
         val newMap = if (stackMap.isEmpty()) HashMap() else stackMap.peek()
@@ -31,7 +31,7 @@ class KlaxonJson {
         return JsonObject(newMap)
     }
 
-    private val stackMap = Stack<HashMap<String, Any?>>()
+    private val stackMap = Stack<HashMap<Any, Any?>>()
 
     fun put(key: String, value: Any?) {
         stackMap.peek()[key] = convert(value)
