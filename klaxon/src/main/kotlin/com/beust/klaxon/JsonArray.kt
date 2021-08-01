@@ -11,14 +11,14 @@ data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> b
     constructor(vararg items : T) : this(ArrayList(Arrays.asList(*items)))
 
     override fun appendJsonStringImpl(result: Appendable, prettyPrint: Boolean, canonical : Boolean, level: Int) {
-        result.append("[")
+        result.append('[')
 
         var comma = false
         value.forEach {
             if (comma) {
-                result.append(",")
+                result.append(',')
                 if (prettyPrint && !canonical) {
-                    result.append(" ")
+                    result.append(' ')
                 }
             } else {
                 comma = true
@@ -26,7 +26,7 @@ data class JsonArray<T>(val value : MutableList<T>) : JsonBase, MutableList<T> b
 
             Render.renderValue(it, result, prettyPrint, canonical, level)
         }
-        result.append("]")
+        result.append(']')
     }
 
     fun string(id: String) : JsonArray<String?> = mapChildren { it.string(id) }
