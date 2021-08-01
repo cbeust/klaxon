@@ -17,11 +17,11 @@ by map {
             }
         }
 
-        result.append("{")
+        result.append('{')
         var comma = false
         for ((k, v) in (if(canonical) map.toSortedMap() else map)) {
             if (comma) {
-                result.append(",")
+                result.append(',')
             } else {
                 comma = true
             }
@@ -31,7 +31,7 @@ by map {
                 indent(result, level + 1)
             }
 
-            result.append(Render.renderString(k)).append(":")
+            result.append(Render.renderString(k)).append(':')
             if (prettyPrint && !canonical) {
                 result.append(" ")
             }
@@ -44,10 +44,10 @@ by map {
             indent(result, level)
         }
 
-        result.append("}")
+        result.append('}')
     }
 
-    override fun toString() = keys.joinToString(",")
+    override fun toString() = keys.joinToString(',')
 
     @Suppress("UNCHECKED_CAST")
     fun <T> array(fieldName: String) : JsonArray<T>? = get(fieldName) as JsonArray<T>?
