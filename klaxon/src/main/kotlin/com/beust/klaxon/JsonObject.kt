@@ -27,7 +27,7 @@ by map {
             }
 
             if (prettyPrint && !canonical) {
-                result.appendln()
+                result.appendLine()
                 indent(result, level + 1)
             }
 
@@ -40,7 +40,7 @@ by map {
         }
 
         if (prettyPrint && !canonical && map.isNotEmpty()) {
-            result.appendln()
+            result.appendLine()
             indent(result, level)
         }
 

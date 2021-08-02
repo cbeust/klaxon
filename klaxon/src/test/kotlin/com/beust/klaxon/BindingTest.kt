@@ -41,10 +41,10 @@ class BindingTest {
 
         override fun fromJson(jv: JsonValue) = Card(jv.objInt("value"), jv.objString("suit"))
 
-        override fun toJson(v: Any) = (v as Card).let { value ->
+        override fun toJson(value: Any) = (value as Card).let {
             """
-                    "value" : ${value.value},
-                    "suit": "${value.suit.uppercase()}"
+                    "value" : ${it.value},
+                    "suit": "${it.suit.uppercase()}"
                 """
         }
     }
