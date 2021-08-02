@@ -1,5 +1,7 @@
 package com.beust.klaxon
 
+import java.util.*
+
 /**
  * Modify field names algorithmically, both from and to JSON.
  */
@@ -19,7 +21,7 @@ interface FieldRenamer {
          *     camelToUnderscores("thisIsA1Test") == "this_is_a_1_test"
          */
         fun camelToUnderscores(name: String) = "[A-Z\\d]".toRegex().replace(name) {
-            "_" + it.groupValues[0].toLowerCase()
+            "_" + it.groupValues[0].lowercase()
         }
 
         /*
@@ -29,7 +31,7 @@ interface FieldRenamer {
          *    underscoreToCamel("this_is_a_1_test") == "thisIsA1Test"
          */
         fun underscoreToCamel(name: String) = "_([a-z\\d])".toRegex().replace(name) {
-            it.groupValues[1].toUpperCase()
+            it.groupValues[1].uppercase()
 
         }
     }
