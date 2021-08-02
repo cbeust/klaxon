@@ -44,7 +44,7 @@ class BindingTest {
         override fun toJson(v: Any) = (v as Card).let { value ->
             """
                     "value" : ${value.value},
-                    "suit": "${value.suit.toUpperCase()}"
+                    "suit": "${value.suit.uppercase()}"
                 """
         }
     }

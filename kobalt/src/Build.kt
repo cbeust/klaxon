@@ -7,7 +7,7 @@ import com.beust.kobalt.project
 
 object Version {
     val klaxon = "5.0.14-SNAPSHOT"
-    val kotlin = "1.3.70"
+    val kotlin = "1.5.21"
 }
 
 val klaxon = project {
