@@ -1,6 +1,8 @@
 package com.beust.klaxon
 
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 
 object Render {
     tailrec fun renderValue(v: Any?, result: Appendable, prettyPrint: Boolean, canonical: Boolean, level: Int) {
@@ -66,6 +68,8 @@ object Render {
                     c in '\u007F'..'\u009F' ||
                     c in '\u2000'..'\u20FF'
 
-    private val decimalFormat = DecimalFormat("0.0####E0;-0.0####E0")
+    private val decimalFormat = DecimalFormat("0.0####E0;-0.0####E0").apply {
+        decimalFormatSymbols = DecimalFormatSymbols.getInstance(Locale.ENGLISH)
+    }
 }
 
