@@ -31,9 +31,10 @@ by map {
                 indent(result, level + 1)
             }
 
-            result.append(Render.renderString(k)).append(':')
+            // Do not remove k::toString, it allows any data type (that needs to be casted to a string before), without crashing
+            result.append(Render.renderString(k.toString())).append(':')
             if (prettyPrint && !canonical) {
-                result.append(" ")
+                result.append(' ')
             }
 
             Render.renderValue(v, result, prettyPrint, canonical, level + 1)
@@ -47,7 +48,7 @@ by map {
         result.append('}')
     }
 
-    override fun toString() = keys.joinToString(',')
+    override fun toString() = keys.joinToString(",")
 
     @Suppress("UNCHECKED_CAST")
     fun <T> array(fieldName: String) : JsonArray<T>? = get(fieldName) as JsonArray<T>?
