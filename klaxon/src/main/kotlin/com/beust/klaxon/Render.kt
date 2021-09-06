@@ -31,23 +31,22 @@ object Render {
 
     fun escapeString(s: String): String {
         val result = StringBuilder().apply {
-            for (idx in 0..s.length - 1) {
-                val ch = s[idx]
-                when (ch) {
-                    '"' -> append("\\").append(ch)
+            for (element in s) {
+                when (element) {
+                    '"' -> append("\\").append(element)
 //                    '\'' -> append("\\").append(ch)
-                    '\\' -> append(ch).append(ch)
+                    '\\' -> append(element).append(element)
                     '\n' -> append("\\n")
                     '\r' -> append("\\r")
                     '\t' -> append("\\t")
                     '\b' -> append("\\b")
                     '\u000c' -> append("\\f")
                     else -> {
-                        if (isNotPrintableUnicode(ch)) {
+                        if (isNotPrintableUnicode(element)) {
                             append("\\u")
-                            append(Integer.toHexString(ch.toInt()).padStart(4, '0'))
+                            append(Integer.toHexString(element.code).padStart(4, '0'))
                         } else {
-                            append(ch)
+                            append(element)
                         }
                     }
                 }
