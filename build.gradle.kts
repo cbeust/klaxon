@@ -1,6 +1,5 @@
 plugins {
     java
-    maven
     `java-library`
     kotlin("jvm") version KOTLIN_VERSION apply true
 }
@@ -42,7 +41,7 @@ dependencies {
     }
 
     listOf("klaxon", "klaxon-jackson").forEach {
-        compile(project(":$it", "default"))
+        implementation(project(":$it", "default"))
     }
 }
 
