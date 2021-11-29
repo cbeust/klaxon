@@ -31,7 +31,8 @@ by map {
                 indent(result, level + 1)
             }
 
-            result.append(Render.renderString(k)).append(":")
+            // Do not remove k::toString, it allows any data type (that needs to be casted to a string before), without crashing
+            result.append(Render.renderString(k.toString())).append(":")
             if (prettyPrint && !canonical) {
                 result.append(" ")
             }
