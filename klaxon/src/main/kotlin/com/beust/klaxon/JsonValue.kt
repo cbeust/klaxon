@@ -6,6 +6,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.isAccessible
 
 /**
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
@@ -191,6 +192,7 @@ class JsonValue constructor(value: Any?,
 //                    .filter { it.visibility != KVisibility.PRIVATE && it.isAccessible }
 //            obj.javaClass.declaredFields
                     .forEach { property ->
+                        property.isAccessible = true
                         val p = property.call(obj)
                         result[property] = p
                     }

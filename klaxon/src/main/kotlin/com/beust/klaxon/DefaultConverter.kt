@@ -6,6 +6,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.TypeVariable
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -77,6 +78,7 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 val valueList = arrayListOf<String>()
                 val properties = Annotations.findNonIgnoredProperties(value::class, klaxon.propertyStrategies)
                 properties.forEach { prop ->
+                    prop.isAccessible = true
                     val getValue = prop.getter.call(value)
                     if (Annotations.findJsonAnnotation(value::class, prop.name)?.serializeNull != false || getValue != null) {
                             val jsonValue = klaxon.toJsonString(getValue, prop)
