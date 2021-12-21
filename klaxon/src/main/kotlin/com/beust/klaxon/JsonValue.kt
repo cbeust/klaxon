@@ -5,7 +5,7 @@ import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.reflect.KProperty
-import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.memberProperties
 
 /**
  * Variant class that encapsulates one JSON value. Only exactly one of the property fields defined in the
@@ -187,7 +187,7 @@ class JsonValue constructor(value: Any?,
 
         private fun propertiesAndValues(obj: Any): Map<KProperty<*>, Any?> {
             val result = hashMapOf<KProperty<*>, Any?>()
-            obj::class.declaredMemberProperties
+            obj::class.memberProperties
 //                    .filter { it.visibility != KVisibility.PRIVATE && it.isAccessible }
 //            obj.javaClass.declaredFields
                     .forEach { property ->
