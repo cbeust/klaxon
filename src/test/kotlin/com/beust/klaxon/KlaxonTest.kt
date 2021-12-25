@@ -512,10 +512,13 @@ abstract class KlaxonBaseTest {
         assertThat(barImpl?.id).isEqualTo("id123")
     }
 
+    open class Person(val name: String, val age: Int)
+
     fun convertToJsonObjectTest() {
-        data class Employee(val name: String, val age: Int)
-        val jo = Klaxon().toJsonObject(Employee("Joe", 24))
+        class Employee(name: String, age: Int, val salary: Float) : Person(name, age)
+        val jo = Klaxon().toJsonObject(Employee("Joe", 24, 5_600.87f))
         assertThat(jo["age"]).isEqualTo("24")
         assertThat(jo["name"]).isEqualTo("\"Joe\"")
+        assertThat(jo["salary"]).isEqualTo("5600.87")
     }
 }
