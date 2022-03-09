@@ -230,8 +230,8 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
             // We have polymorphic information for this field. Retrieve its TypeAdapter,
             // instantiate it, and invoke it with the discriminant value.
             val discriminantFieldName = Annotations.retrieveJsonFieldName(klaxon, kc, polymorphicInfo.discriminantField)
-            val discriminant = jsonObject[discriminantFieldName] as Any
-            polymorphicInfo.adapter.createInstance().classFor(discriminant)
+            val discriminant = jsonObject[discriminantFieldName]
+            polymorphicInfo.adapter.createInstance().classForNullable(discriminant)
         } else {
             null
         }
