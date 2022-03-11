@@ -1,0 +1,5 @@
+To publish a new version:
+
+- Update the Klaxon version in `KlaxonConfig.kt`
+- ./gradlew publish
+- Go to https://oss.sonatype.org/index.html#stagingRepositories to close and publish the distribution
