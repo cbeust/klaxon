@@ -97,4 +97,41 @@ class TypeAdapterTest {
         assertThat(r[1]).isInstanceOf(Cat::class.java)
     }
 
+
+    @TypeFor(field = "type", adapter = VehicleTypeAdapter::class)
+    open class Vehicle(open val type: String)
+    data class Car(override val type: String = "car") : Vehicle(type)
+    data class Truck(override val type: String = "truck") : Vehicle(type)
+
+    class VehicleTypeAdapter : TypeAdapter<Vehicle> {
+
+        override fun classFor(type: Any): KClass<out Vehicle> {
+            TODO("Not used - classForNullable replaces this")
+        }
+
+        override fun classForNullable(type: Any?): KClass<out Vehicle> = when (type) {
+            null -> Car::class
+            "car" -> Car::class
+            "truck" -> Truck::class
+            else -> throw IllegalArgumentException("Unknown type: $type")
+        }
+
+    }
+
+    @Test
+    fun should_default_to_car() {
+        val json = """
+            [
+                { "type": "car" },
+                { "type": "truck" }
+                { "no_type": "should default to car..." }
+            ]
+        """
+        val r = Klaxon().parseArray<Vehicle>(json)
+        println(r)
+        assertThat(r!![0]).isInstanceOf(Car::class.java)
+        assertThat(r[1]).isInstanceOf(Truck::class.java)
+        assertThat(r[2]).isInstanceOf(Car::class.java)
+    }
+
 }
