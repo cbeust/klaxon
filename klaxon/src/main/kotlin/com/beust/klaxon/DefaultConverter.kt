@@ -82,8 +82,8 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
 
                     // Use instance settings only when no local settings exist
                     if (getValue != null
-                         || (getAnnotation?.serializeNull == true) // Local settings have precedence to instance settings
-                         || (getAnnotation == null && klaxon.instanceSettings?.serializeNull != false)
+                        || (getAnnotation?.serializeNull == true) // Local settings have precedence to instance settings
+                        || (getAnnotation == null && klaxon.instanceSettings.serializeNull)
                     ) {
                             val jsonValue = klaxon.toJsonString(getValue, prop)
                             val fieldName = Annotations.retrieveJsonFieldName(klaxon, value::class, prop)
