@@ -78,7 +78,13 @@ class DefaultConverter(private val klaxon: Klaxon, private val allPaths: HashMap
                 val properties = Annotations.findNonIgnoredProperties(value::class, klaxon.propertyStrategies)
                 properties.forEach { prop ->
                     val getValue = prop.getter.call(value)
-                    if (Annotations.findJsonAnnotation(value::class, prop.name)?.serializeNull != false || getValue != null) {
+                    val getAnnotation = Annotations.findJsonAnnotation(value::class, prop.name)
+
+                    // Use instance settings only when no local settings exist
+                    if (getValue != null
+                         || (getAnnotation?.serializeNull == true) // Local settings have precedence to instance settings
+                         || (getAnnotation == null && klaxon.instanceSettings?.serializeNull != false)
+                    ) {
                             val jsonValue = klaxon.toJsonString(getValue, prop)
                             val fieldName = Annotations.retrieveJsonFieldName(klaxon, value::class, prop)
                             valueList.add("\"$fieldName\" : $jsonValue")
