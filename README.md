@@ -186,6 +186,29 @@ println(Klaxon().toJsonString(Data(null)))
 If `serializeNull` is false, the Kotlin default values for this property will be ignored during parsing. 
 Instead, if the property is absent in the JSON, the value will default to `null`.
 
+
+If you don't want to apply this option to every attribute, you can also set it as an instance-wide setting for Klaxon:
+```kotlin
+val settings = KlaxonSettings(serializeNull = false)
+```
+
+This saves you the hassle of setting these attributes onto every single field.
+
+```kotlin
+data class User(
+    val username: String, val email: String, // mandatory
+    val phone: String?, val fax: String?, val age: Int? // optional
+)
+
+Klaxon(settings)
+  .toJsonString(User("user", "user@example.org", null, null, null))
+
+// displays {}
+```
+
+You may still set settings with the `@Json` annotation onto specific fields.
+They will take precedence over global settings of the Klaxon instance.
+
 ### Renaming fields
 
 On top of using the `@Json(name=...)` annotation to rename fields, you can implement a field renamer yourself that

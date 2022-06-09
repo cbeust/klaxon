@@ -207,7 +207,10 @@ class JsonObjectConverter(private val klaxon: Klaxon, private val allPaths: Hash
                             .fromJson(JsonValue(jValue, prop.returnType.javaType,
                                     kType, klaxon))
                     result[prop.name] = convertedValue
-                } else if (jsonAnnotation?.serializeNull == false && prop.returnType.isMarkedNullable) {
+                } else if (prop.returnType.isMarkedNullable
+                    && ((jsonAnnotation?.serializeNull == false) // Local settings have precedence to instance settings
+                    || (jsonAnnotation == null && !klaxon.instanceSettings.serializeNull))
+                ) {
                     // provide a default value of null, overriding Kotlin default
                     result[prop.name] = null
                 } else {

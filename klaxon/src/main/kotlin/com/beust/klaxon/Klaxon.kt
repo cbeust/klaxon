@@ -13,7 +13,9 @@ import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.javaType
 
-class Klaxon : ConverterFinder {
+class Klaxon(
+    val instanceSettings: KlaxonSettings = KlaxonSettings()
+) : ConverterFinder {
     /**
      * Parse a JsonReader into a JsonObject.
      */
