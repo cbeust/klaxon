@@ -6,7 +6,14 @@ package com.beust.klaxon
 class EnumConverter: Converter {
     override fun toJson(value: Any): String {
         val enum = value as Enum<*>
-        val field = value.javaClass.declaredFields.find { it.name == enum.name }
+        val enumClass = if (value.javaClass.isEnum) {
+            value.javaClass
+        } else if (value.javaClass.superclass.isEnum) {
+            value.javaClass.superclass
+        } else {
+            throw IllegalArgumentException("Could not find associated enum class for $value")
+        }
+        val field = enumClass.declaredFields.find { it.name == enum.name }
             ?: throw IllegalArgumentException("Could not find associated enum field for $value")
         return "\"${field.getAnnotation(Json::class.java)?.name ?: enum.name}\""
     }
