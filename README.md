@@ -11,6 +11,51 @@ dependencies {
 }
 ```
 
+## Developer setup
+
+Follow these steps to get the project running locally for development:
+
+- **Prerequisites:**
+    - JDK 8 or 11 installed and `JAVA_HOME` set.
+    - Git
+- **Clone the repo:**
+
+```bash
+git clone https://github.com/cbeust/klaxon.git
+cd klaxon
+```
+
+- **Build the project:**
+
+Unix/macOS:
+```bash
+./gradlew build
+```
+
+Windows (PowerShell/CMD):
+```powershell
+.\gradlew.bat build
+```
+
+- **Run tests:**
+
+```bash
+./gradlew test
+```
+
+- **Run a single test class:**
+
+```bash
+./gradlew test --tests com.beust.klaxon.BindingTest
+```
+
+- **Import into IDE:** Import the project as a Gradle project in IntelliJ IDEA (use the Gradle wrapper). Enable auto-import for Gradle changes.
+
+- **Useful module/task shortcuts:**
+    - Assemble JARs: `./gradlew assemble`
+    - Run aggregate task: `./gradlew publishToMavenLocal`
+    - Generate signature files: `./gradlew signCustomPublication`
+
 ## Community
 
 Join the [`#klaxon` Slack channel](https://kotlinlang.slack.com/messages/C90AVCDQU/).
