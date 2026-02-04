@@ -22,7 +22,6 @@ allprojects {
 plugins {
     `maven-publish`
     signing
-    id("com.jfrog.bintray") version "1.8.3" // Don't use 1.8.4, crash when publishing
     kotlin("jvm")
 }
 
@@ -36,33 +35,6 @@ dependencies {
 
     listOf("stdlib", "reflect").forEach {
         implementation(kotlin(it))
-    }
-}
-
-//
-// Releases:
-// ./gradlew bintrayUpload (to JCenter)
-// ./gradlew publish (to Sonatype, then go to https://oss.sonatype.org/index.html#stagingRepositories to publish)
-//
-
-bintray {
-    user = project.findProperty("bintrayUser")?.toString() ?: System.getenv("BINTRAY_USER")
-    key = project.findProperty("bintrayApiKey")?.toString() ?: System.getenv("BINTRAY_API_KEY")
-    dryRun = false
-    publish = false
-
-    setPublications("custom")
-
-    with(pkg) {
-        repo = "maven"
-        name = This.artifactId
-        with(version) {
-            name = This.version
-            desc = This.description
-            with(gpg) {
-                sign = true
-            }
-        }
     }
 }
 
@@ -149,8 +121,10 @@ tasks.register("publishSnapshotOnly") {
 }
 
 // Sign with ./gradlew signCustomPublication
-with(signing) {
-    sign(publishing.publications.getByName("custom"))
+signing {
+   val isRelease = project.hasProperty("release")
+   isRequired = isRelease 
+   sign(publishing.publications["custom"])
 }
 
 tasks.test {
